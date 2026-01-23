@@ -215,7 +215,7 @@
                                     </div>
                                 </div>
 
-                                <form action="/add-to-cart" method="POST">
+                                <form action="/add-product-to-cart/${product.id}" method="POST">
                                     <input type="hidden" name="productId" value="${product.id}">
                                     <div class="d-flex gap-2 align-items-center">
                                         <div class="input-group input-group-small">

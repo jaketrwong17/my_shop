@@ -70,10 +70,9 @@ public class ProductService {
     }
 
     public void handleAddProductToCart(String email, long productId, HttpSession session, long quantity) {
-        // 1. Tìm User qua email
         User user = this.userService.getUserByEmail(email);
         if (user != null) {
-            // 2. Lấy Cart của User, nếu chưa có thì tạo mới
+            // 1. Lấy Cart của User, nếu chưa có thì tạo mới
             Cart cart = this.cartRepository.findByUser(user);
             if (cart == null) {
                 Cart newCart = new Cart();
@@ -82,34 +81,35 @@ public class ProductService {
                 cart = this.cartRepository.save(newCart);
             }
 
-            // 3. Tìm sản phẩm
-            Product product = this.fetchProductById(productId).get();
+            // 2. Tìm sản phẩm khách muốn mua
+            Product p = this.productRepository.findById(productId).get();
 
-            // 4. Kiểm tra sản phẩm đã có trong CartItem chưa?
-            CartItem oldDetail = this.cartItemRepository.findByCartAndProduct(cart, product);
+            // 3. Kiểm tra xem sản phẩm này đã có trong giỏ chưa
+            CartItem oldDetail = this.cartItemRepository.findByCartAndProduct(cart, p);
 
             if (oldDetail == null) {
-                // Chưa có -> Tạo mới CartItem
+                // Trường hợp chưa có: Tạo mới chi tiết giỏ hàng
                 CartItem cd = new CartItem();
                 cd.setCart(cart);
-                cd.setProduct(product);
-                cd.setPrice(product.getPrice());
+                cd.setProduct(p);
+                cd.setPrice(p.getPrice());
                 cd.setQuantity(quantity);
                 this.cartItemRepository.save(cd);
 
-                // Cập nhật tổng số lượng loại SP trong giỏ (Sum)
+                // Cập nhật tổng số loại SP (Sum) hiện trên icon giỏ hàng
                 int s = cart.getSum() + 1;
                 cart.setSum(s);
                 this.cartRepository.save(cart);
                 session.setAttribute("sum", s);
             } else {
-                // Đã có -> Cộng dồn số lượng
+                // Trường hợp đã có: Chỉ cộng dồn số lượng
                 oldDetail.setQuantity(oldDetail.getQuantity() + quantity);
                 this.cartItemRepository.save(oldDetail);
             }
         }
     }
 
+    // Hàm lấy giỏ hàng để ItemController gọi được
     public Cart fetchCartByUserEmail(String email) {
         User user = this.userService.getUserByEmail(email);
         if (user != null) {

@@ -74,13 +74,18 @@
                                                         </a>
 
                                                         <div class="card-footer bg-transparent border-0 pb-3">
-                                                            <form action="/add-to-cart" method="POST">
-                                                                <input type="hidden" name="id" value="${p.id}">
-                                                                <button type="submit"
-                                                                    class="btn btn-primary w-100 rounded-pill py-2 shadow-sm">
-                                                                    <i class="fas fa-cart-plus me-1"></i> Thêm vào giỏ
-                                                                </button>
-                                                            </form>
+                                                            <%-- Sửa action cho khớp với @PostMapping("/{id}") --%>
+                                                                <form action="/add-product-to-cart/${p.id}"
+                                                                    method="POST">
+                                                                    <%-- Gửi mặc định số lượng là 1 --%>
+                                                                        <input type="hidden" name="quantity" value="1">
+
+                                                                        <button type="submit"
+                                                                            class="btn btn-primary w-100 rounded-pill py-2 shadow-sm">
+                                                                            <i class="fas fa-cart-plus me-1"></i> Thêm
+                                                                            vào giỏ
+                                                                        </button>
+                                                                </form>
                                                         </div>
                                             </div>
                                         </div>
