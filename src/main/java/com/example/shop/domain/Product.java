@@ -52,6 +52,18 @@ public class Product implements Serializable {
     @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;
+    // Trong class Product
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<ProductSpec> specs = new ArrayList<>();
+
+    // Getter và Setter cho specs
+    public List<ProductSpec> getSpecs() {
+        return specs;
+    }
+
+    public void setSpecs(List<ProductSpec> specs) {
+        this.specs = specs;
+    }
 
     // --- Constructor ---
     public Product() {

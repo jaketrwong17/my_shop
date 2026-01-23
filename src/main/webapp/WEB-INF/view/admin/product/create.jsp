@@ -7,7 +7,7 @@
             <jsp:include page="../layout/header.jsp" />
 
             <style>
-                /* Khu vực hiển thị ảnh preview */
+                /* Phần ảnh Preview */
                 .gallery-wrap {
                     display: flex;
                     flex-wrap: wrap;
@@ -32,8 +32,7 @@
                     cursor: pointer;
                 }
 
-                /* Nút xóa ảnh preview */
-                .btn-delete {
+                .btn-delete-img {
                     position: absolute;
                     top: 2px;
                     right: 2px;
@@ -49,15 +48,8 @@
                     align-items: center;
                     justify-content: center;
                     z-index: 10;
-                    transition: transform 0.2s;
                 }
 
-                .btn-delete:hover {
-                    transform: scale(1.1);
-                    background: #dc3545;
-                }
-
-                /* Khung dấu cộng để bấm chọn file */
                 .upload-btn-wrapper {
                     width: 100px;
                     height: 100px;
@@ -72,18 +64,33 @@
                     transition: all 0.3s;
                 }
 
-                .upload-btn-wrapper:hover {
-                    background-color: #e9ecef;
-                    border-color: #0a58ca;
-                }
-
-                /* Ẩn input file gốc */
                 #imageFiles {
                     display: none;
                 }
+
+                /* Phần thông số kỹ thuật */
+                .spec-row {
+                    transition: all 0.2s;
+                }
+
+                .spec-row:hover {
+                    background-color: #f8f9fa;
+                }
+
+                .btn-remove-spec {
+                    color: #dc3545;
+                    border: none;
+                    background: transparent;
+                    transition: 0.2s;
+                }
+
+                .btn-remove-spec:hover {
+                    color: #a71d2a;
+                    transform: scale(1.2);
+                }
             </style>
 
-            <body>
+            <body class="bg-light">
                 <div class="d-flex" id="wrapper">
                     <jsp:include page="../layout/sidebar.jsp">
                         <jsp:param name="active" value="product" />
@@ -91,35 +98,35 @@
 
                     <div id="page-content-wrapper">
                         <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom px-4 py-3">
-                            <h4 class="mb-0 text-dark fw-bold">Thêm Sản Phẩm Mới</h4>
+                            <h4 class="mb-0 text-dark fw-bold">Thêm Sản Phẩm Mới & Thông Số</h4>
                         </nav>
 
                         <div class="container-fluid px-4 py-4">
-                            <div class="row justify-content-center">
-                                <div class="col-lg-9">
-                                    <div class="card shadow-sm border-0 rounded-3">
-                                        <div class="card-body p-4">
-                                            <form:form action="/admin/product/create" method="POST"
-                                                modelAttribute="newProduct" enctype="multipart/form-data">
+                            <form:form action="/admin/product/create" method="POST" modelAttribute="newProduct"
+                                enctype="multipart/form-data">
+                                <div class="row">
+                                    <div class="col-lg-7">
+                                        <div class="card shadow-sm border-0 rounded-3 mb-4">
+                                            <div class="card-body p-4">
+                                                <h6 class="fw-bold mb-4 text-primary text-uppercase small">Thông tin
+                                                    chung</h6>
 
                                                 <div class="row mb-3">
-                                                    <div class="col-md-6">
-                                                        <label class="form-label fw-bold">Tên sản phẩm <span
-                                                                class="text-danger">*</span></label>
+                                                    <div class="col-md-8">
+                                                        <label class="form-label fw-bold small">Tên sản phẩm *</label>
                                                         <form:input path="name" class="form-control"
                                                             placeholder="Nhập tên sản phẩm..." required="true" />
                                                     </div>
-
-                                                    <div class="col-md-6">
-                                                        <label class="form-label fw-bold">Giá bán (VNĐ) <span
-                                                                class="text-danger">*</span></label>
+                                                    <div class="col-md-4">
+                                                        <label class="form-label fw-bold small">Giá bán (VNĐ) *</label>
                                                         <form:input path="price" type="number" class="form-control"
                                                             placeholder="0" required="true" />
                                                     </div>
                                                 </div>
 
                                                 <div class="mb-4">
-                                                    <label class="form-label fw-bold mb-2">Hình ảnh sản phẩm</label>
+                                                    <label class="form-label fw-bold small mb-2">Hình ảnh sản
+                                                        phẩm</label>
                                                     <div class="gallery-wrap" id="gallery">
                                                         <label class="upload-btn-wrapper" for="imageFiles">
                                                             <i class="fas fa-plus fa-2x"></i>
@@ -133,118 +140,153 @@
 
                                                 <div class="row mb-3">
                                                     <div class="col-md-6">
-                                                        <label class="form-label fw-bold">Danh mục sản phẩm</label>
+                                                        <label class="form-label fw-bold small">Danh mục</label>
                                                         <form:select path="category.id" class="form-select">
                                                             <form:options items="${categories}" itemValue="id"
                                                                 itemLabel="name" />
                                                         </form:select>
                                                     </div>
+                                                    <div class="col-md-6">
+                                                        <label class="form-label fw-bold small">Hãng sản xuất</label>
+                                                        <form:input path="factory" class="form-control"
+                                                            placeholder="Ví dụ: Dreame, Xiaomi..." />
+                                                    </div>
                                                 </div>
 
                                                 <div class="mb-3">
-                                                    <label class="form-label fw-bold">Mô tả ngắn</label>
+                                                    <label class="form-label fw-bold small">Mô tả ngắn</label>
                                                     <form:textarea path="shortDesc" class="form-control" rows="2"
                                                         placeholder="Tóm tắt đặc điểm nổi bật..." />
                                                 </div>
 
-                                                <div class="mb-4">
-                                                    <label class="form-label fw-bold">Chi tiết sản phẩm</label>
-                                                    <form:textarea path="detailDesc" class="form-control" rows="5"
-                                                        placeholder="Thông số kỹ thuật, công dụng chi tiết..." />
+                                                <div class="mb-0">
+                                                    <label class="form-label fw-bold small">Chi tiết bài viết</label>
+                                                    <form:textarea path="detailDesc" class="form-control" rows="6" />
                                                 </div>
+                                            </div>
+                                        </div>
+                                    </div>
 
-                                                <div class="d-flex justify-content-end gap-2">
-                                                    <a href="/admin/product" class="btn btn-outline-secondary px-4">Hủy
-                                                        bỏ</a>
-                                                    <button type="submit" class="btn btn-primary px-4">
-                                                        <i class="fas fa-save me-2"></i>Lưu sản phẩm
-                                                    </button>
+                                    <div class="col-lg-5">
+                                        <div class="card shadow-sm border-0 rounded-3">
+                                            <div
+                                                class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                                                <h6 class="mb-0 fw-bold text-primary text-uppercase small">Thông số nổi
+                                                    bật</h6>
+                                                <div class="btn-group">
+                                                    <button type="button" class="btn btn-sm btn-outline-primary"
+                                                        onclick="addMultipleSpecs(5)">+5 Dòng</button>
+                                                    <button type="button" class="btn btn-sm btn-primary ms-1"
+                                                        id="btnAddSpec"><i class="fas fa-plus"></i></button>
                                                 </div>
-                                            </form:form>
+                                            </div>
+                                            <div class="card-body p-3">
+                                                <div id="specs-container">
+                                                    <div class="row g-2 mb-2 spec-row align-items-center">
+                                                        <div class="col-5">
+                                                            <input type="text" name="specNames"
+                                                                class="form-control form-control-sm"
+                                                                placeholder="Tên thông số">
+                                                        </div>
+                                                        <div class="col-6">
+                                                            <input type="text" name="specValues"
+                                                                class="form-control form-control-sm"
+                                                                placeholder="Giá trị">
+                                                        </div>
+                                                        <div class="col-1 text-center">
+                                                            <button type="button" class="btn-remove-spec"
+                                                                onclick="removeSpec(this)"><i
+                                                                    class="fas fa-times-circle"></i></button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="card-footer bg-white border-0 p-4">
+                                                <button type="submit"
+                                                    class="btn btn-primary w-100 py-2 fw-bold shadow-sm">
+                                                    <i class="fas fa-save me-2"></i>LƯU SẢN PHẨM
+                                                </button>
+                                                <a href="/admin/product"
+                                                    class="btn btn-link w-100 text-muted mt-2 small text-decoration-none">Quay
+                                                    lại danh sách</a>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </form:form>
                         </div>
                     </div>
                 </div>
 
                 <div class="modal fade" id="previewModal" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content bg-transparent border-0">
-                            <div class="modal-body text-center p-0">
-                                <img id="modalImg" src="" class="img-fluid rounded shadow" style="max-height: 85vh;">
-                            </div>
-                        </div>
+                        <div class="modal-content bg-transparent border-0 text-center"><img id="modalImg" src=""
+                                class="img-fluid rounded shadow"></div>
                     </div>
                 </div>
 
                 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
                 <script>
-                    // Đối tượng DataTransfer để quản lý danh sách file trong input
+                    // --- QUẢN LÝ ẢNH ---
                     const dt = new DataTransfer();
 
                     function handleFileSelect(input) {
                         const files = input.files;
                         const gallery = document.getElementById('gallery');
                         const uploadBtn = document.querySelector('.upload-btn-wrapper');
-
                         if (files) {
                             Array.from(files).forEach(file => {
-                                // Thêm vào danh sách file thực tế sẽ gửi lên Server
                                 dt.items.add(file);
-
-                                // Tạo giao diện Preview cho người dùng xem
                                 const reader = new FileReader();
                                 reader.onload = function (e) {
                                     const div = document.createElement('div');
                                     div.className = 'img-card';
-
-                                    const img = document.createElement('img');
-                                    img.src = e.target.result;
-                                    img.title = file.name;
-                                    img.onclick = function () { viewImage(this.src) };
-
-                                    const btn = document.createElement('button');
-                                    btn.type = 'button';
-                                    btn.className = 'btn-delete';
-                                    btn.innerHTML = '<i class="fas fa-times"></i>';
-
-                                    // Xử lý khi bấm nút xóa ảnh preview
-                                    btn.onclick = function () {
-                                        div.remove();
-                                        removeFileFromDataTransfer(file);
-                                    };
-
-                                    div.appendChild(img);
-                                    div.appendChild(btn);
-
-                                    // Chèn ảnh mới vào trước nút "+"
+                                    // THOÁT LỖI TRẮNG ẢNH: Sử dụng dấu \ trước ký hiệu $
+                                    div.innerHTML = `<img src="\${e.target.result}" onclick="viewImage(this.src)"><button type="button" class="btn-delete-img"><i class="fas fa-times"></i></button>`;
+                                    div.querySelector('.btn-delete-img').onclick = function () { div.remove(); removeFileFromDT(file); };
                                     gallery.insertBefore(div, uploadBtn);
                                 }
                                 reader.readAsDataURL(file);
                             });
                         }
-                        // Đồng bộ danh sách file ảo vào input file thật
                         input.files = dt.files;
                     }
 
-                    function removeFileFromDataTransfer(fileToRemove) {
+                    function removeFileFromDT(fileToRemove) {
                         const newDt = new DataTransfer();
                         for (let i = 0; i < dt.files.length; i++) {
-                            const file = dt.files[i];
-                            if (file !== fileToRemove) {
-                                newDt.items.add(file);
-                            }
+                            if (dt.files[i] !== fileToRemove) newDt.items.add(dt.files[i]);
                         }
-                        // Xóa sạch dt cũ và copy từ newDt sang
                         dt.items.clear();
-                        for (let i = 0; i < newDt.files.length; i++) {
-                            dt.items.add(newDt.files[i]);
-                        }
-                        // Cập nhật lại input
+                        for (let i = 0; i < newDt.files.length; i++) dt.items.add(newDt.files[i]);
                         document.getElementById('imageFiles').files = dt.files;
+                    }
+
+                    // --- QUẢN LÝ THÔNG SỐ (SPECS) ---
+                    function createSpecRowHTML() {
+                        return `
+                <div class="row g-2 mb-2 spec-row align-items-center">
+                    <div class="col-5"><input type="text" name="specNames" class="form-control form-control-sm" placeholder="Tên thông số"></div>
+                    <div class="col-6"><input type="text" name="specValues" class="form-control form-control-sm" placeholder="Giá trị"></div>
+                    <div class="col-1 text-center"><button type="button" class="btn-remove-spec" onclick="removeSpec(this)"><i class="fas fa-times-circle"></i></button></div>
+                </div>`;
+                    }
+
+                    document.getElementById('btnAddSpec').addEventListener('click', function () {
+                        document.getElementById('specs-container').insertAdjacentHTML('beforeend', createSpecRowHTML());
+                    });
+
+                    function addMultipleSpecs(count) {
+                        for (let i = 0; i < count; i++) {
+                            document.getElementById('specs-container').insertAdjacentHTML('beforeend', createSpecRowHTML());
+                        }
+                    }
+
+                    function removeSpec(btn) {
+                        if (document.querySelectorAll('.spec-row').length > 1) {
+                            btn.closest('.spec-row').remove();
+                        }
                     }
 
                     function viewImage(src) {

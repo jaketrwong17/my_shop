@@ -2,6 +2,7 @@ package com.example.shop.controller.admin;
 
 import com.example.shop.domain.Product;
 import com.example.shop.domain.ProductImage;
+import com.example.shop.domain.ProductSpec;
 import com.example.shop.service.CategoryService;
 import com.example.shop.service.ProductService;
 import com.example.shop.service.UploadService;
@@ -28,7 +29,6 @@ public class ProductController {
         this.uploadService = uploadService;
     }
 
-    // 1. Hiển thị danh sách
     @GetMapping
     public String getProductPage(Model model,
             @RequestParam(required = false) String keyword,
@@ -38,7 +38,6 @@ public class ProductController {
         return "admin/product/show";
     }
 
-    // 2. Trang tạo mới
     @GetMapping("/create")
     public String getCreatePage(Model model) {
         model.addAttribute("newProduct", new Product());
@@ -46,15 +45,23 @@ public class ProductController {
         return "admin/product/create";
     }
 
+    // CẬP NHẬT: Thêm @RequestParam cho specNames và specValues
     @PostMapping("/create")
     public String createProduct(@ModelAttribute("newProduct") Product product,
-            @RequestParam("imageFiles") MultipartFile[] files) {
+            @RequestParam("imageFiles") MultipartFile[] files,
+            @RequestParam(value = "specNames", required = false) String[] specNames,
+            @RequestParam(value = "specValues", required = false) String[] specValues) {
+
+        // 1. Xử lý lưu ảnh
         saveImages(product, files);
+
+        // 2. Xử lý lưu thông số kỹ thuật ( Specs )
+        handleSpecs(product, specNames, specValues);
+
         productService.handleSaveProduct(product);
         return "redirect:/admin/product";
     }
 
-    // 3. Trang cập nhật
     @GetMapping("/update/{id}")
     public String getUpdatePage(Model model, @PathVariable long id) {
         Product currentProduct = productService.fetchProductById(id).get();
@@ -63,41 +70,59 @@ public class ProductController {
         return "admin/product/update";
     }
 
+    // CẬP NHẬT: Thêm tham số nhận mảng thông số từ Form
     @PostMapping("/update")
     public String updateProduct(@ModelAttribute("newProduct") Product product,
             @RequestParam("imageFiles") MultipartFile[] files,
+            @RequestParam(value = "specNames", required = false) String[] specNames,
+            @RequestParam(value = "specValues", required = false) String[] specValues,
             @RequestParam(value = "deleteImageIds", required = false) List<Long> deleteImageIds) {
 
-        // Lấy sản phẩm hiện tại từ DB để giữ lại danh sách ảnh cũ
         Product currentProduct = productService.fetchProductById(product.getId()).get();
 
-        // Xử lý xóa ảnh cũ nếu có
         if (deleteImageIds != null && !deleteImageIds.isEmpty()) {
             currentProduct.getImages().removeIf(img -> deleteImageIds.contains(img.getId()));
         }
 
-        // Xử lý thêm ảnh mới
         saveImages(currentProduct, files);
 
-        // Cập nhật thông tin text
+        // Cập nhật thông tin cơ bản
         currentProduct.setName(product.getName());
         currentProduct.setPrice(product.getPrice());
         currentProduct.setCategory(product.getCategory());
         currentProduct.setShortDesc(product.getShortDesc());
         currentProduct.setDetailDesc(product.getDetailDesc());
+        currentProduct.setFactory(product.getFactory());
+
+        // 3. XỬ LÝ THÔNG SỐ KỸ THUẬT (Xóa cũ, nạp mới)
+        currentProduct.getSpecs().clear(); // Hibernate sẽ tự xóa record mồ côi nhờ orphanRemoval=true
+        handleSpecs(currentProduct, specNames, specValues);
 
         productService.handleSaveProduct(currentProduct);
         return "redirect:/admin/product";
     }
 
-    // 4. Xóa sản phẩm
     @GetMapping("/delete/{id}")
     public String deleteProduct(@PathVariable long id) {
         productService.deleteProduct(id);
         return "redirect:/admin/product";
     }
 
-    // Hàm helper lưu ảnh
+    // Hàm helper nạp thông số kỹ thuật
+    private void handleSpecs(Product product, String[] specNames, String[] specValues) {
+        if (specNames != null && specValues != null) {
+            for (int i = 0; i < specNames.length; i++) {
+                if (specNames[i] != null && !specNames[i].trim().isEmpty()) {
+                    ProductSpec spec = new ProductSpec();
+                    spec.setSpecName(specNames[i]);
+                    spec.setSpecValue(specValues[i]);
+                    spec.setProduct(product);
+                    product.getSpecs().add(spec);
+                }
+            }
+        }
+    }
+
     private void saveImages(Product product, MultipartFile[] files) {
         if (product.getImages() == null)
             product.setImages(new ArrayList<>());

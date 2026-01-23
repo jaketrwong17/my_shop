@@ -42,4 +42,12 @@ public class ProductService {
     public void deleteProduct(long id) {
         productRepository.deleteById(id);
     }
+
+    public List<Product> fetchProductsByName(String name) {
+        return productRepository.findByNameContainingIgnoreCase(name);
+    }
+
+    public List<Product> fetchProductsByCategory(Long categoryId) {
+        return productRepository.findByCategoryId(categoryId);
+    }
 }
