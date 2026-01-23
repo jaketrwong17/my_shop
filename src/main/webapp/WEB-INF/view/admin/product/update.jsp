@@ -4,76 +4,80 @@
 
             <!DOCTYPE html>
             <html lang="vi">
-            <jsp:include page="../layout/header.jsp" />
-            <style>
-                /* CSS cho phần Ảnh */
-                .gallery-wrap {
-                    display: flex;
-                    flex-wrap: wrap;
-                    gap: 10px;
-                }
 
-                .img-card {
-                    position: relative;
-                    width: 100px;
-                    height: 100px;
-                    border: 1px solid #ddd;
-                    border-radius: 5px;
-                    overflow: hidden;
-                }
+            <head>
+                <meta charset="UTF-8">
+                <jsp:include page="../layout/header.jsp" />
+                <style>
+                    .gallery-wrap {
+                        display: flex;
+                        flex-wrap: wrap;
+                        gap: 10px;
+                    }
 
-                .img-card img {
-                    width: 100%;
-                    height: 100%;
-                    object-fit: cover;
-                    cursor: pointer;
-                }
+                    .img-card {
+                        position: relative;
+                        width: 100px;
+                        height: 100px;
+                        border: 1px solid #ddd;
+                        border-radius: 8px;
+                        overflow: hidden;
+                        background: #fff;
+                    }
 
-                .btn-delete-img {
-                    position: absolute;
-                    top: 0;
-                    right: 0;
-                    background: rgba(255, 0, 0, 0.8);
-                    color: white;
-                    border: none;
-                    width: 20px;
-                    height: 20px;
-                    font-size: 10px;
-                    cursor: pointer;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    z-index: 10;
-                }
+                    .img-card img {
+                        width: 100%;
+                        height: 100%;
+                        object-fit: cover;
+                        cursor: pointer;
+                    }
 
-                .upload-btn-wrapper {
-                    width: 100px;
-                    height: 100px;
-                    border: 2px dashed #0d6efd;
-                    border-radius: 5px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    cursor: pointer;
-                    color: #0d6efd;
-                    background: #f8f9fa;
-                }
+                    .btn-delete-img {
+                        position: absolute;
+                        top: 0;
+                        right: 0;
+                        background: rgba(255, 0, 0, 0.8);
+                        color: white;
+                        border: none;
+                        width: 20px;
+                        height: 20px;
+                        font-size: 10px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        z-index: 10;
+                        cursor: pointer;
+                    }
 
-                #imageFiles {
-                    display: none;
-                }
+                    .upload-btn-wrapper {
+                        width: 100px;
+                        height: 100px;
+                        border: 2px dashed #0d6efd;
+                        border-radius: 8px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        cursor: pointer;
+                        color: #0d6efd;
+                        background: #f8f9fa;
+                    }
 
-                /* CSS cho phần Thông số kỹ thuật */
-                .spec-row {
-                    transition: all 0.2s;
-                }
+                    #imageFiles {
+                        display: none;
+                    }
 
-                .spec-row:hover {
-                    background-color: #f8f9fa;
-                }
-            </style>
+                    .dynamic-row {
+                        transition: all 0.2s;
+                        border-radius: 5px;
+                    }
 
-            <body>
+                    .dynamic-row:hover {
+                        background-color: #f8f9fa;
+                    }
+                </style>
+            </head>
+
+            <body class="bg-light">
                 <div class="d-flex" id="wrapper">
                     <jsp:include page="../layout/sidebar.jsp">
                         <jsp:param name="active" value="product" />
@@ -81,32 +85,33 @@
 
                     <div id="page-content-wrapper">
                         <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom px-4 py-3">
-                            <h4 class="mb-0 fw-bold">Cập nhật Sản phẩm & Thông số</h4>
+                            <h4 class="mb-0 fw-bold">Cập nhật Sản phẩm & Cấu hình</h4>
                         </nav>
 
                         <div class="container-fluid px-4 py-4">
                             <form:form action="/admin/product/update" method="POST" modelAttribute="newProduct"
                                 enctype="multipart/form-data">
                                 <form:hidden path="id" />
-
                                 <div class="row">
                                     <div class="col-lg-7">
                                         <div class="card shadow-sm border-0 mb-4">
                                             <div class="card-body p-4">
-                                                <h6 class="fw-bold mb-3 text-primary">Thông tin chung</h6>
+                                                <h6 class="fw-bold mb-3 text-primary text-uppercase small">Thông tin
+                                                    chung</h6>
                                                 <div class="row mb-3">
                                                     <div class="col-md-8">
-                                                        <label class="form-label fw-bold">Tên sản phẩm</label>
+                                                        <label class="form-label fw-bold small">Tên sản phẩm</label>
                                                         <form:input path="name" class="form-control" required="true" />
                                                     </div>
                                                     <div class="col-md-4">
-                                                        <label class="form-label fw-bold">Giá bán</label>
+                                                        <label class="form-label fw-bold small">Giá bán</label>
                                                         <form:input path="price" type="number" class="form-control"
                                                             required="true" />
                                                     </div>
                                                 </div>
                                                 <div class="mb-3">
-                                                    <label class="form-label fw-bold">Hình ảnh sản phẩm</label>
+                                                    <label class="form-label fw-bold small mb-2">Hình ảnh sản
+                                                        phẩm</label>
                                                     <div class="gallery-wrap" id="gallery">
                                                         <c:forEach var="img" items="${newProduct.images}">
                                                             <div class="img-card" id="old-img-${img.id}">
@@ -124,19 +129,26 @@
                                                         accept="image/*" multiple onchange="handleFileSelect(this)">
                                                     <div id="deleteContainer"></div>
                                                 </div>
-                                                <div class="mb-3">
-                                                    <label class="form-label fw-bold">Danh mục</label>
-                                                    <form:select path="category.id" class="form-select">
-                                                        <form:options items="${categories}" itemValue="id"
-                                                            itemLabel="name" />
-                                                    </form:select>
+                                                <div class="row mb-3">
+                                                    <div class="col-md-6">
+                                                        <label class="form-label fw-bold small">Danh mục</label>
+                                                        <form:select path="category.id" class="form-select">
+                                                            <form:options items="${categories}" itemValue="id"
+                                                                itemLabel="name" />
+                                                        </form:select>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label class="form-label fw-bold small">Hãng sản xuất</label>
+                                                        <form:input path="factory" class="form-control"
+                                                            placeholder="Hãng sản xuất..." />
+                                                    </div>
                                                 </div>
                                                 <div class="mb-3">
-                                                    <label class="form-label fw-bold">Mô tả ngắn</label>
+                                                    <label class="form-label fw-bold small">Mô tả ngắn</label>
                                                     <form:textarea path="shortDesc" class="form-control" rows="2" />
                                                 </div>
                                                 <div class="mb-0">
-                                                    <label class="form-label fw-bold">Chi tiết bài viết</label>
+                                                    <label class="form-label fw-bold small">Chi tiết bài viết</label>
                                                     <form:textarea path="detailDesc" class="form-control" rows="5" />
                                                 </div>
                                             </div>
@@ -144,62 +156,63 @@
                                     </div>
 
                                     <div class="col-lg-5">
-                                        <div class="card shadow-sm border-0">
+                                        <div class="card shadow-sm border-0 mb-4">
                                             <div
                                                 class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-                                                <h6 class="mb-0 fw-bold text-primary">Thông số kỹ thuật</h6>
+                                                <h6 class="mb-0 fw-bold text-primary text-uppercase small">Thông số kỹ
+                                                    thuật</h6>
                                                 <div class="btn-group">
-                                                    <button type="button" class="btn btn-sm btn-outline-primary"
-                                                        onclick="addMultipleRows(5)">+5 Dòng</button>
-                                                    <button type="button" class="btn btn-sm btn-primary"
-                                                        id="btnAddSpec"><i class="fas fa-plus"></i> Thêm</button>
+                                                    <button type="button" class="btn btn-xs btn-outline-primary"
+                                                        onclick="addMultipleSpecs(5)">+5</button>
+                                                    <button type="button" class="btn btn-xs btn-primary ms-1"
+                                                        id="btnAddSpec"><i class="fas fa-plus"></i></button>
                                                 </div>
                                             </div>
                                             <div class="card-body p-3">
                                                 <div id="specs-container">
                                                     <c:forEach var="spec" items="${newProduct.specs}">
-                                                        <div class="row g-2 mb-2 spec-row align-items-center">
-                                                            <div class="col-5">
-                                                                <input type="text" name="specNames"
-                                                                    class="form-control form-control-sm"
-                                                                    value="${spec.specName}" placeholder="Tên thông số">
-                                                            </div>
-                                                            <div class="col-6">
-                                                                <input type="text" name="specValues"
-                                                                    class="form-control form-control-sm"
-                                                                    value="${spec.specValue}" placeholder="Giá trị">
-                                                            </div>
-                                                            <div class="col-1">
-                                                                <button type="button"
-                                                                    class="text-danger border-0 bg-transparent"
-                                                                    onclick="removeSpec(this)"><i
-                                                                        class="fas fa-trash-alt"></i></button>
-                                                            </div>
-                                                        </div>
-                                                    </c:forEach>
-
-                                                    <c:if test="${empty newProduct.specs}">
-                                                        <div class="row g-2 mb-2 spec-row align-items-center">
+                                                        <div class="row g-2 mb-2 dynamic-row align-items-center">
                                                             <div class="col-5"><input type="text" name="specNames"
                                                                     class="form-control form-control-sm"
-                                                                    placeholder="VD: Lực hút"></div>
+                                                                    value="${spec.specName}"></div>
                                                             <div class="col-6"><input type="text" name="specValues"
                                                                     class="form-control form-control-sm"
-                                                                    placeholder="VD: 8000 Pa"></div>
-                                                            <div class="col-1"><button type="button"
+                                                                    value="${spec.specValue}"></div>
+                                                            <div class="col-1 text-center"><button type="button"
                                                                     class="text-danger border-0 bg-transparent"
-                                                                    onclick="removeSpec(this)"><i
+                                                                    onclick="removeItem(this)"><i
                                                                         class="fas fa-trash-alt"></i></button></div>
                                                         </div>
-                                                    </c:if>
+                                                    </c:forEach>
                                                 </div>
                                             </div>
-                                            <div class="card-footer bg-light p-3">
+                                        </div>
+
+                                        <div class="card shadow-sm border-0">
+                                            <div
+                                                class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                                                <h6 class="mb-0 fw-bold text-success text-uppercase small">Màu sắc sản
+                                                    phẩm</h6>
+                                                <button type="button" class="btn btn-xs btn-success" id="btnAddColor"><i
+                                                        class="fas fa-plus"></i> Thêm màu</button>
+                                            </div>
+                                            <div class="card-body p-3">
+                                                <div id="colors-container">
+                                                    <c:forEach var="color" items="${newProduct.colors}">
+                                                        <div class="input-group mb-2 dynamic-row">
+                                                            <input type="text" name="colorNames"
+                                                                class="form-control form-control-sm"
+                                                                value="${color.colorName}">
+                                                            <button type="button" class="btn btn-sm btn-outline-danger"
+                                                                onclick="removeItem(this)">X</button>
+                                                        </div>
+                                                    </c:forEach>
+                                                </div>
+                                            </div>
+                                            <div class="card-footer bg-white border-0 p-3">
                                                 <button type="submit"
-                                                    class="btn btn-warning w-100 text-white fw-bold">CẬP NHẬT SẢN
-                                                    PHẨM</button>
-                                                <a href="/admin/product" class="btn btn-link w-100 text-muted mt-2">Quay
-                                                    lại danh sách</a>
+                                                    class="btn btn-warning w-100 py-2 fw-bold text-white shadow-sm">LƯU
+                                                    THAY ĐỔI</button>
                                             </div>
                                         </div>
                                     </div>
@@ -218,7 +231,6 @@
 
                 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
                 <script>
-                    // --- LOGIC XỬ LÝ ẢNH ---
                     function removeOldImage(id) {
                         if (confirm('Xóa ảnh này?')) {
                             document.getElementById('old-img-' + id).remove();
@@ -250,42 +262,26 @@
 
                     function removeFileFromDT(fileToRemove) {
                         const newDt = new DataTransfer();
-                        for (let i = 0; i < dt.files.length; i++) {
-                            if (dt.files[i] !== fileToRemove) newDt.items.add(dt.files[i]);
-                        }
+                        for (let i = 0; i < dt.files.length; i++) { if (dt.files[i] !== fileToRemove) newDt.items.add(dt.files[i]); }
                         dt.items.clear();
                         for (let i = 0; i < newDt.files.length; i++) dt.items.add(newDt.files[i]);
                         document.getElementById('imageFiles').files = dt.files;
                     }
 
-                    // --- LOGIC XỬ LÝ THÔNG SỐ (SPECS) ---
-                    function createSpecRowHTML() {
-                        return `
-                <div class="row g-2 mb-2 spec-row align-items-center">
-                    <div class="col-5"><input type="text" name="specNames" class="form-control form-control-sm" placeholder="Tên thông số"></div>
-                    <div class="col-6"><input type="text" name="specValues" class="form-control form-control-sm" placeholder="Giá trị"></div>
-                    <div class="col-1"><button type="button" class="text-danger border-0 bg-transparent" onclick="removeSpec(this)"><i class="fas fa-trash-alt"></i></button></div>
-                </div>`;
-                    }
+                    function removeItem(btn) { btn.closest('.dynamic-row').remove(); }
 
-                    document.getElementById('btnAddSpec').addEventListener('click', function () {
-                        document.getElementById('specs-container').insertAdjacentHTML('beforeend', createSpecRowHTML());
+                    document.getElementById('btnAddSpec').addEventListener('click', () => {
+                        const html = '<div class="row g-2 mb-2 dynamic-row align-items-center"><div class="col-5"><input type="text" name="specNames" class="form-control form-control-sm" placeholder="Tên thông số"></div><div class="col-6"><input type="text" name="specValues" class="form-control form-control-sm" placeholder="Giá trị"></div><div class="col-1 text-center"><button type="button" class="text-danger border-0 bg-transparent" onclick="removeItem(this)"><i class="fas fa-trash-alt"></i></button></div></div>';
+                        document.getElementById('specs-container').insertAdjacentHTML('beforeend', html);
                     });
 
-                    function addMultipleRows(count) {
-                        for (let i = 0; i < count; i++) {
-                            document.getElementById('specs-container').insertAdjacentHTML('beforeend', createSpecRowHTML());
-                        }
-                    }
+                    document.getElementById('btnAddColor').addEventListener('click', () => {
+                        const html = '<div class="input-group mb-2 dynamic-row"><input type="text" name="colorNames" class="form-control form-control-sm" placeholder="Tên màu"><button type="button" class="btn btn-sm btn-outline-danger" onclick="removeItem(this)">X</button></div>';
+                        document.getElementById('colors-container').insertAdjacentHTML('beforeend', html);
+                    });
 
-                    function removeSpec(btn) {
-                        btn.closest('.spec-row').remove();
-                    }
-
-                    function viewImage(src) {
-                        document.getElementById('modalImg').src = src;
-                        new bootstrap.Modal(document.getElementById('previewModal')).show();
-                    }
+                    function addMultipleSpecs(count) { for (let i = 0; i < count; i++) document.getElementById('btnAddSpec').click(); }
+                    function viewImage(src) { document.getElementById('modalImg').src = src; new bootstrap.Modal(document.getElementById('previewModal')).show(); }
                 </script>
             </body>
 

@@ -55,6 +55,16 @@ public class Product implements Serializable {
     // Trong class Product
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<ProductSpec> specs = new ArrayList<>();
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductColor> colors = new ArrayList<>();
+
+    public List<ProductColor> getColors() {
+        return colors;
+    }
+
+    public void setColors(List<ProductColor> colors) {
+        this.colors = colors;
+    }
 
     // Getter và Setter cho specs
     public List<ProductSpec> getSpecs() {

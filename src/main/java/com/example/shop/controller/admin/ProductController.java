@@ -1,6 +1,7 @@
 package com.example.shop.controller.admin;
 
 import com.example.shop.domain.Product;
+import com.example.shop.domain.ProductColor;
 import com.example.shop.domain.ProductImage;
 import com.example.shop.domain.ProductSpec;
 import com.example.shop.service.CategoryService;
@@ -45,18 +46,21 @@ public class ProductController {
         return "admin/product/create";
     }
 
-    // CẬP NHẬT: Thêm @RequestParam cho specNames và specValues
     @PostMapping("/create")
     public String createProduct(@ModelAttribute("newProduct") Product product,
             @RequestParam("imageFiles") MultipartFile[] files,
             @RequestParam(value = "specNames", required = false) String[] specNames,
-            @RequestParam(value = "specValues", required = false) String[] specValues) {
+            @RequestParam(value = "specValues", required = false) String[] specValues,
+            @RequestParam(value = "colorNames", required = false) String[] colorNames) {
 
-        // 1. Xử lý lưu ảnh
+        // 1. Lưu Ảnh
         saveImages(product, files);
 
-        // 2. Xử lý lưu thông số kỹ thuật ( Specs )
+        // 2. Lưu Thông số (Specs)
         handleSpecs(product, specNames, specValues);
+
+        // 3. Lưu Màu sắc (Colors)
+        handleColors(product, colorNames);
 
         productService.handleSaveProduct(product);
         return "redirect:/admin/product";
@@ -70,23 +74,23 @@ public class ProductController {
         return "admin/product/update";
     }
 
-    // CẬP NHẬT: Thêm tham số nhận mảng thông số từ Form
     @PostMapping("/update")
     public String updateProduct(@ModelAttribute("newProduct") Product product,
             @RequestParam("imageFiles") MultipartFile[] files,
             @RequestParam(value = "specNames", required = false) String[] specNames,
             @RequestParam(value = "specValues", required = false) String[] specValues,
+            @RequestParam(value = "colorNames", required = false) String[] colorNames,
             @RequestParam(value = "deleteImageIds", required = false) List<Long> deleteImageIds) {
 
         Product currentProduct = productService.fetchProductById(product.getId()).get();
 
+        // 1. Cập nhật Ảnh
         if (deleteImageIds != null && !deleteImageIds.isEmpty()) {
             currentProduct.getImages().removeIf(img -> deleteImageIds.contains(img.getId()));
         }
-
         saveImages(currentProduct, files);
 
-        // Cập nhật thông tin cơ bản
+        // 2. Cập nhật thông tin cơ bản
         currentProduct.setName(product.getName());
         currentProduct.setPrice(product.getPrice());
         currentProduct.setCategory(product.getCategory());
@@ -94,9 +98,13 @@ public class ProductController {
         currentProduct.setDetailDesc(product.getDetailDesc());
         currentProduct.setFactory(product.getFactory());
 
-        // 3. XỬ LÝ THÔNG SỐ KỸ THUẬT (Xóa cũ, nạp mới)
-        currentProduct.getSpecs().clear(); // Hibernate sẽ tự xóa record mồ côi nhờ orphanRemoval=true
+        // 3. Cập nhật Thông số (Specs) - Xóa cũ nạp mới
+        currentProduct.getSpecs().clear();
         handleSpecs(currentProduct, specNames, specValues);
+
+        // 4. Cập nhật Màu sắc (Colors) - Xóa cũ nạp mới
+        currentProduct.getColors().clear();
+        handleColors(currentProduct, colorNames);
 
         productService.handleSaveProduct(currentProduct);
         return "redirect:/admin/product";
@@ -108,7 +116,9 @@ public class ProductController {
         return "redirect:/admin/product";
     }
 
-    // Hàm helper nạp thông số kỹ thuật
+    // --- CÁC HÀM HELPER HỖ TRỢ ---
+
+    // Xử lý nạp Thông số kỹ thuật
     private void handleSpecs(Product product, String[] specNames, String[] specValues) {
         if (specNames != null && specValues != null) {
             for (int i = 0; i < specNames.length; i++) {
@@ -123,6 +133,21 @@ public class ProductController {
         }
     }
 
+    // Xử lý nạp Màu sắc
+    private void handleColors(Product product, String[] colorNames) {
+        if (colorNames != null) {
+            for (String name : colorNames) {
+                if (name != null && !name.trim().isEmpty()) {
+                    ProductColor pc = new ProductColor();
+                    pc.setColorName(name);
+                    pc.setProduct(product);
+                    product.getColors().add(pc);
+                }
+            }
+        }
+    }
+
+    // Xử lý nạp Ảnh
     private void saveImages(Product product, MultipartFile[] files) {
         if (product.getImages() == null)
             product.setImages(new ArrayList<>());

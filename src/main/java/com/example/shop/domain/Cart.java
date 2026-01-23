@@ -1,6 +1,8 @@
 package com.example.shop.domain;
 
 import jakarta.persistence.*;
+
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -10,14 +12,14 @@ public class Cart {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    private int sum; // Tổng số loại sản phẩm trong giỏ
-
     @OneToOne
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToMany(mappedBy = "cart")
-    private List<CartItem> cartItems;
+    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CartItem> cartItems = new ArrayList<>();
+
+    private int sum; // Tổng số lượng sản phẩm để hiện số 2 trên icon giỏ hàng
 
     public long getId() {
         return id;
