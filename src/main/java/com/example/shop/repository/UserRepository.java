@@ -22,4 +22,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
     // 4. Tìm kiếm người dùng theo tên hoặc email (Phục vụ chức năng Search bên
     // Admin)
     List<User> findByFullNameContainingIgnoreCaseOrEmailContainingIgnoreCase(String name, String email);
+
 }

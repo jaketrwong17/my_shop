@@ -1,58 +1,19 @@
-// package com.example.shop.config;
-
-// import org.springframework.context.annotation.Bean;
-// import org.springframework.context.annotation.Configuration;
-// import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-// import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-// import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-// import org.springframework.security.crypto.password.PasswordEncoder;
-// import org.springframework.security.web.SecurityFilterChain;
-// import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-
-// @Configuration
-// @EnableWebSecurity
-// public class SecurityConfig {
-
-//     @Bean
-//     public PasswordEncoder passwordEncoder() {
-//         return new BCryptPasswordEncoder(); // Mã hóa mật khẩu chuẩn BCrypt
-//     }
-
-//     @Bean
-//     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-//         http
-//                 .authorizeHttpRequests(authorize -> authorize
-//                         // 1. Cho phép truy cập tự do (Không cần đăng nhập)
-//                         .requestMatchers("/", "/login", "/register", "/product/**", "/css/**", "/js/**", "/images/**")
-//                         .permitAll()
-
-//                         // 2. Chỉ ADMIN mới được vào trang quản trị
-//                         .requestMatchers("/admin/**").hasRole("ADMIN")
-//                         // Lưu ý: Trong DB role tên là "ADMIN", Spring sẽ tự hiểu là "ROLE_ADMIN"
-
-//                         // 3. Các trang còn lại (Giỏ hàng, Đặt hàng) phải đăng nhập mới được vào
-//                         .anyRequest().authenticated())
-//                 .formLogin(form -> form
-//                         .loginPage("/login") // Trang login của mình thiết kế
-//                         .defaultSuccessUrl("/", true) // Đăng nhập thành công thì về trang chủ
-//                         .permitAll())
-//                 .logout(logout -> logout
-//                         .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-//                         .logoutSuccessUrl("/login?logout") // Logout xong về lại trang login
-//                         .permitAll());
-
-//         return http.build();
-//     }
-// }
 package com.example.shop.config;
 
+import com.example.shop.service.CustomUserDetailsService;
+import com.example.shop.service.UserService;
+import jakarta.servlet.DispatcherType;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 @Configuration
 @EnableWebSecurity
@@ -64,16 +25,57 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-                // 1. Cho phép tất cả các request truy cập mà không cần login
-                .authorizeHttpRequests(authorize -> authorize
-                        .anyRequest().permitAll())
-                // 2. Tắt CSRF để test post form không bị lỗi 403
-                .csrf(csrf -> csrf.disable())
+    public UserDetailsService userDetailsService(UserService userService) {
+        return new CustomUserDetailsService(userService);
+    }
 
-                // 3. Tắt form login mặc định
-                .formLogin(form -> form.disable());
+    @Bean
+    public DaoAuthenticationProvider authProvider(
+            PasswordEncoder passwordEncoder,
+            UserDetailsService userDetailsService) {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(userDetailsService);
+        authProvider.setPasswordEncoder(passwordEncoder);
+        return authProvider;
+    }
+
+    // Xử lý logic sau khi đăng nhập thành công
+    @Bean
+    public AuthenticationSuccessHandler customSuccessHandler() {
+        return (request, response, authentication) -> {
+            HttpSession session = request.getSession();
+            String email = authentication.getName(); // Lấy email người dùng
+            session.setAttribute("email", email); // Lưu vào session để code giỏ hàng hoạt động
+
+            // Chuyển hướng về trang chủ
+            response.sendRedirect("/");
+        };
+    }
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http, AuthenticationSuccessHandler successHandler)
+            throws Exception {
+        http
+                .authorizeHttpRequests(authorize -> authorize
+                        .dispatcherTypeMatchers(DispatcherType.FORWARD, DispatcherType.INCLUDE).permitAll()
+                        .requestMatchers("/", "/login", "/register", "/product/**", "/client/**", "/css/**", "/js/**",
+                                "/images/**")
+                        .permitAll()
+                        .requestMatchers("/admin/**").hasRole("ADMIN") // Chỉ Admin mới vào được trang quản trị
+                        .anyRequest().authenticated() // Các trang còn lại (cart, checkout) phải đăng nhập
+                )
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .loginProcessingUrl("/login") // Spring Security tự xử lý POST ở đây
+                        .successHandler(successHandler) // Gắn handler tùy chỉnh ở trên
+                        .failureUrl("/login?error")
+                        .permitAll())
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/")
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID")
+                        .permitAll());
 
         return http.build();
     }

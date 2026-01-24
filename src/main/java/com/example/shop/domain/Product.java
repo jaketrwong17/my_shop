@@ -15,72 +15,41 @@ public class Product implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    // Tên sản phẩm
     @Column(nullable = false)
     private String name;
 
-    // Giá bán
     private double price;
 
-    // --- [QUAN TRỌNG: ĐỔI TỪ 1 ẢNH SANG DANH SÁCH ẢNH] ---
-    // Quan hệ Một - Nhiều: Một sản phẩm có nhiều ảnh
-    // mappedBy = "product": Phải trùng với tên biến "product" bên file
-    // ProductImage.java
-    // cascade = CascadeType.ALL: Khi xóa Product, tự động xóa hết ảnh của nó
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    // SỬA TẠI ĐÂY: Thêm FetchType.EAGER để load ảnh ngay lập tức, tránh lỗi "no
+    // Session"
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<ProductImage> images = new ArrayList<>();
-    // Mô tả chi tiết (TEXT để lưu bài viết dài)
+
     @Column(columnDefinition = "TEXT")
     private String detailDesc;
 
-    // Mô tả ngắn
     private String shortDesc;
-
-    // Số lượng tồn kho
     private long quantity;
-
-    // Số lượng đã bán
     private long sold;
-
-    // Hãng sản xuất
     private String factory;
-
-    // Nhóm khách hàng mục tiêu
     private String target;
 
-    // Quan hệ Nhiều - Một: Sản phẩm thuộc về 1 danh mục
     @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;
-    // Trong class Product
+
+    // Các thông số kỹ thuật cũng nên để EAGER để hiển thị mượt mà
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<ProductSpec> specs = new ArrayList<>();
+
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductColor> colors = new ArrayList<>();
-
-    public List<ProductColor> getColors() {
-        return colors;
-    }
-
-    public void setColors(List<ProductColor> colors) {
-        this.colors = colors;
-    }
-
-    // Getter và Setter cho specs
-    public List<ProductSpec> getSpecs() {
-        return specs;
-    }
-
-    public void setSpecs(List<ProductSpec> specs) {
-        this.specs = specs;
-    }
 
     // --- Constructor ---
     public Product() {
     }
 
     // --- Getters and Setters ---
-
     public long getId() {
         return id;
     }
@@ -105,7 +74,6 @@ public class Product implements Serializable {
         this.price = price;
     }
 
-    // [GETTER/SETTER CHO LIST ẢNH]
     public List<ProductImage> getImages() {
         return images;
     }
@@ -168,6 +136,22 @@ public class Product implements Serializable {
 
     public void setCategory(Category category) {
         this.category = category;
+    }
+
+    public List<ProductSpec> getSpecs() {
+        return specs;
+    }
+
+    public void setSpecs(List<ProductSpec> specs) {
+        this.specs = specs;
+    }
+
+    public List<ProductColor> getColors() {
+        return colors;
+    }
+
+    public void setColors(List<ProductColor> colors) {
+        this.colors = colors;
     }
 
     @Override

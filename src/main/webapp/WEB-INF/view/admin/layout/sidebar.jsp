@@ -36,6 +36,10 @@
             <a href="#" class="list-group-item list-group-item-action ${param.active == 'review' ? 'active' : ''}">
                 <i class="fas fa-star me-2"></i> Đánh giá
             </a>
+            <a href="/admin/voucher"
+                class="list-group-item list-group-item-action ${param.active == 'voucher' ? 'active' : ''}">
+                <i class="fas fa-ticket-alt me-2"></i> Mã giảm giá
+            </a>
 
             <div class="mt-auto p-4">
                 <a href="/logout" class="btn btn-outline-danger w-100">

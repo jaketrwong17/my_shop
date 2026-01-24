@@ -1,111 +1,166 @@
-<%-- DÒNG QUAN TRỌNG NHẤT: Sửa lỗi vỡ font chữ --%>
-    <%@page contentType="text/html" pageEncoding="UTF-8" %>
-        <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-            <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@page contentType="text/html" pageEncoding="UTF-8" %>
+    <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+        <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
-                <!DOCTYPE html>
-                <html lang="vi">
+            <!DOCTYPE html>
+            <html lang="vi">
 
-                <head>
-                    <meta charset="UTF-8">
-                    <title>WolfHome - Thế giới Robot hút bụi</title>
-                    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
-                        rel="stylesheet">
-                    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
-                        rel="stylesheet">
-                    <link rel="stylesheet" href="/client/css/style.css">
-                </head>
+            <head>
+                <meta charset="UTF-8">
+                <title>WolfHome - Robot Hút Bụi Thông Minh</title>
+                <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+                <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+                <style>
+                    /* Card tổng thể: Bo góc rộng và đổ bóng cực mịn */
+                    .product-card {
+                        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+                        border: none !important;
+                        border-radius: 15px;
+                        overflow: hidden;
+                        background-color: #fff;
+                        display: flex;
+                        flex-direction: column;
+                        height: 100%;
+                    }
 
-                <body class="bg-light">
-                    <%-- Header chứa Thanh tìm kiếm và Danh mục --%>
-                        <jsp:include page="../layout/header.jsp" />
+                    /* Hiệu ứng nhấc nhẹ khi di chuột vào */
+                    .product-card:hover {
+                        transform: translateY(-8px);
+                        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08) !important;
+                    }
 
-                        <div class="container my-5">
-                            <div class="section-header mb-4 d-flex justify-content-between align-items-center">
-                                <h3 class="fw-bold text-uppercase border-start border-primary border-4 ps-3">Sản phẩm
-                                    mới nhất</h3>
-                                <div class="filter-sort">
-                                    <small class="text-muted">Sắp xếp theo: </small>
-                                    <select class="form-select-sm border-0 bg-transparent">
-                                        <option>Hàng mới nhất</option>
-                                        <option>Giá tăng dần</option>
-                                    </select>
+                    /* Vùng chứa ảnh: Cố định 210px để form luôn đều */
+                    .product-img-container {
+                        height: 210px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        background-color: #ffffff;
+                        padding: 20px;
+                    }
+
+                    .product-img-container img {
+                        max-width: 100%;
+                        max-height: 100%;
+                        object-fit: contain;
+                        /* Đảm bảo ảnh không bị méo */
+                    }
+
+                    /* Vùng thông tin: Màu trắng xám cực nhạt (#fafafa), không gạch ngang */
+                    .product-info-section {
+                        background-color: #fafafa;
+                        padding: 15px 20px;
+                        flex-grow: 1;
+                        /* Giúp các card cao bằng nhau */
+                        border: none !important;
+                    }
+
+                    /* Giới hạn tên sản phẩm tối đa 2 dòng */
+                    .product-title {
+                        height: 2.4em;
+                        line-height: 1.2em;
+                        overflow: hidden;
+                        display: -webkit-box;
+                        -webkit-line-clamp: 2;
+                        -webkit-box-orient: vertical;
+                        font-size: 0.9rem;
+                        color: #333;
+                        margin-bottom: 5px;
+                    }
+
+                    /* Màu sao đánh giá */
+                    .product-rating {
+                        color: #ffc107;
+                        font-size: 0.8rem;
+                        margin-bottom: 10px;
+                    }
+
+                    /* Giá tiền đỏ cam nổi bật */
+                    .product-price {
+                        color: #ee4d2d;
+                        font-weight: 700;
+                        font-size: 1.1rem;
+                        margin-bottom: 5px;
+                    }
+
+                    /* Footer chứa nút bấm gộp màu với vùng info */
+                    .card-footer-custom {
+                        background-color: #fafafa;
+                        border: none !important;
+                        padding: 0 20px 20px 20px;
+                    }
+
+                    .btn-add-cart {
+                        font-size: 0.85rem;
+                        font-weight: 600;
+                        padding: 10px 0;
+                        transition: all 0.2s;
+                    }
+
+                    .btn-add-cart:hover {
+                        filter: brightness(1.1);
+                        transform: scale(1.02);
+                    }
+                </style>
+            </head>
+
+            <body class="bg-light">
+                <jsp:include page="../layout/header.jsp" />
+
+                <div class="container my-5">
+                    <h3 class="fw-bold text-uppercase border-start border-primary border-4 ps-3 mb-4">
+                        Sản phẩm mới nhất
+                    </h3>
+
+                    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-4">
+                        <c:forEach var="p" items="${products}">
+                            <div class="col">
+                                <div class="card product-card shadow-sm">
+                                    <a href="/product/${p.id}" class="text-decoration-none d-flex flex-column h-100">
+                                        <div class="product-img-container">
+                                            <c:if test="${not empty p.images}">
+                                                <img src="/images/${p.images[0].imageUrl}" alt="${p.name}">
+                                            </c:if>
+                                            <c:if test="${empty p.images}">
+                                                <img src="/images/default-product.png" alt="No image">
+                                            </c:if>
+                                        </div>
+
+                                        <div class="product-info-section text-center">
+                                            <h6 class="product-title fw-bold">${p.name}</h6>
+
+                                            <div class="product-rating">
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                            </div>
+
+                                            <p class="product-price mb-0">
+                                                <fmt:formatNumber value="${p.price}" type="currency"
+                                                    currencySymbol="đ" />
+                                            </p>
+                                        </div>
+                                    </a>
+
+                                    <div class="card-footer-custom">
+                                        <form action="/add-product-to-cart/${p.id}" method="POST">
+                                            <input type="hidden" name="quantity" value="1">
+                                            <button type="submit"
+                                                class="btn btn-primary w-100 rounded-pill btn-add-cart">
+                                                <i class="fas fa-shopping-cart me-2"></i>Thêm vào giỏ
+                                            </button>
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
+                        </c:forEach>
+                    </div>
+                </div>
 
-                            <%-- LƯỚI SẢN PHẨM: Tái hiện mẫu WolfHome --%>
-                                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-4">
-                                    <c:forEach var="p" items="${products}">
-                                        <div class="col">
-                                            <div class="card h-100 product-card shadow-sm border-0">
-                                                <%-- Tag giảm giá như mẫu --%>
-                                                    <span
-                                                        class="badge bg-danger position-absolute top-0 start-0 m-2">Giảm
-                                                        20%</span>
+                <jsp:include page="../layout/footer.jsp" />
+                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+            </body>
 
-                                                    <%-- Link dẫn tới Use Case: Xem chi tiết sản phẩm --%>
-                                                        <a href="/product/${p.id}"
-                                                            class="text-decoration-none text-dark d-flex flex-column h-100">
-                                                            <div class="p-3 text-center">
-                                                                <%-- Lưu ý: Kiểm tra lại list images trong domain
-                                                                    Product của bạn --%>
-                                                                    <img src="/images/${p.images[0].imageUrl}"
-                                                                        class="img-fluid rounded" alt="${p.name}"
-                                                                        style="max-height: 180px;">
-                                                            </div>
-                                                            <div class="card-body pt-0 mt-auto">
-                                                                <h6 class="card-title fw-bold text-truncate-2 mb-2">
-                                                                    ${p.name}</h6>
-                                                                <div class="price-box mb-2">
-                                                                    <span class="text-danger fw-bold fs-5">
-                                                                        <fmt:formatNumber value="${p.price}"
-                                                                            type="currency" currencySymbol="đ" />
-                                                                    </span>
-                                                                </div>
-                                                                <div class="rating-box small text-warning">
-                                                                    <i class="fas fa-star"></i><i
-                                                                        class="fas fa-star"></i><i
-                                                                        class="fas fa-star"></i><i
-                                                                        class="fas fa-star"></i><i
-                                                                        class="fas fa-star"></i>
-                                                                    <span class="text-muted ms-1">(12)</span>
-                                                                </div>
-                                                            </div>
-                                                        </a>
-
-                                                        <div class="card-footer bg-transparent border-0 pb-3">
-                                                            <%-- Sửa action cho khớp với @PostMapping("/{id}") --%>
-                                                                <form action="/add-product-to-cart/${p.id}"
-                                                                    method="POST">
-                                                                    <%-- Gửi mặc định số lượng là 1 --%>
-                                                                        <input type="hidden" name="quantity" value="1">
-
-                                                                        <button type="submit"
-                                                                            class="btn btn-primary w-100 rounded-pill py-2 shadow-sm">
-                                                                            <i class="fas fa-cart-plus me-1"></i> Thêm
-                                                                            vào giỏ
-                                                                        </button>
-                                                                </form>
-                                                        </div>
-                                            </div>
-                                        </div>
-                                    </c:forEach>
-                                </div>
-
-                                <%-- Nếu không có sản phẩm nào --%>
-                                    <c:if test="${empty products}">
-                                        <div class="text-center my-5 py-5">
-                                            <i class="fas fa-box-open fa-4x text-muted mb-3"></i>
-                                            <p class="fs-5 text-secondary">Rất tiếc, không tìm thấy sản phẩm nào phù
-                                                hợp!</p>
-                                            <a href="/" class="btn btn-primary rounded-pill px-4">Quay lại trang chủ</a>
-                                        </div>
-                                    </c:if>
-                        </div>
-
-                        <jsp:include page="../layout/footer.jsp" />
-                        <script
-                            src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-                </body>
-
-                </html>
+            </html>

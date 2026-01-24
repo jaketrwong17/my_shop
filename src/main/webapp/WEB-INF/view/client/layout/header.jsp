@@ -13,10 +13,7 @@
                         </button>
                         <ul class="dropdown-menu shadow border-0">
                             <c:forEach var="cat" items="${categories}">
-                                <li>
-                                    <%-- Sửa link để không bị lỗi 404 --%>
-                                        <a class="dropdown-item" href="/?categoryId=${cat.id}">${cat.name}</a>
-                                </li>
+                                <li><a class="dropdown-item" href="/?categoryId=${cat.id}">${cat.name}</a></li>
                             </c:forEach>
                         </ul>
                     </div>
@@ -34,10 +31,11 @@
                 <div class="header-icons d-flex align-items-center gap-3">
                     <a href="/cart" class="text-white text-decoration-none position-relative">
                         <i class="fas fa-shopping-cart fs-4"></i>
-                        <span
-                            class="badge bg-warning text-dark rounded-pill position-absolute top-0 start-100 translate-middle">
-                            ${cartSum != null ? cartSum : 0}
-                        </span>
+                        <%-- QUAN TRỌNG: Badge này sẽ nhảy số ngay khi Hiếu thêm sản phẩm --%>
+                            <span
+                                class="badge bg-warning text-dark rounded-pill position-absolute top-0 start-100 translate-middle">
+                                ${sum != null ? sum : 0}
+                            </span>
                     </a>
                 </div>
             </div>

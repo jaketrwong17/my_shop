@@ -3,6 +3,7 @@ package com.example.shop.service;
 import com.example.shop.domain.Cart;
 import com.example.shop.domain.Role;
 import com.example.shop.domain.User;
+import com.example.shop.domain.dto.RegisterDTO;
 import com.example.shop.repository.RoleRepository;
 import com.example.shop.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -74,5 +75,19 @@ public class UserService {
     // [BỔ SUNG] Lấy Role theo tên cho các logic phân quyền
     public Role getRoleByName(String name) {
         return this.roleRepository.findByName(name);
+    }
+
+    // 4. Hàm chuyển đổi từ RegisterDTO sang User Entity
+    public User registerDTOtoUser(RegisterDTO registerDTO) {
+        User user = new User();
+        user.setFullName(registerDTO.getFirstName() + " " + registerDTO.getLastName());
+        user.setEmail(registerDTO.getEmail());
+        user.setPassword(registerDTO.getPassword());
+        return user;
+    }
+
+    // THÊM HÀM NÀY
+    public boolean checkEmailExists(String email) {
+        return this.userRepository.existsByEmail(email);
     }
 }

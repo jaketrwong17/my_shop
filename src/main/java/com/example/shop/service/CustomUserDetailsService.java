@@ -1,43 +1,36 @@
 package com.example.shop.service;
 
-import com.example.shop.domain.User;
-import com.example.shop.repository.UserRepository;
+import java.util.Collections;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
-    private final UserRepository userRepository;
+    private final UserService userService;
 
-    public CustomUserDetailsService(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public CustomUserDetailsService(UserService userService) {
+        this.userService = userService;
     }
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        // 1. Tìm user trong DB bằng email
-        User user = userRepository.findByEmail(email);
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        // Trong hệ thống của bạn, username chính là Email
+        com.example.shop.domain.User user = this.userService.getUserByEmail(username);
 
         if (user == null) {
-            throw new UsernameNotFoundException("Không tìm thấy user với email: " + email);
+            throw new UsernameNotFoundException("User not found");
         }
 
-        // 2. Tạo quyền (Role) cho Spring Security hiểu
-        // Spring Security yêu cầu Role phải có tiền tố "ROLE_"
-        String roleName = user.getRole().getName(); // VD: "ADMIN" hoặc "CUSTOMER"
-        SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + roleName);
-
-        // 3. Trả về đối tượng User của Spring Security
-        // (org.springframework.security.core.userdetails.User)
-        return new org.springframework.security.core.userdetails.User(
+        // Tạo User của Spring Security (Mapping từ User của bạn sang)
+        // Giả sử Role của bạn là String (ví dụ "ADMIN" hoặc "USER")
+        return new User(
                 user.getEmail(),
                 user.getPassword(),
-                Collections.singletonList(authority));
+                Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + user.getRole().getName())));
     }
 }

@@ -7,7 +7,7 @@ import com.example.shop.service.ProductService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import java.util.ArrayList;
-import java.util.List; // BỔ SUNG IMPORT LIST
+import java.util.List;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -32,61 +32,71 @@ public class ItemController {
         return "client/product/detail";
     }
 
-    @GetMapping("/cart")
-    public String getCartPage(Model model, HttpServletRequest request) {
-        HttpSession session = request.getSession(false);
+    @PostMapping("/add-product-to-cart/{id}")
+    public String addProductToCart(@PathVariable long id, HttpServletRequest request,
+            @RequestParam("quantity") long quantity) {
+        HttpSession session = request.getSession(true);
         String email = (String) session.getAttribute("email");
 
-        // Lấy thông tin giỏ hàng của User từ database
-        Cart cart = this.productService.fetchCartByUserEmail(email);
+        this.productService.handleAddProductToCart(email, id, session, quantity);
 
-        // LƯU Ý: Sửa getCartItems thành tên List bạn đặt trong class Cart
-        List<CartItem> cartItems = (cart != null) ? cart.getCartItems() : new ArrayList<>();
+        String referer = request.getHeader("Referer");
+        return "redirect:" + referer;
+    }
+
+    @GetMapping("/cart")
+    public String getCartPage(Model model, HttpServletRequest request) {
+        HttpSession session = request.getSession(true);
+        String email = (String) session.getAttribute("email");
+        List<CartItem> cartItems;
+
+        if (email == null) {
+            cartItems = (List<CartItem>) session.getAttribute("guestCart");
+            if (cartItems == null)
+                cartItems = new ArrayList<>();
+        } else {
+            Cart cart = this.productService.fetchCartByUserEmail(email);
+            cartItems = (cart != null) ? cart.getCartItems() : new ArrayList<>();
+        }
 
         double totalPrice = 0;
         for (CartItem item : cartItems) {
-            // SỬA LỖI: Gọi qua hàm Getter getQuantity() và getPrice()
             totalPrice += item.getPrice() * item.getQuantity();
         }
 
         model.addAttribute("cartItems", cartItems);
         model.addAttribute("totalPrice", totalPrice);
-
         return "client/cart/show";
     }
 
-    // Sửa đường dẫn thành /add-to-cart để khớp với yêu cầu POST từ trình duyệt
-    @PostMapping("/add-to-cart")
-    public String addProductToCart(
-            HttpServletRequest request,
-            @RequestParam("productId") long id, // Lấy productId từ input hidden của form
-            @RequestParam("quantity") long quantity) {
-
+    // FIX LỖI TẠI ĐÂY: Thêm HttpServletRequest để lấy Session và truyền vào Service
+    @PostMapping("/update-cart-quantity")
+    public String updateCartQuantity(@RequestParam("cartItemId") long cartItemId,
+            @RequestParam("action") String action,
+            HttpServletRequest request) {
         HttpSession session = request.getSession(false);
-        String email = (String) session.getAttribute("email");
-
-        // Gọi service để xử lý thêm sản phẩm vào database
-        this.productService.handleAddProductToCart(email, id, session, quantity);
-
-        // Sau khi thêm thành công, chuyển hướng người dùng về trang giỏ hàng
+        // Gọi hàm 3 tham số (id, action, session) khớp với ProductService mới
+        this.productService.handleUpdateCartQuantity(cartItemId, action, session);
         return "redirect:/cart";
     }
 
-    @PostMapping("/add-product-to-cart/{id}")
-    public String addProductToCart(@PathVariable long id, HttpServletRequest request,
-            @RequestParam("quantity") long quantity) {
+    // FIX LỖI TẠI ĐÂY: Thêm HttpServletRequest
+    @GetMapping("/delete-cart-item/{id}")
+    public String deleteCartItem(@PathVariable long id, HttpServletRequest request) {
         HttpSession session = request.getSession(false);
-        String email = (String) session.getAttribute("email");
+        // Gọi hàm 2 tham số (id, session) khớp với ProductService mới
+        this.productService.handleDeleteCartItem(id, session);
+        return "redirect:/cart";
+    }
 
-        // 1. Lưu sản phẩm vào Database
-        this.productService.handleAddProductToCart(email, id, session, quantity);
-
-        // 2. Lấy địa chỉ trang hiện tại khách đang đứng
-        String referer = request.getHeader("Referer");
-
-        // 3. QUAN TRỌNG: Quay lại đúng trang cũ
-        // Nó sẽ load lại trang này, cập nhật số lượng trên Header mà không nhảy trang
-        // mới
-        return "redirect:" + referer;
+    @GetMapping("/delete-multiple-cart-items")
+    public String deleteMultipleCartItems(@RequestParam("ids") List<Long> ids, HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (ids != null && !ids.isEmpty()) {
+            for (Long id : ids) {
+                this.productService.handleDeleteCartItem(id, session);
+            }
+        }
+        return "redirect:/cart";
     }
 }
