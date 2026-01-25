@@ -32,17 +32,40 @@ public class ItemController {
         return "client/product/detail";
     }
 
+    // ================== [ĐÃ SỬA] ==================
     @PostMapping("/add-product-to-cart/{id}")
     public String addProductToCart(@PathVariable long id, HttpServletRequest request,
             @RequestParam("quantity") long quantity) {
+
         HttpSession session = request.getSession(true);
         String email = (String) session.getAttribute("email");
 
+        // 1. Xử lý thêm vào Database (logic cũ của bạn)
         this.productService.handleAddProductToCart(email, id, session, quantity);
+
+        // 2. [QUAN TRỌNG] Cập nhật lại số lượng (sum) vào Session ngay lập tức
+        int newSum = 0;
+        if (email != null) {
+            // Nếu User đã đăng nhập: Lấy giỏ hàng từ DB để đếm
+            Cart cart = this.productService.fetchCartByUserEmail(email);
+            if (cart != null) {
+                newSum = cart.getCartItems().size();
+            }
+        } else {
+            // Nếu là khách (Guest): Lấy từ session guestCart để đếm
+            List<CartItem> guestCart = (List<CartItem>) session.getAttribute("guestCart");
+            if (guestCart != null) {
+                newSum = guestCart.size();
+            }
+        }
+
+        // Lưu biến 'sum' để header hiển thị số mới
+        session.setAttribute("sum", newSum);
 
         String referer = request.getHeader("Referer");
         return "redirect:" + referer;
     }
+    // ==============================================
 
     @GetMapping("/cart")
     public String getCartPage(Model model, HttpServletRequest request) {
@@ -69,22 +92,18 @@ public class ItemController {
         return "client/cart/show";
     }
 
-    // FIX LỖI TẠI ĐÂY: Thêm HttpServletRequest để lấy Session và truyền vào Service
     @PostMapping("/update-cart-quantity")
     public String updateCartQuantity(@RequestParam("cartItemId") long cartItemId,
             @RequestParam("action") String action,
             HttpServletRequest request) {
         HttpSession session = request.getSession(false);
-        // Gọi hàm 3 tham số (id, action, session) khớp với ProductService mới
         this.productService.handleUpdateCartQuantity(cartItemId, action, session);
         return "redirect:/cart";
     }
 
-    // FIX LỖI TẠI ĐÂY: Thêm HttpServletRequest
     @GetMapping("/delete-cart-item/{id}")
     public String deleteCartItem(@PathVariable long id, HttpServletRequest request) {
         HttpSession session = request.getSession(false);
-        // Gọi hàm 2 tham số (id, session) khớp với ProductService mới
         this.productService.handleDeleteCartItem(id, session);
         return "redirect:/cart";
     }

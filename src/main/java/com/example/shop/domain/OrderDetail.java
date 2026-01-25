@@ -11,19 +11,16 @@ public class OrderDetail {
     private long id;
 
     private long quantity;
-    private double price; // Giá tại thời điểm mua (để phòng trường hợp sau này giá SP thay đổi)
+    private double price; // Giá tại thời điểm mua (để phòng trường hợp sau này sản phẩm đổi giá)
 
-    // Quan hệ: Thuộc về đơn hàng nào
     @ManyToOne
     @JoinColumn(name = "order_id")
     private Order order;
 
-    // Quan hệ: Là sản phẩm nào
     @ManyToOne
     @JoinColumn(name = "product_id")
     private Product product;
 
-    // --- GETTER & SETTER ---
     public long getId() {
         return id;
     }
@@ -63,4 +60,6 @@ public class OrderDetail {
     public void setProduct(Product product) {
         this.product = product;
     }
+
+    // --- Constructor, Getter, Setter ---
 }

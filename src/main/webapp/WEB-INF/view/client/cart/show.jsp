@@ -115,15 +115,20 @@
                                                 <div class="d-flex align-items-center justify-content-between">
                                                     <form action="/update-cart-quantity" method="POST"
                                                         class="d-flex mb-0">
+                                                        <input type="hidden" name="${_csrf.parameterName}"
+                                                            value="${_csrf.token}" />
+
                                                         <input type="hidden" name="cartItemId" value="${item.id}">
                                                         <div class="input-group border rounded-pill overflow-hidden bg-white"
                                                             style="width: 110px;">
                                                             <button
                                                                 class="btn btn-link text-dark text-decoration-none fw-bold"
                                                                 type="submit" name="action" value="minus">-</button>
+
                                                             <input type="text"
                                                                 class="form-control border-0 text-center fw-bold bg-transparent"
                                                                 value="${item.quantity}" readonly>
+
                                                             <button
                                                                 class="btn btn-link text-dark text-decoration-none fw-bold"
                                                                 type="submit" name="action" value="plus">+</button>

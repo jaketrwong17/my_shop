@@ -90,4 +90,21 @@ public class UserService {
     public boolean checkEmailExists(String email) {
         return this.userRepository.existsByEmail(email);
     }
+    // Trong class UserService
+
+    public void updateUserProfile(long userId, User updatedUser) {
+        User currentUser = this.getUserById(userId);
+
+        if (currentUser != null) {
+            // Chỉ cập nhật các thông tin cho phép
+            currentUser.setFullName(updatedUser.getFullName());
+            currentUser.setPhone(updatedUser.getPhone());
+            currentUser.setAddress(updatedUser.getAddress());
+
+            // currentUser.setEmail(...) -> KHÔNG cập nhật email
+            // currentUser.setPassword(...) -> KHÔNG cập nhật password tại đây
+
+            this.userRepository.save(currentUser);
+        }
+    }
 }

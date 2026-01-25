@@ -56,14 +56,25 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http, AuthenticationSuccessHandler successHandler)
             throws Exception {
         http
+                // Trong SecurityConfig.java
+
                 .authorizeHttpRequests(authorize -> authorize
                         .dispatcherTypeMatchers(DispatcherType.FORWARD, DispatcherType.INCLUDE).permitAll()
+
+                        // 1. Cho phép truy cập tài nguyên tĩnh và các trang công khai
                         .requestMatchers("/", "/login", "/register", "/product/**", "/client/**", "/css/**", "/js/**",
                                 "/images/**")
                         .permitAll()
-                        .requestMatchers("/admin/**").hasRole("ADMIN") // Chỉ Admin mới vào được trang quản trị
-                        .anyRequest().authenticated() // Các trang còn lại (cart, checkout) phải đăng nhập
-                )
+
+                        // 2. [QUAN TRỌNG] Cho phép Thêm/Sửa/Xóa giỏ hàng mà KHÔNG CẦN ĐĂNG NHẬP
+                        .requestMatchers("/add-product-to-cart/**", "/cart", "/delete-cart-item/**",
+                                "/update-cart-quantity/**", "/delete-multiple-cart-items/**")
+                        .permitAll()
+
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+
+                        // 3. Các trang còn lại (Ví dụ: /checkout, /history) bắt buộc phải đăng nhập
+                        .anyRequest().authenticated())
                 .formLogin(form -> form
                         .loginPage("/login")
                         .loginProcessingUrl("/login") // Spring Security tự xử lý POST ở đây

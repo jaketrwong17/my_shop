@@ -1,37 +1,52 @@
 package com.example.shop.domain;
 
 import jakarta.persistence.*;
+import java.util.Date;
 import java.util.List;
 
 @Entity
-@Table(name = "orders") // "order" là từ khóa của SQL nên phải đặt tên bảng là "orders" (số nhiều)
+@Table(name = "orders")
 public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    // Tổng tiền thanh toán
     private double totalPrice;
 
-    // Trạng thái đơn hàng: "PENDING" (Chờ xác nhận), "SHIPPING" (Đang giao),
-    // "COMPLETED" (Hoàn thành), "CANCELLED" (Hủy)
-    private String status;
-
-    // Thông tin người nhận (Có thể khác với thông tin User đăng ký)
+    // Thông tin người nhận (có thể khác với User đăng ký)
     private String receiverName;
     private String receiverAddress;
     private String receiverPhone;
 
-    // Quan hệ: Một User có nhiều đơn hàng
+    // Trạng thái đơn hàng: PENDING (Chờ xác nhận), SHIPPING, COMPLETED, CANCELLED
+    private String status;
+
+    // Phương thức thanh toán: COD, VN_PAY...
+    private String paymentMethod;
+
+    // Trạng thái thanh toán: UNPAID, PAID
+    private String paymentStatus;
+
+    private Date createdAt;
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
-    // Quan hệ: Một đơn hàng có nhiều món (OrderDetail)
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderDetail> orderDetails;
 
-    // --- GETTER & SETTER ---
+    // --- Constructor, Getter, Setter ---
+    // Bạn tự generate nhé (Alt + Insert trong IntelliJ)
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = new Date();
+
+    }
+
     public long getId() {
         return id;
     }
@@ -46,14 +61,6 @@ public class Order {
 
     public void setTotalPrice(double totalPrice) {
         this.totalPrice = totalPrice;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
     }
 
     public String getReceiverName() {
@@ -80,6 +87,38 @@ public class Order {
         this.receiverPhone = receiverPhone;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(String paymentMethod) {
+        this.paymentMethod = paymentMethod;
+    }
+
+    public String getPaymentStatus() {
+        return paymentStatus;
+    }
+
+    public void setPaymentStatus(String paymentStatus) {
+        this.paymentStatus = paymentStatus;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
     public User getUser() {
         return user;
     }
@@ -96,15 +135,4 @@ public class Order {
         this.orderDetails = orderDetails;
     }
 
-    // [THÊM TRƯỜNG NÀY VÀO]
-    private String paymentRef; // Mã giao dịch thanh toán (nếu có)
-
-    // [THÊM GETTER & SETTER]
-    public String getPaymentRef() {
-        return paymentRef;
-    }
-
-    public void setPaymentRef(String paymentRef) {
-        this.paymentRef = paymentRef;
-    }
 }

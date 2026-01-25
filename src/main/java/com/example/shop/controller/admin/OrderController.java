@@ -9,7 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
-@Controller
+// [SỬA LẠI DÒNG NÀY] Đặt tên bean để không trùng với client
+@Controller("adminOrderController")
 public class OrderController {
 
     private final OrderService orderService;
@@ -18,16 +19,14 @@ public class OrderController {
         this.orderService = orderService;
     }
 
-    // 1. DANH SÁCH ĐƠN HÀNG (Có phân trang/tìm kiếm nếu cần)
     @GetMapping("/admin/order")
     public String getDashboard(Model model) {
-        // Lấy tất cả đơn hàng (sau này Jake có thể thêm tìm kiếm theo ID hoặc Status)
+        // Bây giờ hàm này sẽ hết lỗi vì Service đã có getAllOrders()
         List<Order> orders = orderService.getAllOrders();
         model.addAttribute("orders", orders);
         return "admin/order/show";
     }
 
-    // 2. XEM CHI TIẾT ĐƠN HÀNG
     @GetMapping("/admin/order/view/{id}")
     public String getOrderDetailPage(Model model, @PathVariable long id) {
         Optional<Order> orderOptional = orderService.getOrderById(id);
@@ -41,7 +40,6 @@ public class OrderController {
         }
     }
 
-    // 3. CẬP NHẬT TRẠNG THÁI (Xác nhận, Hủy,...)
     @PostMapping("/admin/order/update/{id}")
     public String updateOrderStatus(@PathVariable long id, @RequestParam("status") String status) {
         Optional<Order> orderOptional = orderService.getOrderById(id);
@@ -53,7 +51,6 @@ public class OrderController {
         return "redirect:/admin/order";
     }
 
-    // 4. XÓA ĐƠN HÀNG (Nếu cần)
     @GetMapping("/admin/order/delete/{id}")
     public String deleteOrder(@PathVariable long id) {
         orderService.deleteOrderById(id);

@@ -146,6 +146,8 @@
 
                                     <div class="card-footer-custom">
                                         <form action="/add-product-to-cart/${p.id}" method="POST">
+                                            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+
                                             <input type="hidden" name="quantity" value="1">
                                             <button type="submit"
                                                 class="btn btn-primary w-100 rounded-pill btn-add-cart">
