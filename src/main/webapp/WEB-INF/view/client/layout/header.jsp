@@ -3,27 +3,41 @@
         <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
             <style>
-                /* Container chứa dòng chạy */
+                /* 1. CSS CHO THANH CHỮ CHẠY */
                 .coupon-ticker-wrap {
                     background-color: #0D6EFD;
-                    /* Vàng nhạt */
+                    /* Màu xanh */
                     border-bottom: 1px solid #ffecb5;
+                    width: 100%;
+                    position: relative;
+                    z-index: 1;
+                    /* QUAN TRỌNG: Để thấp (1) để menu (1020) đè lên được */
+                }
+
+                /* Khung nhìn giới hạn chữ chạy */
+                .ticker-viewport {
                     overflow: hidden;
                     white-space: nowrap;
                     height: 40px;
                     display: flex;
                     align-items: center;
                     position: relative;
-                    z-index: 1;
-                    /* Đảm bảo nằm dưới Navbar nhưng trên nội dung khác */
+                    /* Tạo hiệu ứng mờ 2 đầu */
+                    -webkit-mask-image: linear-gradient(to right, transparent, black 20px, black 95%, transparent);
+                    mask-image: linear-gradient(to right, transparent, black 20px, black 95%, transparent);
                 }
 
-                /* Phần nội dung chạy */
+                /* Nội dung chạy */
                 .coupon-ticker-content {
                     display: inline-block;
                     padding-left: 100%;
+                    animation: ticker-scroll 120s linear infinite;
+                }
 
-                    animation: ticker-scroll 300s linear infinite;
+                /* Di chuột vào thì dừng */
+                .coupon-ticker-content:hover {
+                    animation-play-state: paused;
+                    cursor: default;
                 }
 
                 @keyframes ticker-scroll {
@@ -36,32 +50,37 @@
                     }
                 }
 
-                /* Di chuột vào thì dừng lại
-                .coupon-ticker-content:hover {
-                    animation-play-state: paused;
-                    cursor: pointer;
-                } */
-
-                /* Style cho từng mã */
                 .coupon-item {
-                    margin-right: 60px;
+                    margin-right: 50px;
                     font-weight: 500;
                     color: #fff;
                     font-size: 0.9rem;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 8px;
                 }
 
-                .coupon-code {
-                    background-color: #dc3545;
-                    color: white;
-                    padding: 2px 8px;
-                    border-radius: 4px;
-                    font-weight: bold;
-                    border: 1px dashed white;
-                    margin-left: 5px;
+                .coupon-item i {
+                    font-size: 0.85rem;
+                    opacity: 0.9;
+                }
+
+                /* 2. QUAN TRỌNG: Đảm bảo Header luôn nằm trên thanh chạy */
+                header.sticky-top {
+                    z-index: 1020 !important;
+                    /* Bootstrap mặc định là 1020, set cứng để chắc chắn */
+                    position: sticky;
+                    top: 0;
+                }
+
+                /* Chỉnh lại dropdown menu */
+                .dropdown-menu {
+                    z-index: 1030 !important;
+                    /* Cao hơn mọi thứ */
                 }
             </style>
 
-            <header class="navbar navbar-expand-lg navbar-dark bg-primary py-3  sticky-top">
+            <header class="navbar navbar-expand-lg navbar-dark bg-primary py-3 sticky-top">
                 <div class="container">
                     <a class="navbar-brand fw-bold fs-3" href="/">16Home<span class="text-warning">.</span></a>
 
@@ -72,30 +91,53 @@
 
                     <div class="collapse navbar-collapse" id="navbarContent">
                         <div class="d-flex flex-grow-1 mx-lg-4 my-2 my-lg-0">
+
                             <div class="dropdown me-2">
                                 <button class="btn btn-primary border-white dropdown-toggle rounded-pill w-100"
                                     type="button" id="dropdownMenuCategory" data-bs-toggle="dropdown"
                                     aria-expanded="false">
                                     <i class="fas fa-bars me-2"></i>Danh mục
                                 </button>
-                                <ul class="dropdown-menu shadow border-0" aria-labelledby="dropdownMenuCategory">
+                                <ul class="dropdown-menu shadow border-0" aria-labelledby="dropdownMenuCategory"
+                                    style="min-width: 250px; padding: 0.5rem 0;">
                                     <c:choose>
                                         <c:when test="${not empty categories}">
                                             <c:forEach var="cat" items="${categories}">
-                                                <li><a class="dropdown-item"
-                                                        href="/?categoryId=${cat.id}">${cat.name}</a></li>
+                                                <li>
+                                                    <a class="dropdown-item py-2 d-flex align-items-center"
+                                                        href="/?categoryId=${cat.id}">
+                                                        <div class="me-3 d-flex align-items-center justify-content-center"
+                                                            style="width: 30px; height: 30px;">
+                                                            <c:choose>
+                                                                <c:when test="${not empty cat.image}">
+                                                                    <img src="/images/${cat.image}" alt="${cat.name}"
+                                                                        style="width: 100%; height: 100%; object-fit: contain;"
+                                                                        onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+                                                                    <i class="fas fa-mobile-alt text-muted"
+                                                                        style="display: none;"></i>
+                                                                </c:when>
+                                                                <c:otherwise>
+                                                                    <i class="fas fa-tag text-secondary opacity-50"></i>
+                                                                </c:otherwise>
+                                                            </c:choose>
+                                                        </div>
+                                                        <span class="fw-normal"
+                                                            style="font-size: 0.95rem;">${cat.name}</span>
+                                                    </a>
+                                                </li>
                                             </c:forEach>
                                         </c:when>
                                         <c:otherwise>
-                                            <li><a class="dropdown-item disabled" href="#">Chưa có danh mục</a></li>
+                                            <li><a class="dropdown-item disabled text-muted" href="#">Chưa có danh
+                                                    mục</a></li>
                                         </c:otherwise>
                                     </c:choose>
                                 </ul>
                             </div>
 
                             <form class="flex-grow-1 d-flex position-relative" action="/" method="GET">
-                                <input class="form-control rounded-pill pe-5" type="search" name="search"
-                                    placeholder="Tìm Robot hút bụi, Nồi cơm..." value="${param.search}">
+                                <input class="form-control rounded-pill pe-5" type="search" name="keyword"
+                                    placeholder="Tìm Robot hút bụi, Nồi cơm..." value="${param.keyword}">
                                 <button
                                     class="btn btn-link position-absolute end-0 top-50 translate-middle-y me-2 text-primary"
                                     type="submit">
@@ -154,7 +196,6 @@
                                             <li><a class="dropdown-item py-2" href="/history"><i
                                                         class="fas fa-box-open me-2 text-success"></i> Đơn hàng của
                                                     tôi</a></li>
-
                                             <li>
                                                 <hr class="dropdown-divider">
                                             </li>
@@ -179,56 +220,25 @@
                 </div>
             </header>
 
-            </header>
-
-            <div class="coupon-ticker-wrap py-2">
-                <div class="coupon-ticker-content">
-                    <c:forEach begin="1" end="20">
-                        <span class="coupon-item">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"
-                                fill="none">
-                                <path stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                    d="M4.5 6a4 4 0 1 0 8 0 4 4 0 0 0-8 0Z"></path>
-                                <path stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                    d="m8.5 10 2.267 3.927 1.065-2.156 2.399.155L11.964 8M5.035 8l-2.267 3.927 2.399-.156 1.065 2.155L8.499 10">
-                                </path>
-                            </svg>
-                            Sản phẩm chính hãng
-                        </span>
-
-                        <span class="coupon-item">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                                fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round">
-                                <path
-                                    d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
-                                </path>
-                            </svg>
-                            Tổng đài tư vấn: 0968 733 752
-                        </span>
-
-                        <span class="coupon-item">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"
-                                viewBox="0 0 17 16">
-                                <path stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                    d="M3.833 11.333a1.333 1.333 0 1 0 2.667 0 1.333 1.333 0 0 0-2.667 0ZM10.5 11.333a1.333 1.333 0 1 0 2.667 0 1.333 1.333 0 0 0-2.667 0Z">
-                                </path>
-                                <path stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                    d="M3.833 11.333H2.5V8.667m-.667-5.334h7.334v8m-2.667 0h4m2.667 0H14.5v-4m0 0H9.167m5.333 0L12.5 4H9.167M2.5 6h2.667">
-                                </path>
-                            </svg>
-                            Giao hàng tận nơi
-                        </span>
-
-                        <span class="coupon-item">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="17" height="16" viewBox="0 0 17 16"
-                                fill="none">
-                                <path stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                    d="M3.167 8V6a2 2 0 0 1 2-2h8.666m0 0-2-2m2 2-2 2M13.833 8v2a2 2 0 0 1-2 2H3.167m0 0 2 2m-2-2 2-2">
-                                </path>
-                            </svg>
-                            Đổi trả miễn phí trong vòng 7 ngày
-                        </span>
-                    </c:forEach>
+            <div class="coupon-ticker-wrap">
+                <div class="container">
+                    <div class="ticker-viewport">
+                        <div class="coupon-ticker-content">
+                            <c:forEach begin="1" end="10">
+                                <span class="coupon-item">
+                                    <i class="fas fa-check-circle"></i> Sản phẩm chính hãng
+                                </span>
+                                <span class="coupon-item">
+                                    <i class="fas fa-phone-alt"></i> Tổng đài: 0968 733 752
+                                </span>
+                                <span class="coupon-item">
+                                    <i class="fas fa-shipping-fast"></i> Giao hàng tận nơi
+                                </span>
+                                <span class="coupon-item">
+                                    <i class="fas fa-sync-alt"></i> Đổi trả 7 ngày
+                                </span>
+                            </c:forEach>
+                        </div>
+                    </div>
                 </div>
             </div>

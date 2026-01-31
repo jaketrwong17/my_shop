@@ -8,8 +8,6 @@ import org.springframework.web.bind.annotation.*;
 import com.example.shop.domain.Order; // <-- Thêm dòng này
 import java.util.List; // <-- Thêm dòng này nếu List cũng bị đỏ
 
-import java.util.List;
-
 @Controller
 public class UserController {
 
