@@ -17,8 +17,8 @@
                 <div class="container my-5">
 
                     <c:if test="${not empty param.error}">
-                        <div class="alert alert-danger text-center">
-                            ${param.error}
+                        <div class="alert alert-danger shadow-sm border-start border-4 border-danger">
+                            <i class="fas fa-exclamation-triangle me-2"></i> ${param.error}
                         </div>
                     </c:if>
 
@@ -35,8 +35,8 @@
                             <div class="col-md-7">
                                 <div class="card shadow-sm border-0 mb-4">
                                     <div class="card-header bg-white py-3">
-                                        <h5 class="mb-0 fw-bold"><i
-                                                class="fas fa-map-marker-alt text-danger me-2"></i>Thông tin nhận hàng
+                                        <h5 class="mb-0 fw-bold">
+                                            <i class="fas fa-map-marker-alt text-danger me-2"></i>Thông tin nhận hàng
                                         </h5>
                                     </div>
                                     <div class="card-body p-4">
@@ -75,6 +75,13 @@
                                                         <div>
                                                             <h6 class="my-0 small fw-bold">${item.product.name}</h6>
 
+                                                            <c:if test="${not empty item.productColor}">
+                                                                <small class="text-muted d-block mt-1">
+                                                                    Phân loại: <span
+                                                                        class="text-primary">${item.productColor.colorName}</span>
+                                                                </small>
+                                                            </c:if>
+
                                                             <c:if
                                                                 test="${not empty discountMap and discountMap[item.id] > 0}">
                                                                 <small class="text-success fst-italic">
@@ -88,7 +95,6 @@
 
                                                     <div class="text-end">
                                                         <c:set var="itemTotal" value="${item.price * item.quantity}" />
-
                                                         <c:if
                                                             test="${not empty discountMap and discountMap[item.id] > 0}">
                                                             <div class="text-muted small text-decoration-line-through">
@@ -101,9 +107,8 @@
                                                                     type="currency" currencySymbol="đ" />
                                                             </span>
                                                         </c:if>
-
                                                         <c:if test="${empty discountMap or discountMap[item.id] == 0}">
-                                                            <span class="text-muted small">
+                                                            <span class="text-muted small fw-bold">
                                                                 <fmt:formatNumber value="${itemTotal}" type="currency"
                                                                     currencySymbol="đ" />
                                                             </span>
@@ -115,26 +120,15 @@
                                     </div>
 
                                     <div class="p-4 bg-light border-top">
-                                        <c:if test="${not empty successMessage}">
-                                            <div class="alert alert-success py-1 small mb-2"><i
-                                                    class="fas fa-check-circle me-1"></i> ${successMessage}</div>
-                                        </c:if>
-                                        <c:if test="${not empty errorMessage}">
-                                            <div class="alert alert-danger py-1 small mb-2"><i
-                                                    class="fas fa-exclamation-circle me-1"></i> ${errorMessage}</div>
-                                        </c:if>
-
                                         <div class="input-group mb-3">
                                             <input type="text" class="form-control" id="voucherInput"
                                                 value="${voucherCode}" placeholder="Nhập mã giảm giá">
                                             <button class="btn btn-outline-primary fw-bold" type="button"
-                                                onclick="applyVoucher()">
-                                                Áp dụng
-                                            </button>
+                                                onclick="applyVoucher()">Áp dụng</button>
                                         </div>
 
                                         <div class="d-flex justify-content-between mb-2">
-                                            <span>Tạm tính:</span>
+                                            <span class="text-muted">Tạm tính:</span>
                                             <span>
                                                 <fmt:formatNumber value="${originalPrice}" type="currency"
                                                     currencySymbol="đ" />
@@ -143,13 +137,7 @@
 
                                         <c:if test="${discountAmount > 0}">
                                             <div class="d-flex justify-content-between mb-2 text-success">
-                                                <span>
-                                                    Giảm giá
-                                                    <c:if test="${not empty voucher}">
-                                                        (Mã: ${voucher.code} - ${voucher.discount}%)
-                                                    </c:if>
-                                                    :
-                                                </span>
+                                                <span>Giảm giá:</span>
                                                 <span>-
                                                     <fmt:formatNumber value="${discountAmount}" type="currency"
                                                         currencySymbol="đ" />
@@ -180,14 +168,13 @@
                                             <input class="form-check-input" type="radio" name="paymentMethod"
                                                 id="online" value="VNPAY" disabled>
                                             <label class="form-check-label text-muted" for="online">
-                                                <i class="fas fa-credit-card me-2"></i>Thanh toán Online (VNPAY/Momo) -
-                                                Đang bảo trì
+                                                <i class="fas fa-credit-card me-2"></i>Thanh toán Online - Đang bảo trì
                                             </label>
                                         </div>
 
                                         <button type="submit"
                                             class="btn btn-primary w-100 rounded-pill py-2 fw-bold text-uppercase shadow-sm">
-                                            Đặt hàng ngay
+                                            ĐẶT HÀNG NGAY
                                         </button>
                                     </div>
                                 </div>
@@ -202,14 +189,11 @@
                     function applyVoucher() {
                         const code = document.getElementById("voucherInput").value;
                         const currentUrl = new URL(window.location.href);
-
                         if (code.trim() !== "") {
                             currentUrl.searchParams.set('voucherCode', code);
                         } else {
                             currentUrl.searchParams.delete('voucherCode');
                         }
-
-                        // Reload trang với mã voucher trên URL để Controller tính lại tiền
                         window.location.href = currentUrl.toString();
                     }
                 </script>

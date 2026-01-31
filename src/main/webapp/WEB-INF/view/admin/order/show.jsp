@@ -6,6 +6,27 @@
             <html lang="vi">
             <jsp:include page="../layout/header.jsp" />
 
+            <head>
+                <meta name="_csrf" content="${_csrf.token}" />
+                <meta name="_csrf_header" content="${_csrf.headerName}" />
+                <style>
+                    .btn.disabled,
+                    .btn:disabled {
+                        opacity: 0.3 !important;
+                        cursor: not-allowed;
+                        pointer-events: none;
+                        filter: grayscale(100%);
+                    }
+
+                    .action-group {
+                        display: flex;
+                        align-items: center;
+                        justify-content: flex-end;
+                        gap: 8px;
+                    }
+                </style>
+            </head>
+
             <body>
                 <div class="d-flex" id="wrapper">
                     <jsp:include page="../layout/sidebar.jsp">
@@ -19,77 +40,168 @@
 
                         <div class="container-fluid px-4 py-4">
                             <div class="card shadow-sm border-0 rounded-3">
+
                                 <div class="card-header bg-white py-3">
                                     <div class="row">
-                                        <div class="col-md-6">
-                                            <form class="d-flex">
-                                                <input class="form-control me-2" type="search"
-                                                    placeholder="Tìm ID đơn hàng...">
-                                                <button class="btn btn-outline-primary" type="submit">Tìm</button>
+                                        <div class="col-md-9">
+                                            <form action="/admin/order" method="GET"
+                                                class="d-flex gap-2 align-items-center">
+                                                <input type="text" name="keyword" class="form-control" placeholder=""
+                                                    value="${keyword}" style="max-width: 400px;">
+                                                <button class="btn btn-outline-primary ms-2"><i
+                                                        class="fas fa-search"></i>
+                                                </button>
                                             </form>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="card-body p-0">
-                                    <table class="table table-hover align-middle mb-0">
-                                        <thead class="bg-light text-secondary">
-                                            <tr>
-                                                <th class="ps-4">ID</th>
-                                                <th>Người nhận</th>
-                                                <th>Tổng tiền</th>
-                                                <th>Trạng thái</th>
-                                                <th>Hành động</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <c:forEach var="order" items="${orders}">
-                                                <tr>
-                                                    <td class="ps-4 fw-bold">#${order.id}</td>
-                                                    <td>
-                                                        <div class="fw-bold">${order.receiverName}</div>
-                                                        <small class="text-muted">${order.receiverPhone}</small>
-                                                    </td>
-                                                    <td class="text-danger fw-bold">
-                                                        <fmt:formatNumber value="${order.totalPrice}" type="currency"
-                                                            currencySymbol="đ" />
-                                                    </td>
-                                                    <td>
-                                                        <c:choose>
-                                                            <c:when test="${order.status == 'PENDING'}">
-                                                                <span class="badge bg-warning text-dark">Chờ xác
-                                                                    nhận</span>
-                                                            </c:when>
-                                                            <c:when test="${order.status == 'SHIPPING'}">
-                                                                <span class="badge bg-info text-dark">Đang giao</span>
-                                                            </c:when>
-                                                            <c:when test="${order.status == 'COMPLETED'}">
-                                                                <span class="badge bg-success">Hoàn thành</span>
-                                                            </c:when>
-                                                            <c:when test="${order.status == 'CANCELLED'}">
-                                                                <span class="badge bg-danger">Đã hủy</span>
-                                                            </c:when>
-                                                            <c:otherwise>
-                                                                <span class="badge bg-secondary">${order.status}</span>
-                                                            </c:otherwise>
-                                                        </c:choose>
-                                                    </td>
-                                                    <td>
-                                                        <a href="/admin/order/view/${order.id}"
-                                                            class="btn btn-sm btn-primary">
-                                                            <i class="fas fa-eye"></i> Xem & Xử lý
-                                                        </a>
-                                                    </td>
-                                                </tr>
-                                            </c:forEach>
-                                        </tbody>
-                                    </table>
+
+                                    <c:if test="${empty orders}">
+                                        <div class="text-center py-5">
+                                            <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+                                            <p class="text-muted">Không tìm thấy đơn hàng nào phù hợp!</p>
+                                        </div>
+                                    </c:if>
+
+                                    <c:if test="${not empty orders}">
+                                        <div class="table-responsive">
+                                            <table class="table table-hover align-middle mb-0">
+                                                <thead class="bg-light text-secondary">
+                                                    <tr>
+                                                        <th class="ps-4">ID</th>
+                                                        <th>Khách hàng</th>
+                                                        <th>Tổng tiền</th>
+                                                        <th>Trạng thái</th>
+                                                        <th style="min-width: 350px;" class="text-end pe-4">Thao tác
+                                                            nhanh</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <c:forEach var="order" items="${orders}">
+                                                        <tr>
+                                                            <td class="ps-4 fw-bold">#${order.id}</td>
+                                                            <td>
+                                                                <div class="fw-bold">${order.receiverName}</div>
+                                                                <small class="text-muted">${order.receiverPhone}</small>
+                                                            </td>
+                                                            <td class="text-danger fw-bold">
+                                                                <fmt:formatNumber value="${order.totalPrice}"
+                                                                    type="currency" currencySymbol="đ" />
+                                                            </td>
+
+                                                            <td id="status-badge-${order.id}">
+                                                                <c:choose>
+                                                                    <c:when test="${order.status == 'PENDING'}"><span
+                                                                            class="badge bg-warning text-dark">Chờ xử
+                                                                            lý</span></c:when>
+                                                                    <c:when test="${order.status == 'SHIPPING'}"><span
+                                                                            class="badge bg-info text-dark">Đang
+                                                                            giao</span></c:when>
+                                                                    <c:when test="${order.status == 'COMPLETED'}"><span
+                                                                            class="badge bg-success">Hoàn thành</span>
+                                                                    </c:when>
+                                                                    <c:when test="${order.status == 'CANCELLED'}"><span
+                                                                            class="badge bg-danger">Đã hủy</span>
+                                                                    </c:when>
+                                                                </c:choose>
+                                                            </td>
+
+                                                            <td id="action-cell-${order.id}" class="pe-4">
+                                                                <div class="action-group">
+                                                                    <select class="form-select form-select-sm"
+                                                                        onchange="updateStatus(${order.id}, this.value)"
+                                                                        style="width: 140px; font-weight: 500;"
+                                                                        ${order.status=='CANCELLED' ? 'disabled' : '' }>
+                                                                        <option value="PENDING"
+                                                                            ${order.status=='PENDING' ? 'selected' : ''
+                                                                            }>Chờ xử lý</option>
+                                                                        <option value="SHIPPING"
+                                                                            ${order.status=='SHIPPING' ? 'selected' : ''
+                                                                            }>Đang giao</option>
+                                                                        <option value="COMPLETED"
+                                                                            ${order.status=='COMPLETED' ? 'selected'
+                                                                            : '' }>Hoàn thành</option>
+                                                                    </select>
+
+                                                                    <button
+                                                                        onclick="updateStatus(${order.id}, 'SHIPPING')"
+                                                                        class="btn btn-sm btn-success text-white ${order.status != 'PENDING' ? 'disabled' : ''}">
+                                                                        <i class="fas fa-check"></i>
+                                                                    </button>
+
+                                                                    <button
+                                                                        onclick="updateStatus(${order.id}, 'CANCELLED')"
+                                                                        class="btn btn-sm btn-danger ${order.status == 'COMPLETED' || order.status == 'CANCELLED' ? 'disabled' : ''}">
+                                                                        <i class="fas fa-times"></i>
+                                                                    </button>
+
+                                                                    <a href="/admin/order/view/${order.id}"
+                                                                        class="btn btn-sm btn-light border text-primary">
+                                                                        <i class="fas fa-eye"></i>
+                                                                    </a>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </c:forEach>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </c:if>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+
                 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+                <script>
+                    // ... (GIỮ NGUYÊN CODE JAVASCRIPT AJAX CŨ CỦA BẠN Ở ĐÂY) ...
+                    function updateStatus(orderId, newStatus) {
+                        const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+                        const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+                        const formData = new FormData();
+                        formData.append('id', orderId);
+                        formData.append('status', newStatus);
+
+                        fetch('/admin/order/update-status-ajax', {
+                            method: 'POST',
+                            headers: { [csrfHeader]: csrfToken },
+                            body: formData
+                        }).then(response => {
+                            if (response.ok) refreshRowUI(orderId, newStatus);
+                            else alert("Lỗi cập nhật!");
+                        }).catch(error => console.error('Error:', error));
+                    }
+
+                    function refreshRowUI(id, status) {
+                        const badgeCell = document.getElementById('status-badge-' + id);
+                        let badgeHtml = '';
+                        if (status === 'PENDING') badgeHtml = '<span class="badge bg-warning text-dark">Chờ xử lý</span>';
+                        else if (status === 'SHIPPING') badgeHtml = '<span class="badge bg-info text-dark">Đang giao</span>';
+                        else if (status === 'COMPLETED') badgeHtml = '<span class="badge bg-success">Hoàn thành</span>';
+                        else if (status === 'CANCELLED') badgeHtml = '<span class="badge bg-danger">Đã hủy</span>';
+                        badgeCell.innerHTML = badgeHtml;
+
+                        const confirmDisabled = (status !== 'PENDING') ? 'disabled' : '';
+                        const cancelDisabled = (status === 'COMPLETED' || status === 'CANCELLED') ? 'disabled' : '';
+                        const selectDisabled = (status === 'CANCELLED') ? 'disabled' : '';
+
+                        const actionCell = document.getElementById('action-cell-' + id);
+                        actionCell.innerHTML = `
+                <div class="action-group">
+                    <select class="form-select form-select-sm" onchange="updateStatus(\${id}, this.value)" style="width: 140px; font-weight: 500;" \${selectDisabled}>
+                        <option value="PENDING" \${status === 'PENDING' ? 'selected' : ''}>Chờ xử lý</option>
+                        <option value="SHIPPING" \${status === 'SHIPPING' ? 'selected' : ''}>Đang giao</option>
+                        <option value="COMPLETED" \${status === 'COMPLETED' ? 'selected' : ''}>Hoàn thành</option>
+                    </select>
+                    <button onclick="updateStatus(\${id}, 'SHIPPING')" class="btn btn-sm btn-success text-white \${confirmDisabled}"><i class="fas fa-check"></i></button>
+                    <button onclick="updateStatus(\${id}, 'CANCELLED')" class="btn btn-sm btn-danger \${cancelDisabled}"><i class="fas fa-times"></i></button>
+                    <a href="/admin/order/view/\${id}" class="btn btn-sm btn-light border text-primary"><i class="fas fa-eye"></i></a>
+                </div>`;
+                    }
+                </script>
             </body>
 
             </html>

@@ -84,6 +84,12 @@
                         <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom px-4 py-3">
                             <h4 class="mb-0 text-dark fw-bold">Quản lý Sản phẩm</h4>
                         </nav>
+                        <c:if test="${not empty errorMessage}">
+                            <div class="alert alert-danger alert-dismissible fade show m-3">
+                                ${errorMessage}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        </c:if>
 
                         <div class="container-fluid px-4 py-4">
                             <div class="card shadow-sm border-0 rounded-3">
@@ -102,17 +108,14 @@
                                                             </option>
                                                         </c:forEach>
                                                     </select>
-                                                    <a href="/admin/category/create" class="btn btn-outline-primary"
-                                                        title="Thêm danh mục mới">
-                                                        <i class="fas fa-plus-circle"></i>
-                                                    </a>
+
                                                 </div>
 
-                                                <input type="text" name="keyword" class="form-control"
-                                                    placeholder="Tìm tên sản phẩm..." value="${keyword}"
-                                                    style="max-width: 250px;">
-                                                <button class="btn btn-primary"><i class="fas fa-search"></i>
-                                                    Lọc</button>
+                                                <input type="text" name="keyword" class="form-control" placeholder=""
+                                                    value="${keyword}" style="max-width: 400px;">
+                                                <button class="btn btn-outline-primary ms-2"><i
+                                                        class="fas fa-search"></i>
+                                                </button>
                                             </form>
                                         </div>
                                         <div class="col-md-3 text-end">
@@ -147,7 +150,18 @@
                                                             </div>
                                                         </c:if>
                                                     </td>
-                                                    <td class="fw-bold text-primary">${p.name}</td>
+                                                    <td class="fw-bold text-primary">
+                                                        ${p.name}
+                                                        <div class="mt-1">
+                                                            <c:forEach var="color" items="${p.colors}">
+                                                                <span class="badge border text-dark fw-normal bg-light"
+                                                                    style="font-size: 0.7rem;">
+                                                                    ${color.colorName}: <strong
+                                                                        class="text-danger">${color.quantity}</strong>
+                                                                </span>
+                                                            </c:forEach>
+                                                        </div>
+                                                    </td>
                                                     <td class="text-success fw-bold">
                                                         <fmt:formatNumber value="${p.price}" type="currency"
                                                             currencySymbol="đ" />

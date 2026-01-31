@@ -11,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,16 +52,13 @@ public class ProductController {
             @RequestParam("imageFiles") MultipartFile[] files,
             @RequestParam(value = "specNames", required = false) String[] specNames,
             @RequestParam(value = "specValues", required = false) String[] specValues,
-            @RequestParam(value = "colorNames", required = false) String[] colorNames) {
-
-        // 1. Lưu Ảnh
+            @RequestParam(value = "colorNames", required = false) String[] colorNames,
+            @RequestParam(value = "colorQuantities", required = false) Long[] colorQuantities) {
         saveImages(product, files);
-
-        // 2. Lưu Thông số (Specs)
         handleSpecs(product, specNames, specValues);
 
-        // 3. Lưu Màu sắc (Colors)
-        handleColors(product, colorNames);
+        // Sửa lại hàm handleColors để truyền thêm mảng số lượng
+        handleColors(product, colorNames, colorQuantities);
 
         productService.handleSaveProduct(product);
         return "redirect:/admin/product";
@@ -80,6 +78,7 @@ public class ProductController {
             @RequestParam(value = "specNames", required = false) String[] specNames,
             @RequestParam(value = "specValues", required = false) String[] specValues,
             @RequestParam(value = "colorNames", required = false) String[] colorNames,
+            @RequestParam(value = "colorQuantities", required = false) Long[] colorQuantities,
             @RequestParam(value = "deleteImageIds", required = false) List<Long> deleteImageIds) {
 
         Product currentProduct = productService.fetchProductById(product.getId()).get();
@@ -104,15 +103,22 @@ public class ProductController {
 
         // 4. Cập nhật Màu sắc (Colors) - Xóa cũ nạp mới
         currentProduct.getColors().clear();
-        handleColors(currentProduct, colorNames);
+        handleColors(currentProduct, colorNames, colorQuantities); // Truyền thêm mảng số lượng
 
         productService.handleSaveProduct(currentProduct);
         return "redirect:/admin/product";
     }
 
     @GetMapping("/delete/{id}")
-    public String deleteProduct(@PathVariable long id) {
-        productService.deleteProduct(id);
+    public String deleteProduct(@PathVariable long id, RedirectAttributes redirectAttributes) {
+        try {
+            productService.deleteProduct(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Xóa sản phẩm thành công!");
+        } catch (Exception e) {
+            // Đây là chỗ xử lý khi Database chặn xóa
+            redirectAttributes.addFlashAttribute("errorMessage",
+                    "Sản phẩm này dính dáng đến đơn hàng (kể cả đơn đã hủy), không thể xóa!");
+        }
         return "redirect:/admin/product";
     }
 
@@ -134,12 +140,14 @@ public class ProductController {
     }
 
     // Xử lý nạp Màu sắc
-    private void handleColors(Product product, String[] colorNames) {
-        if (colorNames != null) {
-            for (String name : colorNames) {
-                if (name != null && !name.trim().isEmpty()) {
+    private void handleColors(Product product, String[] colorNames, Long[] colorQuantities) {
+        if (colorNames != null && colorQuantities != null) {
+            for (int i = 0; i < colorNames.length; i++) {
+                if (colorNames[i] != null && !colorNames[i].trim().isEmpty()) {
                     ProductColor pc = new ProductColor();
-                    pc.setColorName(name);
+                    pc.setColorName(colorNames[i]);
+                    // Lấy số lượng tương ứng với vị trí màu, nếu thiếu thì mặc định là 0
+                    pc.setQuantity(i < colorQuantities.length ? colorQuantities[i] : 0);
                     pc.setProduct(product);
                     product.getColors().add(pc);
                 }

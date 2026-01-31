@@ -52,6 +52,17 @@
                         height: 1.2em;
                         cursor: pointer;
                     }
+
+                    /* Style cho nhãn màu sắc */
+                    .color-tag {
+                        font-size: 0.8rem;
+                        color: #666;
+                        background: #f0f0f0;
+                        padding: 2px 8px;
+                        border-radius: 4px;
+                        display: inline-block;
+                        margin-top: 5px;
+                    }
                 </style>
             </head>
 
@@ -105,10 +116,20 @@
 
                                             <div class="col-md-4">
                                                 <h6 class="fw-bold mb-1">${item.product.name}</h6>
-                                                <span class="text-danger fw-bold">
-                                                    <fmt:formatNumber value="${item.price}" type="currency"
-                                                        currencySymbol="đ" />
-                                                </span>
+
+                                                <c:if test="${not empty item.productColor}">
+                                                    <div class="color-tag">
+                                                        <i class="fas fa-palette me-1"></i> Phân loại:
+                                                        <strong>${item.productColor.colorName}</strong>
+                                                    </div>
+                                                </c:if>
+
+                                                <div class="mt-2">
+                                                    <span class="text-danger fw-bold">
+                                                        <fmt:formatNumber value="${item.price}" type="currency"
+                                                            currencySymbol="đ" />
+                                                    </span>
+                                                </div>
                                             </div>
 
                                             <div class="col-md-4">
@@ -117,18 +138,15 @@
                                                         class="d-flex mb-0">
                                                         <input type="hidden" name="${_csrf.parameterName}"
                                                             value="${_csrf.token}" />
-
                                                         <input type="hidden" name="cartItemId" value="${item.id}">
                                                         <div class="input-group border rounded-pill overflow-hidden bg-white"
                                                             style="width: 110px;">
                                                             <button
                                                                 class="btn btn-link text-dark text-decoration-none fw-bold"
                                                                 type="submit" name="action" value="minus">-</button>
-
                                                             <input type="text"
                                                                 class="form-control border-0 text-center fw-bold bg-transparent"
                                                                 value="${item.quantity}" readonly>
-
                                                             <button
                                                                 class="btn btn-link text-dark text-decoration-none fw-bold"
                                                                 type="submit" name="action" value="plus">+</button>
@@ -143,7 +161,8 @@
 
                                             <div class="col-md-1 text-end">
                                                 <a href="/delete-cart-item/${item.id}"
-                                                    class="text-muted text-decoration-none">
+                                                    class="text-muted text-decoration-none"
+                                                    onclick="return confirm('Xóa sản phẩm này?')">
                                                     <i class="far fa-trash-alt fs-5"></i>
                                                 </a>
                                             </div>
@@ -182,60 +201,44 @@
                 <jsp:include page="../layout/footer.jsp" />
 
                 <script>
-                    // Hàm định dạng tiền tệ VNĐ
                     const formatCurrency = (amount) => {
                         return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
                     };
 
-                    // 1. Tính tổng tiền dựa trên các mục ĐƯỢC CHỌN
                     function updateTotalSummary() {
                         let total = 0;
                         const selectedCheckboxes = document.querySelectorAll('input[name="selectedItems"]:checked');
                         const btnCheckout = document.getElementById('btnCheckout');
 
                         selectedCheckboxes.forEach(cb => {
-                            // Lấy giá trị data-price (đã tính quantity * price ở server)
                             total += parseFloat(cb.getAttribute('data-price'));
                         });
 
-                        // Cập nhật giao diện
-                        const formattedTotal = formatCurrency(total);
-                        document.getElementById('totalDisplay').innerText = formattedTotal;
-                        document.getElementById('totalFinal').innerText = formattedTotal;
-
-                        // Khóa/Mở nút thanh toán
+                        document.getElementById('totalDisplay').innerText = formatCurrency(total);
+                        document.getElementById('totalFinal').innerText = formatCurrency(total);
                         btnCheckout.disabled = selectedCheckboxes.length === 0;
                     }
 
-                    // 2. Logic Chọn Tất Cả
                     function toggleSelectAll(source) {
                         const checkboxes = document.querySelectorAll('input[name="selectedItems"]');
                         checkboxes.forEach(cb => cb.checked = source.checked);
                         updateTotalSummary();
                     }
 
-                    // 3. Logic Xóa Mục Đã Chọn
                     function deleteSelected() {
-                        // Lấy danh sách ID các item được chọn
-                        const selectedIds = Array.from(document.querySelectorAll('input[name="selectedItems"]:checked'))
-                            .map(cb => cb.value);
-
+                        const selectedIds = Array.from(document.querySelectorAll('input[name="selectedItems"]:checked')).map(cb => cb.value);
                         if (selectedIds.length === 0) {
                             alert("Vui lòng chọn ít nhất một sản phẩm để xóa!");
                             return;
                         }
-
-                        // Gọi về Server để xóa (không hỏi confirm theo ý bạn, hoặc confirm 1 lần cho cả nhóm)
-                        // Ở đây mình xóa luôn theo flow "bỏ hỏi lại"
-                        window.location.href = '/delete-multiple-cart-items?ids=' + selectedIds.join(',');
+                        if (confirm("Xóa các sản phẩm đã chọn?")) {
+                            window.location.href = '/delete-multiple-cart-items?ids=' + selectedIds.join(',');
+                        }
                     }
 
-                    // 4. Chuyển hướng thanh toán với các ID đã chọn
                     function handleCheckout() {
-                        const selectedIds = Array.from(document.querySelectorAll('input[name="selectedItems"]:checked'))
-                            .map(cb => cb.value);
+                        const selectedIds = Array.from(document.querySelectorAll('input[name="selectedItems"]:checked')).map(cb => cb.value);
                         if (selectedIds.length > 0) {
-                            // Chuyển sang trang checkout kèm theo list ID
                             window.location.href = '/checkout?selectedIds=' + selectedIds.join(',');
                         }
                     }

@@ -4,6 +4,7 @@ import com.example.shop.domain.Cart;
 import com.example.shop.domain.CartItem;
 import com.example.shop.domain.User;
 import com.example.shop.domain.Voucher;
+import com.example.shop.service.CategoryService; // <--- 1. IMPORT SERVICE
 import com.example.shop.service.OrderService;
 import com.example.shop.service.ProductService;
 import com.example.shop.service.UserService;
@@ -25,11 +26,15 @@ public class OrderController {
     private final OrderService orderService;
     private final UserService userService;
     private final ProductService productService;
+    private final CategoryService categoryService; // <--- 2. KHAI BÁO BIẾN
 
-    public OrderController(OrderService orderService, UserService userService, ProductService productService) {
+    // <--- 3. INJECT CATEGORY SERVICE VÀO CONSTRUCTOR
+    public OrderController(OrderService orderService, UserService userService,
+            ProductService productService, CategoryService categoryService) {
         this.orderService = orderService;
         this.userService = userService;
         this.productService = productService;
+        this.categoryService = categoryService;
     }
 
     @GetMapping("/checkout")
@@ -91,55 +96,66 @@ public class OrderController {
         model.addAttribute("voucherCode", voucherCode);
         model.addAttribute("discountMap", discountMap);
 
+        // <--- 4. THÊM DÒNG NÀY ĐỂ HIỆN DANH MỤC TRÊN HEADER TRANG CHECKOUT
+        model.addAttribute("categories", categoryService.getAllCategories(null));
+
         return "client/cart/checkout";
     }
 
-    // ==================== HÀM DEBUG QUAN TRỌNG ====================
     @PostMapping("/place-order")
     public String handlePlaceOrder(
             @RequestParam("receiverName") String receiverName,
             @RequestParam("receiverAddress") String receiverAddress,
             @RequestParam("receiverPhone") String receiverPhone,
             @RequestParam("paymentMethod") String paymentMethod,
-            // Sửa required = false để tránh lỗi 400 Bad Request nếu list bị rỗng
             @RequestParam(value = "cartItemIds", required = false) List<Long> cartItemIds,
             @RequestParam(value = "voucherCode", required = false) String voucherCode,
             HttpServletRequest request) {
 
-        // --- BẮT ĐẦU DEBUG: In ra Console xem code có chạy vào đây không ---
-        System.out.println(">>> DEBUG: Đang xử lý đặt hàng...");
-        System.out.println(">>> Người nhận: " + receiverName);
-        System.out.println(">>> Danh sách ID sản phẩm: " + cartItemIds);
-
-        // Kiểm tra lỗi dữ liệu đầu vào
-        if (cartItemIds == null || cartItemIds.isEmpty()) {
-            System.out.println(">>> LỖI: Không tìm thấy sản phẩm nào (cartItemIds bị null hoặc rỗng)");
-            return "redirect:/cart?error=Vui long chon san pham de thanh toan";
-        }
-
+        // 1. Kiểm tra session đăng nhập
         HttpSession session = request.getSession(false);
         String email = (String) session.getAttribute("email");
-        if (email == null)
+        if (email == null) {
             return "redirect:/login";
+        }
+
+        // 2. Kiểm tra dữ liệu đầu vào
+        if (cartItemIds == null || cartItemIds.isEmpty()) {
+            return "redirect:/cart?error=Vui lòng chọn sản phẩm để thanh toán";
+        }
 
         User user = this.userService.getUserByEmail(email);
 
         try {
-            this.orderService.handlePlaceOrder(user, session, receiverName, receiverAddress, receiverPhone,
-                    paymentMethod, cartItemIds, voucherCode);
-            System.out.println(">>> THÀNH CÔNG: Đã đặt hàng xong, chuẩn bị chuyển hướng");
-        } catch (Exception e) {
-            // In toàn bộ lỗi ra console để bạn đọc
-            System.out.println(">>> LỖI XẢY RA TRONG SERVICE:");
-            e.printStackTrace();
-            return "redirect:/checkout?error=" + e.getMessage();
-        }
+            // 3. Gọi Service xử lý đặt hàng
+            this.orderService.handlePlaceOrder(user, session, receiverName, receiverAddress,
+                    receiverPhone, paymentMethod, cartItemIds, voucherCode);
 
-        return "redirect:/thanks";
+            // 4. THÀNH CÔNG
+            return "redirect:/thanks";
+
+        } catch (Exception e) {
+            // 5. THẤT BẠI: Xử lý lỗi
+            System.out.println(">>> LỖI ĐẶT HÀNG: " + e.getMessage());
+            e.printStackTrace();
+
+            String idsParam = cartItemIds.toString().replace("[", "").replace("]", "").replace(" ", "");
+
+            try {
+                String encodedMsg = java.net.URLEncoder.encode(e.getMessage(), "UTF-8");
+                return "redirect:/checkout?error=" + encodedMsg + "&selectedIds=" + idsParam;
+            } catch (java.io.UnsupportedEncodingException ex) {
+                return "redirect:/checkout?error=Place order failed&selectedIds=" + idsParam;
+            }
+        }
     }
 
     @GetMapping("/thanks")
-    public String getThankYouPage() {
+    public String getThankYouPage(Model model) { // <--- Nhớ thêm tham số Model vào đây
+
+        // <--- 5. THÊM DÒNG NÀY ĐỂ HIỆN DANH MỤC TRÊN HEADER TRANG THANKS
+        model.addAttribute("categories", categoryService.getAllCategories(null));
+
         return "client/cart/thanks";
     }
 }

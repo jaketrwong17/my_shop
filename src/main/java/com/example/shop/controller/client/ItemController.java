@@ -3,6 +3,7 @@ package com.example.shop.controller.client;
 import com.example.shop.domain.Cart;
 import com.example.shop.domain.CartItem;
 import com.example.shop.domain.Product;
+import com.example.shop.service.CategoryService; // <--- Mới thêm
 import com.example.shop.service.ProductService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -20,52 +21,38 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class ItemController {
 
     private final ProductService productService;
+    private final CategoryService categoryService; // <--- Khai báo Service danh mục
 
-    public ItemController(ProductService productService) {
+    // Inject cả ProductService và CategoryService vào Constructor
+    public ItemController(ProductService productService, CategoryService categoryService) {
         this.productService = productService;
+        this.categoryService = categoryService;
     }
 
     @GetMapping("/product/{id}")
     public String getProductDetail(Model model, @PathVariable long id) {
         Product product = productService.fetchProductById(id).get();
         model.addAttribute("product", product);
+
+        // <--- LẤY DANH MỤC ĐỂ HIỆN TRÊN HEADER --->
+        model.addAttribute("categories", categoryService.getAllCategories(null));
+
         return "client/product/detail";
     }
 
-    // ================== [ĐÃ SỬA] ==================
     @PostMapping("/add-product-to-cart/{id}")
-    public String addProductToCart(@PathVariable long id, HttpServletRequest request,
-            @RequestParam("quantity") long quantity) {
+    public String addProductToCart(@PathVariable long id,
+            @RequestParam("quantity") long quantity,
+            @RequestParam("colorId") long colorId,
+            HttpServletRequest request) {
 
         HttpSession session = request.getSession(true);
         String email = (String) session.getAttribute("email");
 
-        // 1. Xử lý thêm vào Database (logic cũ của bạn)
-        this.productService.handleAddProductToCart(email, id, session, quantity);
+        this.productService.handleAddProductToCart(email, id, colorId, session, quantity);
 
-        // 2. [QUAN TRỌNG] Cập nhật lại số lượng (sum) vào Session ngay lập tức
-        int newSum = 0;
-        if (email != null) {
-            // Nếu User đã đăng nhập: Lấy giỏ hàng từ DB để đếm
-            Cart cart = this.productService.fetchCartByUserEmail(email);
-            if (cart != null) {
-                newSum = cart.getCartItems().size();
-            }
-        } else {
-            // Nếu là khách (Guest): Lấy từ session guestCart để đếm
-            List<CartItem> guestCart = (List<CartItem>) session.getAttribute("guestCart");
-            if (guestCart != null) {
-                newSum = guestCart.size();
-            }
-        }
-
-        // Lưu biến 'sum' để header hiển thị số mới
-        session.setAttribute("sum", newSum);
-
-        String referer = request.getHeader("Referer");
-        return "redirect:" + referer;
+        return "redirect:" + request.getHeader("Referer");
     }
-    // ==============================================
 
     @GetMapping("/cart")
     public String getCartPage(Model model, HttpServletRequest request) {
@@ -89,6 +76,10 @@ public class ItemController {
 
         model.addAttribute("cartItems", cartItems);
         model.addAttribute("totalPrice", totalPrice);
+
+        // <--- LẤY DANH MỤC ĐỂ HIỆN TRÊN HEADER (TRANG GIỎ HÀNG) --->
+        model.addAttribute("categories", categoryService.getAllCategories(null));
+
         return "client/cart/show";
     }
 

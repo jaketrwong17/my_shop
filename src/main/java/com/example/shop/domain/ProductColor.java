@@ -9,9 +9,8 @@ public class ProductColor implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-
-    private String colorName; // Ví dụ: Trắng, Đen, Xanh Teal
-
+    private String colorName;
+    private long quantity;
     @ManyToOne
     @JoinColumn(name = "product_id")
     private Product product;
@@ -41,6 +40,14 @@ public class ProductColor implements Serializable {
 
     public void setProduct(Product product) {
         this.product = product;
+    }
+
+    public long getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(long quantity) {
+        this.quantity = quantity;
     }
 
 }

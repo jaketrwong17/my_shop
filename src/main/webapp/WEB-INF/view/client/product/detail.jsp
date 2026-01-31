@@ -11,7 +11,7 @@
                 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
                 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
                 <style>
-                    /* 1. Slider & Thumbnails */
+                    /* Slider & Thumbnails */
                     .carousel-inner img {
                         height: 400px;
                         object-fit: contain;
@@ -24,10 +24,6 @@
                         margin-top: 10px;
                         overflow-x: auto;
                         padding: 5px 0;
-                    }
-
-                    .thumbnails-wrap::-webkit-scrollbar {
-                        height: 3px;
                     }
 
                     .thumb-item {
@@ -46,7 +42,7 @@
                         box-shadow: 0 0 0 1px #ee4d2d;
                     }
 
-                    /* 2. Màu sắc & Nút mua hàng (Thu nhỏ gọn gàng) */
+                    /* Màu sắc & Nút mua hàng */
                     .color-radio {
                         display: none;
                     }
@@ -58,6 +54,27 @@
                         border-radius: 4px;
                         font-size: 13px;
                         transition: 0.2s;
+                        position: relative;
+                    }
+
+                    /* Hiệu ứng màu hết hàng */
+                    .color-radio:disabled+.color-label-small {
+                        background-color: #f5f5f5;
+                        color: #ccc;
+                        border-style: dashed;
+                        cursor: not-allowed;
+                        overflow: hidden;
+                    }
+
+                    .color-radio:disabled+.color-label-small::after {
+                        content: "";
+                        position: absolute;
+                        top: 50%;
+                        left: 0;
+                        width: 100%;
+                        height: 1px;
+                        background: #ccc;
+                        transform: rotate(-20deg);
                     }
 
                     .color-radio:checked+.color-label-small {
@@ -93,14 +110,12 @@
                         color: white;
                     }
 
-                    /* 3. Bảng thông số (Ô phân tách, Cột tiêu đề xám, Chữ đồng nhất) */
-                    .specs-box {
-                        border-radius: 8px;
-                        position: sticky;
-                        top: 20px;
-                        overflow: hidden;
+                    .btn-shopee-small:disabled {
+                        background-color: #ccc;
+                        cursor: not-allowed;
                     }
 
+                    /* Bảng thông số */
                     .specs-table {
                         border-collapse: collapse;
                         width: 100%;
@@ -113,17 +128,11 @@
                         border: 1px solid #dee2e6 !important;
                         color: #333;
                         font-weight: normal !important;
-                        /* Chữ đồng nhất không đậm nhạt */
                     }
 
                     .specs-table td:first-child {
                         background-color: #f1f3f5;
-                        /* Màu xám cho cột tiêu đề bên trái */
                         width: 40%;
-                    }
-
-                    .specs-table td:last-child {
-                        background-color: #fff;
                     }
 
                     .detail-content {
@@ -203,36 +212,40 @@
                                     <div class="small text-secondary">${product.shortDesc}</div>
                                 </div>
 
-                                <div class="mb-4">
-                                    <label class="fw-bold small mb-2 d-block text-uppercase">Màu sắc:</label>
-                                    <div class="d-flex gap-2">
-                                        <c:forEach var="color" items="${product.colors}" varStatus="status">
-                                            <input type="radio" name="productColor" id="color-${color.id}"
-                                                class="color-radio" ${status.first ? 'checked' : '' }>
-                                            <label for="color-${color.id}"
-                                                class="color-label-small">${color.colorName}</label>
-                                        </c:forEach>
-                                    </div>
-                                </div>
-
-                                <form action="/add-product-to-cart/${product.id}" method="POST">
+                                <form action="/add-product-to-cart/${product.id}" method="POST" id="addToCartForm">
                                     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
 
-                                    <input type="hidden" name="productId" value="${product.id}">
+                                    <div class="mb-4">
+                                        <label class="fw-bold small mb-2 d-block text-uppercase">Màu sắc:
+                                            <span id="stock-display" class="text-secondary fw-normal"></span>
+                                        </label>
+                                        <div class="d-flex gap-2 flex-wrap">
+                                            <c:forEach var="color" items="${product.colors}" varStatus="status">
+                                                <input type="radio" name="colorId" id="color-${color.id}"
+                                                    class="color-radio" data-stock="${color.quantity}"
+                                                    value="${color.id}" ${color.quantity <=0 ? 'disabled' : '' }>
+                                                <label for="color-${color.id}"
+                                                    class="color-label-small">${color.colorName}</label>
+                                            </c:forEach>
+                                        </div>
+                                    </div>
+
                                     <div class="d-flex gap-2 align-items-center">
                                         <div class="input-group input-group-small">
                                             <button class="btn btn-outline-secondary" type="button"
-                                                onclick="this.parentNode.querySelector('input').stepDown()">-</button>
-                                            <input type="number" name="quantity" value="1" min="1"
+                                                onclick="changeQty(-1)">-</button>
+                                            <input type="number" name="quantity" id="inputQuantity" value="1" min="1"
                                                 class="form-control text-center border-secondary">
                                             <button class="btn btn-outline-secondary" type="button"
-                                                onclick="this.parentNode.querySelector('input').stepUp()">+</button>
+                                                onclick="changeQty(1)">+</button>
                                         </div>
-                                        <button type="submit"
-                                            class="btn btn-shopee btn-shopee-small rounded-pill text-uppercase">
+                                        <button type="submit" id="btnSubmit"
+                                            class="btn btn-shopee-small rounded-pill text-uppercase">
                                             <i class="fas fa-cart-plus me-2"></i>Thêm vào giỏ hàng
                                         </button>
                                     </div>
+                                    <div id="error-msg" class="text-danger small mt-2" style="display:none;">Số lượng
+                                        vượt quá kho hàng!</div>
                                 </form>
 
                                 <div class="mt-4 pt-3 border-top d-flex gap-4 small text-muted">
@@ -250,18 +263,7 @@
                                         class="fas fa-info-circle text-primary me-2"></i>Thông tin sản phẩm</h5>
                                 <div class="detail-content">${product.detailDesc}</div>
                             </div>
-
-                            <div class="bg-white p-4 rounded shadow-sm border mb-5">
-                                <h5 class="fw-bold border-bottom pb-3 mb-3 text-uppercase"><i
-                                        class="fas fa-star text-warning me-2"></i>Khách hàng đánh giá</h5>
-                                <div class="text-center py-5">
-                                    <p class="text-muted small">Chưa có đánh giá nào cho sản phẩm này.</p>
-                                    <button class="btn btn-sm btn-outline-primary rounded-pill px-4">Viết đánh giá đầu
-                                        tiên</button>
-                                </div>
-                            </div>
                         </div>
-
                         <div class="col-lg-4">
                             <div class="specs-box p-3 shadow-sm border bg-white">
                                 <h6 class="fw-bold mb-3 text-primary text-uppercase small"><i
@@ -274,12 +276,6 @@
                                                 <td>${s.specValue}</td>
                                             </tr>
                                         </c:forEach>
-                                        <c:if test="${empty product.specs}">
-                                            <tr>
-                                                <td colspan="2" class="text-center text-muted py-4 small">Đang cập
-                                                    nhật...</td>
-                                            </tr>
-                                        </c:if>
                                     </tbody>
                                 </table>
                             </div>
@@ -288,18 +284,50 @@
                 </div>
 
                 <jsp:include page="../layout/footer.jsp" />
-                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
                 <script>
+                    const inputQty = document.getElementById('inputQuantity');
+                    const btnSubmit = document.getElementById('btnSubmit');
+                    const stockDisplay = document.getElementById('stock-display');
+                    const errorMsg = document.getElementById('error-msg');
+                    const colorRadios = document.querySelectorAll('.color-radio');
+                    let currentStock = 0;
+
                     function activateThumb(element) {
                         document.querySelectorAll('.thumb-item').forEach(t => t.classList.remove('active'));
                         element.classList.add('active');
                     }
-                    var myCarousel = document.getElementById('productCarousel');
-                    myCarousel.addEventListener('slide.bs.carousel', function (e) {
-                        var index = e.to;
-                        var thumbs = document.querySelectorAll('.thumb-item');
-                        thumbs.forEach(t => t.classList.remove('active'));
-                        if (thumbs[index]) thumbs[index].classList.add('active');
+
+                    colorRadios.forEach(radio => {
+                        radio.addEventListener('change', function () {
+                            currentStock = parseInt(this.getAttribute('data-stock'));
+                            stockDisplay.innerText = `(Còn lại: \${currentStock} sản phẩm)`;
+                            inputQty.value = 1;
+                            validateQuantity();
+                        });
+                    });
+
+                    function changeQty(amt) {
+                        inputQty.value = Math.max(1, parseInt(inputQty.value) + amt);
+                        validateQuantity();
+                    }
+
+                    function validateQuantity() {
+                        let val = parseInt(inputQty.value);
+                        if (val > currentStock) {
+                            inputQty.value = currentStock;
+                            errorMsg.style.display = 'block';
+                            setTimeout(() => { errorMsg.style.display = 'none'; }, 2000);
+                        }
+                        btnSubmit.disabled = (currentStock <= 0);
+                    }
+
+                    inputQty.addEventListener('change', validateQuantity);
+
+                    window.addEventListener('DOMContentLoaded', () => {
+                        const firstAvailable = document.querySelector('.color-radio:not(:disabled)');
+                        if (firstAvailable) { firstAvailable.click(); }
+                        else { stockDisplay.innerText = "(Hết hàng)"; btnSubmit.disabled = true; inputQty.disabled = true; }
                     });
                 </script>
             </body>

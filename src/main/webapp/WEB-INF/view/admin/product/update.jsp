@@ -82,12 +82,10 @@
                     <jsp:include page="../layout/sidebar.jsp">
                         <jsp:param name="active" value="product" />
                     </jsp:include>
-
                     <div id="page-content-wrapper">
                         <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom px-4 py-3">
-                            <h4 class="mb-0 fw-bold">Cập nhật Sản phẩm & Cấu hình</h4>
+                            <h4 class="mb-0 fw-bold">Cập nhật Sản phẩm</h4>
                         </nav>
-
                         <div class="container-fluid px-4 py-4">
                             <form:form action="/admin/product/update" method="POST" modelAttribute="newProduct"
                                 enctype="multipart/form-data">
@@ -99,19 +97,18 @@
                                                 <h6 class="fw-bold mb-3 text-primary text-uppercase small">Thông tin
                                                     chung</h6>
                                                 <div class="row mb-3">
-                                                    <div class="col-md-8">
-                                                        <label class="form-label fw-bold small">Tên sản phẩm</label>
+                                                    <div class="col-md-8"><label class="form-label fw-bold small">Tên
+                                                            sản phẩm</label>
                                                         <form:input path="name" class="form-control" required="true" />
                                                     </div>
-                                                    <div class="col-md-4">
-                                                        <label class="form-label fw-bold small">Giá bán</label>
+                                                    <div class="col-md-4"><label class="form-label fw-bold small">Giá
+                                                            bán</label>
                                                         <form:input path="price" type="number" class="form-control"
                                                             required="true" />
                                                     </div>
                                                 </div>
                                                 <div class="mb-3">
-                                                    <label class="form-label fw-bold small mb-2">Hình ảnh sản
-                                                        phẩm</label>
+                                                    <label class="form-label fw-bold small mb-2">Hình ảnh</label>
                                                     <div class="gallery-wrap" id="gallery">
                                                         <c:forEach var="img" items="${newProduct.images}">
                                                             <div class="img-card" id="old-img-${img.id}">
@@ -130,43 +127,40 @@
                                                     <div id="deleteContainer"></div>
                                                 </div>
                                                 <div class="row mb-3">
-                                                    <div class="col-md-6">
-                                                        <label class="form-label fw-bold small">Danh mục</label>
+                                                    <div class="col-md-6"><label class="form-label fw-bold small">Danh
+                                                            mục</label>
                                                         <form:select path="category.id" class="form-select">
                                                             <form:options items="${categories}" itemValue="id"
                                                                 itemLabel="name" />
                                                         </form:select>
                                                     </div>
-                                                    <div class="col-md-6">
-                                                        <label class="form-label fw-bold small">Hãng sản xuất</label>
-                                                        <form:input path="factory" class="form-control"
-                                                            placeholder="Hãng sản xuất..." />
+                                                    <div class="col-md-6"><label
+                                                            class="form-label fw-bold small">Hãng</label>
+                                                        <form:input path="factory" class="form-control" />
                                                     </div>
                                                 </div>
-                                                <div class="mb-3">
-                                                    <label class="form-label fw-bold small">Mô tả ngắn</label>
+                                                <div class="mb-3"><label class="form-label fw-bold small">Mô tả
+                                                        ngắn</label>
                                                     <form:textarea path="shortDesc" class="form-control" rows="2" />
                                                 </div>
-                                                <div class="mb-0">
-                                                    <label class="form-label fw-bold small">Chi tiết bài viết</label>
+                                                <div class="mb-0"><label class="form-label fw-bold small">Chi
+                                                        tiết</label>
                                                     <form:textarea path="detailDesc" class="form-control" rows="5" />
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-
                                     <div class="col-lg-5">
                                         <div class="card shadow-sm border-0 mb-4">
                                             <div
                                                 class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
                                                 <h6 class="mb-0 fw-bold text-primary text-uppercase small">Thông số kỹ
                                                     thuật</h6>
-                                                <div class="btn-group">
-                                                    <button type="button" class="btn btn-xs btn-outline-primary"
-                                                        onclick="addMultipleSpecs(5)">+5</button>
-                                                    <button type="button" class="btn btn-xs btn-primary ms-1"
-                                                        id="btnAddSpec"><i class="fas fa-plus"></i></button>
-                                                </div>
+                                                <div class="btn-group"><button type="button"
+                                                        class="btn btn-xs btn-outline-primary"
+                                                        onclick="addMultipleSpecs(5)">+5</button><button type="button"
+                                                        class="btn btn-xs btn-primary ms-1" id="btnAddSpec"><i
+                                                            class="fas fa-plus"></i></button></div>
                                             </div>
                                             <div class="card-body p-3">
                                                 <div id="specs-container">
@@ -187,12 +181,11 @@
                                                 </div>
                                             </div>
                                         </div>
-
                                         <div class="card shadow-sm border-0">
                                             <div
                                                 class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-                                                <h6 class="mb-0 fw-bold text-success text-uppercase small">Màu sắc sản
-                                                    phẩm</h6>
+                                                <h6 class="mb-0 fw-bold text-success text-uppercase small">Màu sắc & Kho
+                                                </h6>
                                                 <button type="button" class="btn btn-xs btn-success" id="btnAddColor"><i
                                                         class="fas fa-plus"></i> Thêm màu</button>
                                             </div>
@@ -203,6 +196,10 @@
                                                             <input type="text" name="colorNames"
                                                                 class="form-control form-control-sm"
                                                                 value="${color.colorName}">
+                                                            <input type="number" name="colorQuantities"
+                                                                class="form-control form-control-sm"
+                                                                value="${color.quantity}" min="0"
+                                                                style="max-width: 100px;">
                                                             <button type="button" class="btn btn-sm btn-outline-danger"
                                                                 onclick="removeItem(this)">X</button>
                                                         </div>
@@ -221,67 +218,36 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="modal fade" id="previewModal" tabindex="-1">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content bg-transparent border-0 text-center"><img id="modalImg" src=""
                                 class="img-fluid rounded shadow"></div>
                     </div>
                 </div>
-
                 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
                 <script>
-                    function removeOldImage(id) {
-                        if (confirm('Xóa ảnh này?')) {
-                            document.getElementById('old-img-' + id).remove();
-                            const input = document.createElement('input');
-                            input.type = 'hidden'; input.name = 'deleteImageIds'; input.value = id;
-                            document.getElementById('deleteContainer').appendChild(input);
-                        }
-                    }
-
+                    function removeOldImage(id) { if (confirm('Xóa ảnh?')) { document.getElementById('old-img-' + id).remove(); const input = document.createElement('input'); input.type = 'hidden'; input.name = 'deleteImageIds'; input.value = id; document.getElementById('deleteContainer').appendChild(input); } }
                     const dt = new DataTransfer();
                     function handleFileSelect(input) {
-                        const files = input.files;
-                        const gallery = document.getElementById('gallery');
-                        const uploadBtn = document.querySelector('.upload-btn-wrapper');
+                        const files = input.files; const gallery = document.getElementById('gallery');
                         Array.from(files).forEach(file => {
-                            dt.items.add(file);
-                            const reader = new FileReader();
+                            dt.items.add(file); const reader = new FileReader();
                             reader.onload = e => {
-                                const div = document.createElement('div');
-                                div.className = 'img-card';
-                                div.innerHTML = '<img src="' + e.target.result + '" onclick="viewImage(this.src)"><button type="button" class="btn-delete-img"><i class="fas fa-times"></i></button>';
+                                const div = document.createElement('div'); div.className = 'img-card';
+                                div.innerHTML = `<img src="\${e.target.result}" onclick="viewImage(this.src)"><button type="button" class="btn-delete-img"><i class="fas fa-times"></i></button>`;
                                 div.querySelector('.btn-delete-img').onclick = () => { div.remove(); removeFileFromDT(file); };
-                                gallery.insertBefore(div, uploadBtn);
-                            };
-                            reader.readAsDataURL(file);
-                        });
-                        input.files = dt.files;
+                                gallery.insertBefore(div, gallery.lastElementChild);
+                            }; reader.readAsDataURL(file);
+                        }); input.files = dt.files;
                     }
-
-                    function removeFileFromDT(fileToRemove) {
-                        const newDt = new DataTransfer();
-                        for (let i = 0; i < dt.files.length; i++) { if (dt.files[i] !== fileToRemove) newDt.items.add(dt.files[i]); }
-                        dt.items.clear();
-                        for (let i = 0; i < newDt.files.length; i++) dt.items.add(newDt.files[i]);
-                        document.getElementById('imageFiles').files = dt.files;
-                    }
-
+                    function removeFileFromDT(f) { const newDt = new DataTransfer(); for (let i = 0; i < dt.files.length; i++) { if (dt.files[i] !== f) newDt.items.add(dt.files[i]); } dt.items.clear(); for (let i = 0; i < newDt.files.length; i++) dt.items.add(newDt.files[i]); document.getElementById('imageFiles').files = dt.files; }
                     function removeItem(btn) { btn.closest('.dynamic-row').remove(); }
-
-                    document.getElementById('btnAddSpec').addEventListener('click', () => {
-                        const html = '<div class="row g-2 mb-2 dynamic-row align-items-center"><div class="col-5"><input type="text" name="specNames" class="form-control form-control-sm" placeholder="Tên thông số"></div><div class="col-6"><input type="text" name="specValues" class="form-control form-control-sm" placeholder="Giá trị"></div><div class="col-1 text-center"><button type="button" class="text-danger border-0 bg-transparent" onclick="removeItem(this)"><i class="fas fa-trash-alt"></i></button></div></div>';
-                        document.getElementById('specs-container').insertAdjacentHTML('beforeend', html);
-                    });
-
+                    document.getElementById('btnAddSpec').addEventListener('click', () => { document.getElementById('specs-container').insertAdjacentHTML('beforeend', `<div class="row g-2 mb-2 dynamic-row align-items-center"><div class="col-5"><input type="text" name="specNames" class="form-control form-control-sm" placeholder="Tên"></div><div class="col-6"><input type="text" name="specValues" class="form-control form-control-sm" placeholder="Giá trị"></div><div class="col-1 text-center"><button type="button" class="text-danger border-0 bg-transparent" onclick="removeItem(this)"><i class="fas fa-trash-alt"></i></button></div></div>`); });
                     document.getElementById('btnAddColor').addEventListener('click', () => {
-                        const html = '<div class="input-group mb-2 dynamic-row"><input type="text" name="colorNames" class="form-control form-control-sm" placeholder="Tên màu"><button type="button" class="btn btn-sm btn-outline-danger" onclick="removeItem(this)">X</button></div>';
-                        document.getElementById('colors-container').insertAdjacentHTML('beforeend', html);
+                        document.getElementById('colors-container').insertAdjacentHTML('beforeend', `<div class="input-group mb-2 dynamic-row"><input type="text" name="colorNames" class="form-control form-control-sm" placeholder="Tên màu"><input type="number" name="colorQuantities" class="form-control form-control-sm" placeholder="SL" min="0" value="0" style="max-width: 100px;"><button type="button" class="btn btn-sm btn-outline-danger" onclick="removeItem(this)">X</button></div>`);
                     });
-
-                    function addMultipleSpecs(count) { for (let i = 0; i < count; i++) document.getElementById('btnAddSpec').click(); }
-                    function viewImage(src) { document.getElementById('modalImg').src = src; new bootstrap.Modal(document.getElementById('previewModal')).show(); }
+                    function addMultipleSpecs(c) { for (let i = 0; i < c; i++) document.getElementById('btnAddSpec').click(); }
+                    function viewImage(s) { document.getElementById('modalImg').src = s; new bootstrap.Modal(document.getElementById('previewModal')).show(); }
                 </script>
             </body>
 

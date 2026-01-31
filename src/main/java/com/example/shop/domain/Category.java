@@ -11,26 +11,17 @@ public class Category {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    // Tên danh mục
     @Column(nullable = false)
     private String name;
 
-    // Mô tả danh mục
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    // Quan hệ One-to-Many: Một danh mục có nhiều sản phẩm
-    // mappedBy trỏ tới biến "category" trong class Product
+    // --- MỚI THÊM: Lưu tên file ảnh (VD: camera.png) ---
+    private String image;
 
-    // [THÊM ĐOẠN NÀY]
-    // Quan hệ 1-N: Một danh mục có List các sản phẩm
-    // mappedBy = "category" phải trùng tên biến "category" bên file Product.java
     @OneToMany(mappedBy = "category")
     private List<Product> products;
-
-    // Getter và Setter cho products
-
-    // ... các getter/setter khác
 
     // --- Getters and Setters ---
     public long getId() {
@@ -55,6 +46,14 @@ public class Category {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 
     public List<Product> getProducts() {

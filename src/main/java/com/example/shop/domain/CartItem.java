@@ -20,6 +20,11 @@ public class CartItem {
     @JoinColumn(name = "product_id")
     private Product product;
 
+    // THÊM TRƯỜNG NÀY ĐỂ BIẾT KHÁCH CHỌN MÀU NÀO
+    @ManyToOne
+    @JoinColumn(name = "product_color_id")
+    private ProductColor productColor;
+
     public long getId() {
         return id;
     }
@@ -60,4 +65,11 @@ public class CartItem {
         this.product = product;
     }
 
+    public ProductColor getProductColor() {
+        return productColor;
+    }
+
+    public void setProductColor(ProductColor productColor) {
+        this.productColor = productColor;
+    }
 }
