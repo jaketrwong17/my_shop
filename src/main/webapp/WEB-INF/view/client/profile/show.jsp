@@ -32,9 +32,7 @@
                                         class="list-group-item list-group-item-action active border-0 fw-bold">
                                         <i class="fas fa-user-circle me-2"></i> Thông tin tài khoản
                                     </a>
-                                    <a href="/history" class="list-group-item list-group-item-action border-0">
-                                        <i class="fas fa-history me-2"></i> Lịch sử mua hàng
-                                    </a>
+
                                     <a href="/change-password" class="list-group-item list-group-item-action border-0">
                                         <i class="fas fa-key me-2"></i> Đổi mật khẩu
                                     </a>
@@ -114,7 +112,7 @@
                 </div>
 
                 <jsp:include page="../layout/footer.jsp" />
-                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
             </body>
 
             </html>

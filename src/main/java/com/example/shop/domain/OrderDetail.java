@@ -5,13 +5,15 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "order_details")
 public class OrderDetail {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     private long quantity;
-    private double price; // Giá tại thời điểm mua (để phòng trường hợp sau này sản phẩm đổi giá)
+    private double price;
+
+    // --- THÊM TRƯỜNG NÀY ĐỂ LƯU TÊN MÀU ---
+    private String selectedColor;
 
     @ManyToOne
     @JoinColumn(name = "order_id")
@@ -21,6 +23,16 @@ public class OrderDetail {
     @JoinColumn(name = "product_id")
     private Product product;
 
+    // --- Getter & Setter cho selectedColor ---
+    public String getSelectedColor() {
+        return selectedColor;
+    }
+
+    public void setSelectedColor(String selectedColor) {
+        this.selectedColor = selectedColor;
+    }
+
+    // ... (Các Getter/Setter khác giữ nguyên) ...
     public long getId() {
         return id;
     }
@@ -60,6 +72,4 @@ public class OrderDetail {
     public void setProduct(Product product) {
         this.product = product;
     }
-
-    // --- Constructor, Getter, Setter ---
 }

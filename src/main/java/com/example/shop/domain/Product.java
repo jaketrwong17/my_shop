@@ -158,4 +158,18 @@ public class Product implements Serializable {
     public String toString() {
         return "Product [id=" + id + ", name=" + name + ", price=" + price + "]";
     }
+    // ... (Các code cũ giữ nguyên) ...
+
+    // ==================================================================
+    // THÊM HÀM NÀY ĐỂ SỬA LỖI: "Property [image] not found"
+    // Giúp file JSP gọi được ${product.image}
+    // ==================================================================
+    public String getImage() {
+        if (this.images != null && !this.images.isEmpty()) {
+            // VÌ ProductImage DÙNG getImageUrl() NÊN Ở ĐÂY PHẢI GỌI getImageUrl()
+            return this.images.get(0).getImageUrl();
+        }
+        return ""; // Trả về chuỗi rỗng nếu không có ảnh
+    }
+
 }

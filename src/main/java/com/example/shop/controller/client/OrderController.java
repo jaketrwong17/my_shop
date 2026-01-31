@@ -17,8 +17,11 @@ import java.util.Map;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import java.util.Optional; // Để sửa lỗi Optional
+import com.example.shop.domain.Order; // Để sửa lỗi Order
 
 @Controller("clientOrderController")
 public class OrderController {
@@ -157,5 +160,96 @@ public class OrderController {
         model.addAttribute("categories", categoryService.getAllCategories(null));
 
         return "client/cart/thanks";
+    }
+    // Route cho Lịch sử đơn hàng
+    // ... (Các phần import và code bên trên giữ nguyên) ...
+
+    // Route cho Lịch sử đơn hàng
+    // Route cho Lịch sử đơn hàng
+    // --- CẬP NHẬT: LỊCH SỬ ĐƠN HÀNG ---
+    @GetMapping("/order-history")
+    public String getHistoryPage(Model model, HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        String email = (String) session.getAttribute("email");
+        if (email == null)
+            return "redirect:/login";
+
+        model.addAttribute("categories", categoryService.getAllCategories(null));
+        // Lấy danh sách đơn đã hoàn thành/đã hủy
+        model.addAttribute("historyOrders", orderService.getCompletedOrders(email));
+
+        return "client/order/history";
+    }
+
+    // --- CẬP NHẬT: THEO DÕI ĐƠN HÀNG ---
+    @GetMapping("/order-tracking")
+    public String getTrackingPage(Model model, HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        String email = (String) session.getAttribute("email");
+        if (email == null)
+            return "redirect:/login";
+
+        model.addAttribute("categories", categoryService.getAllCategories(null));
+        // Sử dụng biến "activeOrders" để đồng bộ với JSP
+        model.addAttribute("activeOrders", orderService.getActiveOrders(email));
+
+        return "client/order/tracking";
+    }
+
+    // --- MỚI: HỦY ĐƠN HÀNG (Chỉ cho phép khi đang PENDING) ---
+    @GetMapping("/order/cancel/{id}")
+    public String handleCancelOrder(@PathVariable long id, HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        String email = (String) session.getAttribute("email");
+        if (email == null)
+            return "redirect:/login";
+
+        Optional<Order> orderOptional = orderService.getOrderById(id);
+        if (orderOptional.isPresent()) {
+            Order order = orderOptional.get();
+            // Kiểm tra bảo mật: User hiện tại có phải chủ đơn hàng không
+            // Kiểm tra logic: Chỉ hủy được đơn đang Chờ xử lý (PENDING)
+            if (order.getStatus().equals("PENDING")) {
+                order.setStatus("CANCELLED");
+                orderService.handleSaveOrder(order);
+            }
+        }
+        return "redirect:/order-tracking";
+    }
+
+    // --- MỚI: XEM CHI TIẾT ĐƠN HÀNG & ĐÁNH GIÁ ---
+    // ... Các code khác giữ nguyên ...
+
+    @GetMapping("/order-detail/{id}")
+    public String getOrderDetailPage(Model model, @PathVariable long id, HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        String email = (String) session.getAttribute("email");
+        if (email == null)
+            return "redirect:/login";
+
+        User user = userService.getUserByEmail(email);
+        Optional<Order> orderOptional = orderService.getOrderById(id);
+
+        if (orderOptional.isPresent()) {
+            Order order = orderOptional.get();
+            // Bảo mật: Chỉ xem được đơn của chính mình
+            if (order.getUser().getId() != user.getId()) {
+                return "redirect:/order-history";
+            }
+
+            model.addAttribute("order", order);
+
+            // --- SỬA ĐOẠN NÀY ---
+            // Thay vì dùng order.getOrderDetails(), hãy gọi hàm mới từ Service
+            // Để đảm bảo danh sách sản phẩm được tải đầy đủ
+            model.addAttribute("orderDetails", orderService.getOrderDetailsByOrderId(id));
+            // --------------------
+
+        } else {
+            return "redirect:/order-history";
+        }
+
+        model.addAttribute("categories", categoryService.getAllCategories(null));
+        return "client/order/detail";
     }
 }

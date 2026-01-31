@@ -40,24 +40,22 @@
 
                         <div class="container-fluid px-4 py-4">
                             <div class="card shadow-sm border-0 rounded-3">
-
                                 <div class="card-header bg-white py-3">
                                     <div class="row">
                                         <div class="col-md-9">
                                             <form action="/admin/order" method="GET"
                                                 class="d-flex gap-2 align-items-center">
-                                                <input type="text" name="keyword" class="form-control" placeholder=""
-                                                    value="${keyword}" style="max-width: 400px;">
+                                                <input type="text" name="keyword" class="form-control"
+                                                    placeholder="Tìm kiếm..." value="${keyword}"
+                                                    style="max-width: 400px;">
                                                 <button class="btn btn-outline-primary ms-2"><i
-                                                        class="fas fa-search"></i>
-                                                </button>
+                                                        class="fas fa-search"></i></button>
                                             </form>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="card-body p-0">
-
                                     <c:if test="${empty orders}">
                                         <div class="text-center py-5">
                                             <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
@@ -93,17 +91,23 @@
 
                                                             <td id="status-badge-${order.id}">
                                                                 <c:choose>
-                                                                    <c:when test="${order.status == 'PENDING'}"><span
-                                                                            class="badge bg-warning text-dark">Chờ xử
-                                                                            lý</span></c:when>
-                                                                    <c:when test="${order.status == 'SHIPPING'}"><span
-                                                                            class="badge bg-info text-dark">Đang
-                                                                            giao</span></c:when>
-                                                                    <c:when test="${order.status == 'COMPLETED'}"><span
-                                                                            class="badge bg-success">Hoàn thành</span>
+                                                                    <c:when test="${order.status == 'PENDING'}">
+                                                                        <span class="badge bg-warning text-dark">Chờ xử
+                                                                            lý</span>
                                                                     </c:when>
-                                                                    <c:when test="${order.status == 'CANCELLED'}"><span
-                                                                            class="badge bg-danger">Đã hủy</span>
+                                                                    <c:when test="${order.status == 'CONFIRMED'}">
+                                                                        <span class="badge bg-primary">Đã xác
+                                                                            nhận</span>
+                                                                    </c:when>
+                                                                    <c:when test="${order.status == 'SHIPPING'}">
+                                                                        <span class="badge bg-info text-dark">Đang
+                                                                            giao</span>
+                                                                    </c:when>
+                                                                    <c:when test="${order.status == 'COMPLETED'}">
+                                                                        <span class="badge bg-success">Hoàn thành</span>
+                                                                    </c:when>
+                                                                    <c:when test="${order.status == 'CANCELLED'}">
+                                                                        <span class="badge bg-danger">Đã hủy</span>
                                                                     </c:when>
                                                                 </c:choose>
                                                             </td>
@@ -117,6 +121,9 @@
                                                                         <option value="PENDING"
                                                                             ${order.status=='PENDING' ? 'selected' : ''
                                                                             }>Chờ xử lý</option>
+                                                                        <option value="CONFIRMED"
+                                                                            ${order.status=='CONFIRMED' ? 'selected'
+                                                                            : '' }>Đã xác nhận</option>
                                                                         <option value="SHIPPING"
                                                                             ${order.status=='SHIPPING' ? 'selected' : ''
                                                                             }>Đang giao</option>
@@ -125,15 +132,53 @@
                                                                             : '' }>Hoàn thành</option>
                                                                     </select>
 
-                                                                    <button
-                                                                        onclick="updateStatus(${order.id}, 'SHIPPING')"
-                                                                        class="btn btn-sm btn-success text-white ${order.status != 'PENDING' ? 'disabled' : ''}">
-                                                                        <i class="fas fa-check"></i>
-                                                                    </button>
+                                                                    <c:choose>
+                                                                        <%-- 1. Nếu PENDING -> Hiện nút Check để CONFIRM
+                                                                            --%>
+                                                                            <c:when test="${order.status == 'PENDING'}">
+                                                                                <button
+                                                                                    onclick="updateStatus(${order.id}, 'CONFIRMED')"
+                                                                                    class="btn btn-sm btn-primary text-white"
+                                                                                    title="Xác nhận đơn">
+                                                                                    <i class="fas fa-check"></i>
+                                                                                </button>
+                                                                            </c:when>
+
+                                                                            <%-- 2. Nếu CONFIRMED -> Hiện nút Xe tải để
+                                                                                SHIPPING --%>
+                                                                                <c:when
+                                                                                    test="${order.status == 'CONFIRMED'}">
+                                                                                    <button
+                                                                                        onclick="updateStatus(${order.id}, 'SHIPPING')"
+                                                                                        class="btn btn-sm btn-info text-dark"
+                                                                                        title="Giao hàng">
+                                                                                        <i class="fas fa-truck"></i>
+                                                                                    </button>
+                                                                                </c:when>
+
+                                                                                <%-- 3. Nếu SHIPPING -> Hiện nút Check
+                                                                                    đôi để COMPLETED --%>
+                                                                                    <c:when
+                                                                                        test="${order.status == 'SHIPPING'}">
+                                                                                        <button
+                                                                                            onclick="updateStatus(${order.id}, 'COMPLETED')"
+                                                                                            class="btn btn-sm btn-success text-white"
+                                                                                            title="Hoàn thành">
+                                                                                            <i
+                                                                                                class="fas fa-check-double"></i>
+                                                                                        </button>
+                                                                                    </c:when>
+
+                                                                                    <c:otherwise>
+                                                                                        <button
+                                                                                            class="btn btn-sm btn-secondary disabled"><i
+                                                                                                class="fas fa-check"></i></button>
+                                                                                    </c:otherwise>
+                                                                    </c:choose>
 
                                                                     <button
                                                                         onclick="updateStatus(${order.id}, 'CANCELLED')"
-                                                                        class="btn btn-sm btn-danger ${order.status == 'COMPLETED' || order.status == 'CANCELLED' ? 'disabled' : ''}">
+                                                                        class="btn btn-sm btn-danger ${order.status == 'COMPLETED' || order.status == 'CANCELLED' || order.status == 'SHIPPING' ? 'disabled' : ''}">
                                                                         <i class="fas fa-times"></i>
                                                                     </button>
 
@@ -157,7 +202,6 @@
 
                 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
                 <script>
-                    // ... (GIỮ NGUYÊN CODE JAVASCRIPT AJAX CŨ CỦA BẠN Ở ĐÂY) ...
                     function updateStatus(orderId, newStatus) {
                         const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
                         const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
@@ -175,28 +219,46 @@
                         }).catch(error => console.error('Error:', error));
                     }
 
+                    // Cập nhật giao diện Javascript ngay lập tức (không reload trang)
                     function refreshRowUI(id, status) {
                         const badgeCell = document.getElementById('status-badge-' + id);
                         let badgeHtml = '';
+
+                        // Cập nhật Badge
                         if (status === 'PENDING') badgeHtml = '<span class="badge bg-warning text-dark">Chờ xử lý</span>';
+                        else if (status === 'CONFIRMED') badgeHtml = '<span class="badge bg-primary">Đã xác nhận</span>';
                         else if (status === 'SHIPPING') badgeHtml = '<span class="badge bg-info text-dark">Đang giao</span>';
                         else if (status === 'COMPLETED') badgeHtml = '<span class="badge bg-success">Hoàn thành</span>';
                         else if (status === 'CANCELLED') badgeHtml = '<span class="badge bg-danger">Đã hủy</span>';
                         badgeCell.innerHTML = badgeHtml;
 
-                        const confirmDisabled = (status !== 'PENDING') ? 'disabled' : '';
-                        const cancelDisabled = (status === 'COMPLETED' || status === 'CANCELLED') ? 'disabled' : '';
+                        const actionCell = document.getElementById('action-cell-' + id);
+
+                        // Logic tạo nút bấm động
+                        let actionBtnHtml = '';
+                        if (status === 'PENDING') {
+                            actionBtnHtml = `<button onclick="updateStatus(\${id}, 'CONFIRMED')" class="btn btn-sm btn-primary text-white" title="Xác nhận đơn"><i class="fas fa-check"></i></button>`;
+                        } else if (status === 'CONFIRMED') {
+                            actionBtnHtml = `<button onclick="updateStatus(\${id}, 'SHIPPING')" class="btn btn-sm btn-info text-dark" title="Giao hàng"><i class="fas fa-truck"></i></button>`;
+                        } else if (status === 'SHIPPING') {
+                            actionBtnHtml = `<button onclick="updateStatus(\${id}, 'COMPLETED')" class="btn btn-sm btn-success text-white" title="Hoàn thành"><i class="fas fa-check-double"></i></button>`;
+                        } else {
+                            actionBtnHtml = `<button class="btn btn-sm btn-secondary disabled"><i class="fas fa-check"></i></button>`;
+                        }
+
+                        const cancelDisabled = (status === 'COMPLETED' || status === 'CANCELLED' || status === 'SHIPPING') ? 'disabled' : '';
                         const selectDisabled = (status === 'CANCELLED') ? 'disabled' : '';
 
-                        const actionCell = document.getElementById('action-cell-' + id);
+                        // Render lại ô Thao tác
                         actionCell.innerHTML = `
                 <div class="action-group">
                     <select class="form-select form-select-sm" onchange="updateStatus(\${id}, this.value)" style="width: 140px; font-weight: 500;" \${selectDisabled}>
                         <option value="PENDING" \${status === 'PENDING' ? 'selected' : ''}>Chờ xử lý</option>
+                        <option value="CONFIRMED" \${status === 'CONFIRMED' ? 'selected' : ''}>Đã xác nhận</option>
                         <option value="SHIPPING" \${status === 'SHIPPING' ? 'selected' : ''}>Đang giao</option>
                         <option value="COMPLETED" \${status === 'COMPLETED' ? 'selected' : ''}>Hoàn thành</option>
                     </select>
-                    <button onclick="updateStatus(\${id}, 'SHIPPING')" class="btn btn-sm btn-success text-white \${confirmDisabled}"><i class="fas fa-check"></i></button>
+                    \${actionBtnHtml}
                     <button onclick="updateStatus(\${id}, 'CANCELLED')" class="btn btn-sm btn-danger \${cancelDisabled}"><i class="fas fa-times"></i></button>
                     <a href="/admin/order/view/\${id}" class="btn btn-sm btn-light border text-primary"><i class="fas fa-eye"></i></a>
                 </div>`;

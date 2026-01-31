@@ -193,9 +193,9 @@
                                             <li><a class="dropdown-item py-2" href="/profile"><i
                                                         class="fas fa-id-card me-2 text-primary"></i> Thông tin tài
                                                     khoản</a></li>
-                                            <li><a class="dropdown-item py-2" href="/history"><i
-                                                        class="fas fa-box-open me-2 text-success"></i> Đơn hàng của
-                                                    tôi</a></li>
+                                            <li><a class="dropdown-item py-2" href="/order-history"><i
+                                                        class="fas fa-box-open me-2 text-success"></i> Quản lý đơn
+                                                    hàng</a></li>
                                             <li>
                                                 <hr class="dropdown-divider">
                                             </li>

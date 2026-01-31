@@ -23,6 +23,7 @@ public class OrderService {
     private final CartItemRepository cartItemRepository;
     private final VoucherRepository voucherRepository;
     private final ProductColorRepository productColorRepository; // THÊM REPO NÀY
+    private UserRepository userRepository;
 
     public OrderService(OrderRepository orderRepository,
             OrderDetailRepository orderDetailRepository,
@@ -30,7 +31,8 @@ public class OrderService {
             ProductRepository productRepository,
             CartItemRepository cartItemRepository,
             VoucherRepository voucherRepository,
-            ProductColorRepository productColorRepository) { // INJECT REPO
+            ProductColorRepository productColorRepository,
+            UserRepository userRepository) { // INJECT REPO
         this.orderRepository = orderRepository;
         this.orderDetailRepository = orderDetailRepository;
         this.cartRepository = cartRepository;
@@ -38,6 +40,7 @@ public class OrderService {
         this.cartItemRepository = cartItemRepository;
         this.voucherRepository = voucherRepository;
         this.productColorRepository = productColorRepository;
+        this.userRepository = userRepository;
     }
 
     // ==================== ADMIN ====================
@@ -106,10 +109,10 @@ public class OrderService {
         List<CartItem> cartItems = cart.getCartItems();
         List<CartItem> itemsToOrder = new ArrayList<>();
 
-        // 2. Lọc sản phẩm & Kiểm tra kho THEO MÀU SẮC (Variant Check)
+        // 2. Lọc sản phẩm & Kiểm tra kho THEO MÀU SẮC
         for (CartItem item : cartItems) {
             if (cartItemIds.contains(item.getId())) {
-                ProductColor pc = item.getProductColor(); // Lấy màu sắc đã lưu trong CartItem
+                ProductColor pc = item.getProductColor();
 
                 if (pc == null) {
                     throw new Exception("Sản phẩm " + item.getProduct().getName() + " chưa chọn màu sắc!");
@@ -161,7 +164,7 @@ public class OrderService {
 
         order = this.orderRepository.save(order);
 
-        // 5. Lưu Chi tiết (OrderDetail) & TRỪ KHO THEO MÀU & Xóa CartItem
+        // 5. Lưu Chi tiết (OrderDetail) & TRỪ KHO & LƯU MÀU
         for (CartItem item : itemsToOrder) {
             OrderDetail orderDetail = new OrderDetail();
             orderDetail.setOrder(order);
@@ -169,16 +172,17 @@ public class OrderService {
             orderDetail.setPrice(item.getPrice());
             orderDetail.setQuantity(item.getQuantity());
 
-            // Lưu lại tên màu vào chi tiết đơn hàng để lưu lịch sử
+            // --- PHẦN QUAN TRỌNG ĐÃ SỬA ---
             if (item.getProductColor() != null) {
-                // Giả sử domain OrderDetail có trường colorName
-                // orderDetail.setColorName(item.getProductColor().getColorName());
+                // 1. Lưu tên màu vào chi tiết đơn hàng (để hiển thị ở lịch sử)
+                orderDetail.setSelectedColor(item.getProductColor().getColorName());
 
-                // THỰC HIỆN TRỪ KHO THEO MÀU
+                // 2. Trừ kho
                 ProductColor pc = item.getProductColor();
                 pc.setQuantity(pc.getQuantity() - item.getQuantity());
                 this.productColorRepository.save(pc);
             }
+            // -----------------------------
 
             this.orderDetailRepository.save(orderDetail);
 
@@ -200,5 +204,34 @@ public class OrderService {
             return orderRepository.searchOrders(keyword);
         }
         return orderRepository.findAll();
+    }
+
+    public List<Order> getCompletedOrders(String email) {
+        User user = userRepository.findByEmail(email);
+        List<String> statuses = List.of("COMPLETED", "CANCELLED");
+        return orderRepository.findByUserAndStatusIn(user, statuses);
+    }
+
+    // Hàm lấy đơn hàng cho trang Theo dõi (Chờ duyệt hoặc Đang giao)
+    public List<Order> getActiveOrders(String email) {
+        User user = userRepository.findByEmail(email);
+        // THÊM TRẠNG THÁI "CONFIRMED" VÀO LIST NÀY
+        List<String> statuses = List.of("PENDING", "CONFIRMED", "SHIPPING");
+        return orderRepository.findByUserAndStatusIn(user, statuses);
+    }
+    // ... Các hàm cũ giữ nguyên ...
+
+    // --- THÊM HÀM NÀY ĐỂ FIX LỖI BLANK CHI TIẾT ĐƠN HÀNG ---
+    @Transactional
+    public List<OrderDetail> getOrderDetailsByOrderId(long id) {
+        Optional<Order> orderOptional = this.orderRepository.findById(id);
+        if (orderOptional.isPresent()) {
+            Order order = orderOptional.get();
+            // Gọi hàm này để Hibernate ép buộc tải dữ liệu chi tiết (Initialize)
+            // Khắc phục lỗi Lazy Loading khiến list bị rỗng bên Controller
+            order.getOrderDetails().size();
+            return order.getOrderDetails();
+        }
+        return new ArrayList<>();
     }
 }
