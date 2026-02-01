@@ -7,6 +7,6 @@ import java.util.List;
 
 @Repository
 public interface CategoryRepository extends JpaRepository<Category, Long> {
-    // Phục vụ chức năng tìm kiếm danh mục
+
     List<Category> findByNameContainingIgnoreCase(String name);
 }

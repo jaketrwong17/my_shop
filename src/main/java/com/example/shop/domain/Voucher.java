@@ -15,7 +15,7 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "vouchers") // Dùng @Table chứ không phải @Target
+@Table(name = "vouchers")
 public class Voucher implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -23,9 +23,9 @@ public class Voucher implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    private String code; // Tên mã (VD: WOLF2026)
-    private double discount; // Phần trăm giảm (VD: 10, 20)
-    private boolean isAll; // true: Toàn sàn, false: Theo danh mục
+    private String code;
+    private double discount;
+    private boolean isAll;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "voucher_category", joinColumns = @JoinColumn(name = "voucher_id"), inverseJoinColumns = @JoinColumn(name = "category_id"))
@@ -34,7 +34,6 @@ public class Voucher implements Serializable {
     public Voucher() {
     }
 
-    // --- Getters and Setters ---
     public long getId() {
         return id;
     }

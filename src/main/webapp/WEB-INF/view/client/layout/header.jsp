@@ -3,18 +3,17 @@
         <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
             <style>
-                /* 1. CSS CHO THANH CHỮ CHẠY */
                 .coupon-ticker-wrap {
                     background-color: #237fe7;
-                    /* Màu xanh */
+
 
                     width: 100%;
                     position: relative;
                     z-index: 1;
-                    /* QUAN TRỌNG: Để thấp (1) để menu (1020) đè lên được */
+
                 }
 
-                /* Khung nhìn giới hạn chữ chạy */
+
                 .ticker-viewport {
                     overflow: hidden;
                     white-space: nowrap;
@@ -22,19 +21,19 @@
                     display: flex;
                     align-items: center;
                     position: relative;
-                    /* Tạo hiệu ứng mờ 2 đầu */
+
                     -webkit-mask-image: linear-gradient(to right, transparent, black 20px, black 95%, transparent);
                     mask-image: linear-gradient(to right, transparent, black 20px, black 95%, transparent);
                 }
 
-                /* Nội dung chạy */
+
                 .coupon-ticker-content {
                     display: inline-block;
                     padding-left: 100%;
                     animation: ticker-scroll 120s linear infinite;
                 }
 
-                /* Di chuột vào thì dừng */
+
                 .coupon-ticker-content:hover {
                     animation-play-state: paused;
                     cursor: default;
@@ -65,51 +64,68 @@
                     opacity: 0.9;
                 }
 
-                /* 2. QUAN TRỌNG: Đảm bảo Header luôn nằm trên thanh chạy */
+
                 header.sticky-top {
                     z-index: 1020 !important;
-                    /* Bootstrap mặc định là 1020, set cứng để chắc chắn */
+
                     position: sticky;
                     top: 0;
                 }
 
-                /* Chỉnh lại dropdown menu */
+
                 .dropdown-menu {
                     z-index: 1030 !important;
-                    /* Cao hơn mọi thứ */
+
                 }
 
-                /* Class tùy chỉnh để đổi màu chữ khi di chuột */
+
                 .btn-register-custom {
                     color: #0d6efd !important;
-                    /* Màu xanh mặc định (giống text-primary) */
+
                     background-color: #fff;
                     transition: all 0.3s ease;
                 }
 
-                /* Ép nút Đăng nhập chuyển chữ đen khi di chuột */
+
                 .btn-login-hover:hover {
                     color: #2A83E9 !important;
-                    /* Chữ màu đen */
+
                     background-color: #fff !important;
-                    /* Nền màu trắng */
+
                     border-color: #fff !important;
-                    /* Viền màu trắng */
+
                 }
 
                 .btn-auth {
                     min-width: 120px;
-                    /* Độ rộng đủ để chứa chữ 'Đăng nhập' */
+
                     display: inline-flex;
-                    /* Giúp căn giữa nội dung tốt hơn */
+
                     justify-content: center;
                     align-items: center;
+                }
+
+                .custom-logo {
+                    display: inline-block;
+                    border-bottom: 3px solid #ffc107;
+
+                    line-height: 1.2;
+
+                    padding-bottom: 2px;
+                }
+
+                .custom-logo:hover {
+                    color: inherit;
+
+                    opacity: 0.8;
                 }
             </style>
 
             <header class="navbar navbar-expand-lg navbar-dark py-3 sticky-top" style="background-color: #2A83E9;">
                 <div class="container">
-                    <a class="navbar-brand fw-bold fs-3" href="/">16Home<span class="text-warning">.</span></a>
+                    <a class="navbar-brand fw-bold fs-2 custom-logo" href="/">
+                        16Home<span class="text-warning">.</span>
+                    </a>
 
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                         data-bs-target="#navbarContent">
@@ -213,7 +229,7 @@
                                             aria-labelledby="userDropdown">
                                             <c:if test="${sessionScope.role == 'ADMIN'}">
                                                 <li>
-                                                    <a class="dropdown-item py-2" href="/admin/user">
+                                                    <a class="dropdown-item py-2" href="/admin/dashboard">
                                                         <i class="fas fa-user-shield me-2 text-danger"></i> Trang quản
                                                         trị
                                                     </a>

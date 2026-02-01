@@ -15,13 +15,11 @@ public class UploadService {
             String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
             String rootPath = System.getProperty("user.dir");
 
-            // 1. Lưu vào thư mục target (Để hiện ảnh ngay lập tức sau khi up)
             Path pathTarget = Paths.get(rootPath, "target", "classes", "static", targetFolder, fileName);
             if (!Files.exists(pathTarget.getParent()))
                 Files.createDirectories(pathTarget.getParent());
             Files.copy(file.getInputStream(), pathTarget, StandardCopyOption.REPLACE_EXISTING);
 
-            // 2. Lưu vào thư mục src (Lưu vĩnh viễn trong project)
             Path pathSrc = Paths.get(rootPath, "src", "main", "resources", "static", targetFolder, fileName);
             if (!Files.exists(pathSrc.getParent()))
                 Files.createDirectories(pathSrc.getParent());

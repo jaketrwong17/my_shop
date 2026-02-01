@@ -12,7 +12,6 @@ public class OrderDetail {
     private long quantity;
     private double price;
 
-    // --- THÊM TRƯỜNG NÀY ĐỂ LƯU TÊN MÀU ---
     private String selectedColor;
 
     @ManyToOne
@@ -23,7 +22,6 @@ public class OrderDetail {
     @JoinColumn(name = "product_id")
     private Product product;
 
-    // --- Getter & Setter cho selectedColor ---
     public String getSelectedColor() {
         return selectedColor;
     }
@@ -32,7 +30,6 @@ public class OrderDetail {
         this.selectedColor = selectedColor;
     }
 
-    // ... (Các Getter/Setter khác giữ nguyên) ...
     public long getId() {
         return id;
     }

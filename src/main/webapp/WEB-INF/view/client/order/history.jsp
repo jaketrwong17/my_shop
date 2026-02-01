@@ -22,14 +22,6 @@
                         flex: 1;
                     }
 
-                    .page-header-box {
-                        background: #fff;
-                        padding: 1rem;
-                        border-radius: 8px;
-                        box-shadow: 0 .125rem .25rem rgba(0, 0, 0, .075);
-                        margin-bottom: 1.5rem;
-                    }
-
                     .content-box {
                         background: #fff;
                         border-radius: 8px;
@@ -45,6 +37,7 @@
                         font-weight: 600;
                         text-transform: uppercase;
                         font-size: 0.85rem;
+                        white-space: nowrap;
                     }
 
                     .table-custom tbody td {
@@ -86,74 +79,108 @@
                                     </h5>
 
                                     <c:choose>
-                                        <c:when test="${empty historyOrders}">
-                                            <div class="text-center py-5">
-                                                <i class="fas fa-shopping-basket fa-4x text-muted opacity-25 mb-3"></i>
-                                                <p class="text-muted">Bạn chưa mua đơn hàng nào.</p>
-                                                <a href="/" class="btn btn-primary rounded-pill px-4">Mua sắm ngay</a>
-                                            </div>
-                                        </c:when>
-                                        <c:otherwise>
-                                            <div class="table-responsive">
-                                                <table class="table table-hover table-custom mb-0">
-                                                    <thead>
-                                                        <tr>
-                                                            <th class="text-center">Mã ĐH</th>
-                                                            <th>Ngày đặt</th>
-                                                            <th>Tổng tiền</th>
-                                                            <th class="text-center">Trạng thái</th>
-                                                            <th class="text-center">Thao tác</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <c:forEach var="order" items="${historyOrders}">
-                                                            <tr>
-                                                                <td class="text-center fw-bold text-primary">
-                                                                    #${order.id}</td>
-                                                                <td>
-                                                                    <%-- SỬA: Đổi từ orderDate thành createdAt nếu
-                                                                        entity dùng createdAt --%>
-                                                                        <fmt:formatDate value="${order.createdAt}"
-                                                                            pattern="dd/MM/yyyy HH:mm" />
-                                                                </td>
-                                                                <td class="fw-bold text-danger">
-                                                                    <fmt:formatNumber value="${order.totalPrice}"
-                                                                        type="currency" currencySymbol="đ" />
-                                                                </td>
-                                                                <td class="text-center">
-                                                                    <c:choose>
-                                                                        <c:when test="${order.status == 'COMPLETED'}">
-                                                                            <span
-                                                                                class="badge rounded-pill bg-success bg-opacity-10 text-success px-3 py-2">Thành
-                                                                                công</span>
-                                                                        </c:when>
-                                                                        <c:when test="${order.status == 'CANCELLED'}">
-                                                                            <span
-                                                                                class="badge rounded-pill bg-secondary bg-opacity-10 text-secondary px-3 py-2">Đã
-                                                                                hủy</span>
-                                                                        </c:when>
-                                                                    </c:choose>
-                                                                </td>
-                                                                <td class="text-center">
-                                                                    <a href="/order-detail/${order.id}"
-                                                                        class="btn btn-sm btn-light border"
-                                                                        title="Xem chi tiết">
-                                                                        <i class="fas fa-eye text-primary"></i>
-                                                                    </a>
-                                                                </td>
-                                                            </tr>
-                                                        </c:forEach>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </c:otherwise>
+                                        <%-- TRƯỜNG HỢP KHÔNG CÓ ĐƠN HÀNG --%>
+                                            <c:when test="${empty historyOrders}">
+                                                <div class="text-center py-5">
+                                                    <i
+                                                        class="fas fa-shopping-basket fa-4x text-muted opacity-25 mb-3"></i>
+                                                    <p class="text-muted">Bạn chưa mua đơn hàng nào.</p>
+                                                    <a href="/" class="btn btn-primary rounded-pill px-4">Mua sắm
+                                                        ngay</a>
+                                                </div>
+                                            </c:when>
+
+                                            <%-- TRƯỜNG HỢP CÓ ĐƠN HÀNG --%>
+                                                <c:otherwise>
+                                                    <div class="table-responsive">
+                                                        <table class="table table-hover table-custom mb-0">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th class="text-center">Mã ĐH</th>
+                                                                    <th>Ngày đặt</th>
+                                                                    <th>Hoàn thành</th>
+                                                                    <th>Tổng tiền</th>
+                                                                    <th class="text-center">Trạng thái</th>
+                                                                    <th class="text-center">Thao tác</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <c:forEach var="order" items="${historyOrders}">
+                                                                    <tr>
+                                                                        <td class="text-center fw-bold text-primary">
+                                                                            #${order.id}
+                                                                        </td>
+
+                                                                        <td>
+                                                                            <fmt:formatDate value="${order.createdAt}"
+                                                                                pattern="dd/MM/yyyy HH:mm" />
+                                                                        </td>
+
+                                                                        <td class="small fw-bold text-success">
+                                                                            <c:if test="${not empty order.completedAt}">
+                                                                                <fmt:formatDate
+                                                                                    value="${order.completedAt}"
+                                                                                    pattern="dd/MM/yyyy HH:mm" />
+                                                                            </c:if>
+                                                                            <c:if test="${empty order.completedAt}">
+                                                                                <span
+                                                                                    class="text-muted fw-normal">-</span>
+                                                                            </c:if>
+                                                                        </td>
+
+                                                                        <td class="fw-bold text-danger">
+                                                                            <fmt:formatNumber
+                                                                                value="${order.totalPrice}"
+                                                                                type="currency" currencySymbol="đ" />
+                                                                        </td>
+
+                                                                        <td class="text-center">
+                                                                            <c:choose>
+                                                                                <c:when
+                                                                                    test="${order.status == 'COMPLETED'}">
+                                                                                    <span
+                                                                                        class="badge rounded-pill bg-success bg-opacity-10 text-success px-3 py-2">
+                                                                                        Thành công
+                                                                                    </span>
+                                                                                </c:when>
+                                                                                <c:when
+                                                                                    test="${order.status == 'CANCELLED'}">
+                                                                                    <span
+                                                                                        class="badge rounded-pill bg-secondary bg-opacity-10 text-secondary px-3 py-2">
+                                                                                        Đã hủy
+                                                                                    </span>
+                                                                                </c:when>
+                                                                                <c:otherwise>
+                                                                                    <span
+                                                                                        class="badge rounded-pill bg-warning bg-opacity-10 text-dark px-3 py-2">
+                                                                                        ${order.status}
+                                                                                    </span>
+                                                                                </c:otherwise>
+                                                                            </c:choose>
+                                                                        </td>
+
+                                                                        <td class="text-center">
+                                                                            <a href="/order-detail/${order.id}"
+                                                                                class="btn btn-sm btn-light border"
+                                                                                title="Xem chi tiết">
+                                                                                <i class="fas fa-eye text-primary"></i>
+                                                                            </a>
+                                                                        </td>
+                                                                    </tr>
+                                                                </c:forEach>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </c:otherwise>
                                     </c:choose>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+
                 <jsp:include page="../layout/footer.jsp" />
+
             </body>
 
             </html>

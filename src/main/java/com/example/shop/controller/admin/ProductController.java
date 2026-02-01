@@ -31,6 +31,7 @@ public class ProductController {
         this.uploadService = uploadService;
     }
 
+    // Hiển thị danh sách sản phẩm có lọc theo từ khóa và danh mục
     @GetMapping
     public String getProductPage(Model model,
             @RequestParam(required = false) String keyword,
@@ -40,6 +41,7 @@ public class ProductController {
         return "admin/product/show";
     }
 
+    // Hiển thị trang tạo mới sản phẩm
     @GetMapping("/create")
     public String getCreatePage(Model model) {
         model.addAttribute("newProduct", new Product());
@@ -47,6 +49,7 @@ public class ProductController {
         return "admin/product/create";
     }
 
+    // Xử lý lưu sản phẩm mới kèm ảnh, thông số và màu sắc
     @PostMapping("/create")
     public String createProduct(@ModelAttribute("newProduct") Product product,
             @RequestParam("imageFiles") MultipartFile[] files,
@@ -56,14 +59,13 @@ public class ProductController {
             @RequestParam(value = "colorQuantities", required = false) Long[] colorQuantities) {
         saveImages(product, files);
         handleSpecs(product, specNames, specValues);
-
-        // Sửa lại hàm handleColors để truyền thêm mảng số lượng
         handleColors(product, colorNames, colorQuantities);
 
         productService.handleSaveProduct(product);
         return "redirect:/admin/product";
     }
 
+    // Hiển thị trang cập nhật sản phẩm theo ID
     @GetMapping("/update/{id}")
     public String getUpdatePage(Model model, @PathVariable long id) {
         Product currentProduct = productService.fetchProductById(id).get();
@@ -72,6 +74,7 @@ public class ProductController {
         return "admin/product/update";
     }
 
+    // Xử lý cập nhật thông tin sản phẩm và đồng bộ dữ liệu liên quan
     @PostMapping("/update")
     public String updateProduct(@ModelAttribute("newProduct") Product product,
             @RequestParam("imageFiles") MultipartFile[] files,
@@ -83,13 +86,11 @@ public class ProductController {
 
         Product currentProduct = productService.fetchProductById(product.getId()).get();
 
-        // 1. Cập nhật Ảnh
         if (deleteImageIds != null && !deleteImageIds.isEmpty()) {
             currentProduct.getImages().removeIf(img -> deleteImageIds.contains(img.getId()));
         }
         saveImages(currentProduct, files);
 
-        // 2. Cập nhật thông tin cơ bản
         currentProduct.setName(product.getName());
         currentProduct.setPrice(product.getPrice());
         currentProduct.setCategory(product.getCategory());
@@ -97,34 +98,30 @@ public class ProductController {
         currentProduct.setDetailDesc(product.getDetailDesc());
         currentProduct.setFactory(product.getFactory());
 
-        // 3. Cập nhật Thông số (Specs) - Xóa cũ nạp mới
         currentProduct.getSpecs().clear();
         handleSpecs(currentProduct, specNames, specValues);
 
-        // 4. Cập nhật Màu sắc (Colors) - Xóa cũ nạp mới
         currentProduct.getColors().clear();
-        handleColors(currentProduct, colorNames, colorQuantities); // Truyền thêm mảng số lượng
+        handleColors(currentProduct, colorNames, colorQuantities);
 
         productService.handleSaveProduct(currentProduct);
         return "redirect:/admin/product";
     }
 
+    // Xử lý xóa sản phẩm và bắt lỗi ràng buộc dữ liệu
     @GetMapping("/delete/{id}")
     public String deleteProduct(@PathVariable long id, RedirectAttributes redirectAttributes) {
         try {
             productService.deleteProduct(id);
             redirectAttributes.addFlashAttribute("successMessage", "Xóa sản phẩm thành công!");
         } catch (Exception e) {
-            // Đây là chỗ xử lý khi Database chặn xóa
             redirectAttributes.addFlashAttribute("errorMessage",
                     "Sản phẩm này dính dáng đến đơn hàng (kể cả đơn đã hủy), không thể xóa!");
         }
         return "redirect:/admin/product";
     }
 
-    // --- CÁC HÀM HELPER HỖ TRỢ ---
-
-    // Xử lý nạp Thông số kỹ thuật
+    // Helper: Xử lý nạp thông số kỹ thuật cho sản phẩm
     private void handleSpecs(Product product, String[] specNames, String[] specValues) {
         if (specNames != null && specValues != null) {
             for (int i = 0; i < specNames.length; i++) {
@@ -139,14 +136,13 @@ public class ProductController {
         }
     }
 
-    // Xử lý nạp Màu sắc
+    // Helper: Xử lý nạp danh sách màu sắc và số lượng tồn kho
     private void handleColors(Product product, String[] colorNames, Long[] colorQuantities) {
         if (colorNames != null && colorQuantities != null) {
             for (int i = 0; i < colorNames.length; i++) {
                 if (colorNames[i] != null && !colorNames[i].trim().isEmpty()) {
                     ProductColor pc = new ProductColor();
                     pc.setColorName(colorNames[i]);
-                    // Lấy số lượng tương ứng với vị trí màu, nếu thiếu thì mặc định là 0
                     pc.setQuantity(i < colorQuantities.length ? colorQuantities[i] : 0);
                     pc.setProduct(product);
                     product.getColors().add(pc);
@@ -155,7 +151,7 @@ public class ProductController {
         }
     }
 
-    // Xử lý nạp Ảnh
+    // Helper: Xử lý tải lên và lưu danh sách ảnh sản phẩm
     private void saveImages(Product product, MultipartFile[] files) {
         if (product.getImages() == null)
             product.setImages(new ArrayList<>());

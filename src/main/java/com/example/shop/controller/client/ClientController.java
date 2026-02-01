@@ -1,6 +1,7 @@
 package com.example.shop.controller.client;
 
 import com.example.shop.domain.User;
+import com.example.shop.service.CategoryService;
 import com.example.shop.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -14,9 +15,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 public class ClientController {
 
     private final UserService userService;
+    private final CategoryService categoryService;
 
-    public ClientController(UserService userService) {
+    public ClientController(UserService userService, CategoryService categoryService) {
         this.userService = userService;
+        this.categoryService = categoryService;
     }
 
     // 1. Hiển thị trang thông tin cá nhân
@@ -27,7 +30,7 @@ public class ClientController {
 
         User currentUser = this.userService.getUserByEmail(email);
         model.addAttribute("user", currentUser);
-
+        model.addAttribute("categories", categoryService.getAllCategories(null));
         return "client/profile/show";
     }
 
@@ -37,15 +40,11 @@ public class ClientController {
         HttpSession session = request.getSession(false);
         String email = (String) session.getAttribute("email");
 
-        // Lấy ID của người đang đăng nhập để đảm bảo an toàn (không tin tưởng ID từ
-        // form gửi lên hoàn toàn)
         User currentUser = this.userService.getUserByEmail(email);
 
-        // Gọi service cập nhật
         this.userService.updateUserProfile(currentUser.getId(), user);
 
-        // Cập nhật lại thông tin hiển thị trên Session (nếu có lưu tên hiển thị)
-        session.setAttribute("fullName", user.getFullName()); // Nếu bạn dùng fullName trên header
+        session.setAttribute("fullName", user.getFullName());
 
         return "redirect:/profile";
     }

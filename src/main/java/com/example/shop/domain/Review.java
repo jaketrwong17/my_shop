@@ -2,7 +2,7 @@ package com.example.shop.domain;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
-import java.util.Date; // Bắt buộc dùng java.util.Date để tương thích với JSP
+import java.util.Date;
 
 @Entity
 @Table(name = "reviews")
@@ -13,22 +13,17 @@ public class Review implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    // Số sao đánh giá (1-5)
     private int rating;
 
-    // Nội dung bình luận
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    // Ngày tạo (Kiểu Date để fix lỗi 500 bên Admin)
     private Date createdAt;
 
-    // Người đánh giá
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
-    // Sản phẩm được đánh giá
     @ManyToOne
     @JoinColumn(name = "product_id")
     private Product product;
@@ -36,13 +31,11 @@ public class Review implements Serializable {
     public Review() {
     }
 
-    // Tự động gán ngày giờ hiện tại khi lưu vào DB
     @PrePersist
     public void onCreate() {
         this.createdAt = new Date();
     }
 
-    // --- Getters and Setters ---
     public long getId() {
         return id;
     }

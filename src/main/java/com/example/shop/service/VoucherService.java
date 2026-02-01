@@ -10,11 +10,10 @@ import java.util.Optional;
 
 @Service
 public class VoucherService {
-    // PHẢI có 2 dòng khai báo này
+
     private final VoucherRepository voucherRepository;
     private final CategoryService categoryService;
 
-    // PHẢI có Constructor này để hết gạch đỏ
     public VoucherService(VoucherRepository voucherRepository, CategoryService categoryService) {
         this.voucherRepository = voucherRepository;
         this.categoryService = categoryService;
@@ -28,7 +27,7 @@ public class VoucherService {
         if (categoryIds != null && !voucher.isAll()) {
             List<Category> cats = new ArrayList<>();
             for (Long id : categoryIds) {
-                // Gọi đúng hàm từ categoryService đã nạp ở trên
+
                 cats.add(this.categoryService.getCategoryById(id));
             }
             voucher.setCategories(cats);
@@ -40,7 +39,6 @@ public class VoucherService {
         this.voucherRepository.deleteById(id);
     }
 
-    // Thêm hàm này vào class VoucherService
     public Voucher getVoucherById(long id) {
         Optional<Voucher> voucherOptional = this.voucherRepository.findById(id);
         if (voucherOptional.isPresent()) {
@@ -50,23 +48,20 @@ public class VoucherService {
     }
 
     public List<Voucher> getVouchersWithFilters(Long categoryId, String keyword) {
-        List<Voucher> allVouchers = this.getAllVouchers(); // Lấy từ Repository
+        List<Voucher> allVouchers = this.getAllVouchers();
 
         return allVouchers.stream().filter(v -> {
-            // 1. Lọc theo từ khóa (Code)
+
             boolean matchKeyword = (keyword == null || keyword.isEmpty()) ||
                     v.getCode().toLowerCase().contains(keyword.toLowerCase());
 
-            // 2. Lọc theo Danh mục hoặc Toàn sàn
             boolean matchCategory = true;
             if (categoryId != null) {
                 if (categoryId == -1) {
-                    // Trường hợp người dùng chọn "Toàn bộ sàn"
+
                     matchCategory = v.isAll();
                 } else {
-                    // Trường hợp chọn một danh mục cụ thể
-                    // Voucher đó phải thuộc danh mục này HOẶC là voucher toàn sàn (vì toàn sàn áp
-                    // dụng cho mọi danh mục)
+
                     matchCategory = v.isAll() || v.getCategories().stream().anyMatch(c -> c.getId() == categoryId);
                 }
             }

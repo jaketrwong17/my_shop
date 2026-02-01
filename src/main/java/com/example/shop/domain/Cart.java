@@ -19,7 +19,7 @@ public class Cart {
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CartItem> cartItems = new ArrayList<>();
 
-    private int sum; // Tổng số lượng sản phẩm để hiện số 2 trên icon giỏ hàng
+    private int sum;
 
     public long getId() {
         return id;

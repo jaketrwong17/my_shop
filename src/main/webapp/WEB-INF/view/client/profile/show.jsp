@@ -7,111 +7,92 @@
 
             <head>
                 <meta charset="UTF-8">
-                <title>Thông tin tài khoản - WolfHome</title>
+                <title>Hồ sơ cá nhân - WolfHome</title>
                 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-                <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+                <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+                <style>
+                    body {
+                        background-color: #f5f5fa;
+                        min-height: 100vh;
+                        display: flex;
+                        flex-direction: column;
+                    }
+
+                    .main-wrapper {
+                        flex: 1;
+                    }
+
+                    .content-box {
+                        background: #fff;
+                        border-radius: 8px;
+                        box-shadow: 0 .125rem .25rem rgba(0, 0, 0, .075);
+                        padding: 1.5rem;
+                        min-height: 100%;
+                    }
+
+                    .form-label-custom {
+                        color: #6c757d;
+                        font-weight: 500;
+                    }
+                </style>
             </head>
 
-            <body class="bg-light">
+            <body>
                 <jsp:include page="../layout/header.jsp" />
 
-                <div class="container my-5">
-                    <nav aria-label="breadcrumb" class="mb-4">
-                        <ol class="breadcrumb mb-0">
-                            <li class="breadcrumb-item">
-                                <a href="/" class="text-decoration-none text-muted">Trang chủ</a>
-                            </li>
-                            <li class="breadcrumb-item active text-primary" aria-current="page">
-                                Thông tin tài khoản
-                            </li>
-                        </ol>
-                    </nav>
-                    <div class="row">
-                        <div class="col-md-3 mb-4">
+                <div class="main-wrapper">
+                    <div class="container mt-4 mb-5">
+                        <nav aria-label="breadcrumb" class="mb-4">
+                            <ol class="breadcrumb mb-0">
+                                <li class="breadcrumb-item"><a href="/" class="text-decoration-none text-muted">Trang
+                                        chủ</a></li>
+                                <li class="breadcrumb-item active text-primary">Thông tin tài khoản</li>
+                            </ol>
+                        </nav>
 
-                            <div class="card border-0 shadow-sm rounded-3">
-                                <div class="card-body text-center py-4">
-                                    <div class="bg-warning rounded-circle d-flex justify-content-center align-items-center mx-auto mb-3 fw-bold fs-2"
-                                        style="width: 80px; height: 80px;">
-                                        ${user.fullName.charAt(0)}
-                                    </div>
-                                    <h5 class="fw-bold">${user.fullName}</h5>
-                                    <p class="text-muted small">${user.email}</p>
-                                </div>
-                                <div class="list-group list-group-flush small">
-                                    <a href="/profile"
-                                        class="list-group-item list-group-item-action active border-0 fw-bold">
-                                        <i class="fas fa-user-circle me-2"></i> Thông tin tài khoản
-                                    </a>
-
-                                    <a href="/change-password" class="list-group-item list-group-item-action border-0">
-                                        <i class="fas fa-key me-2"></i> Đổi mật khẩu
-                                    </a>
-                                    <form action="/logout" method="post"
-                                        class="list-group-item list-group-item-action border-0 text-danger">
-                                        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
-                                        <button type="submit"
-                                            class="btn btn-link text-danger text-decoration-none p-0 w-100 text-start">
-                                            <i class="fas fa-sign-out-alt me-2"></i> Đăng xuất
-                                        </button>
-                                    </form>
-                                </div>
+                        <div class="row g-4">
+                            <div class="col-lg-3">
+                                <jsp:include page="sidebar.jsp">
+                                    <jsp:param name="activePage" value="profile" />
+                                </jsp:include>
                             </div>
-                        </div>
 
-                        <div class="col-md-9">
-                            <div class="card border-0 shadow-sm rounded-3">
-                                <div class="card-header bg-white border-bottom py-3">
-                                    <h5 class="mb-0 fw-bold">Hồ sơ của tôi</h5>
-                                    <small class="text-muted">Quản lý thông tin hồ sơ để bảo mật tài khoản</small>
-                                </div>
-                                <div class="card-body p-4">
+                            <div class="col-lg-9">
+                                <div class="content-box">
+                                    <h5 class="fw-bold text-uppercase mb-4 pb-3 border-bottom text-primary">
+                                        <i class="fas fa-user-circle me-2"></i>Hồ sơ của tôi
+                                    </h5>
+
                                     <form:form action="/profile" method="post" modelAttribute="user">
-
-                                        <div class="row mb-3 align-items-center">
-                                            <label class="col-md-3 col-form-label text-md-end text-muted">Email</label>
-                                            <div class="col-md-7">
-                                                <div class="input-group">
-                                                    <span class="input-group-text bg-light"><i
-                                                            class="fas fa-envelope text-muted"></i></span>
-                                                    <form:input path="email" class="form-control bg-light"
-                                                        readonly="true" />
-                                                </div>
-                                                <small class="text-muted fst-italic mt-1 d-block">* Email không thể thay
-                                                    đổi</small>
+                                        <div class="row mb-4 align-items-center">
+                                            <label class="col-md-3 text-md-end form-label-custom">Email</label>
+                                            <div class="col-md-8">
+                                                <form:input path="email" class="form-control bg-light"
+                                                    readonly="true" />
                                             </div>
                                         </div>
-
-                                        <div class="row mb-3 align-items-center">
-                                            <label class="col-md-3 col-form-label text-md-end text-muted">Họ và
-                                                tên</label>
-                                            <div class="col-md-7">
+                                        <div class="row mb-4 align-items-center">
+                                            <label class="col-md-3 text-md-end form-label-custom">Họ và tên</label>
+                                            <div class="col-md-8">
                                                 <form:input path="fullName" class="form-control" />
                                             </div>
                                         </div>
-
-                                        <div class="row mb-3 align-items-center">
-                                            <label class="col-md-3 col-form-label text-md-end text-muted">Số điện
-                                                thoại</label>
-                                            <div class="col-md-7">
-                                                <form:input path="phone" class="form-control"
-                                                    placeholder="Thêm số điện thoại" />
+                                        <div class="row mb-4 align-items-center">
+                                            <label class="col-md-3 text-md-end form-label-custom">Số điện thoại</label>
+                                            <div class="col-md-8">
+                                                <form:input path="phone" class="form-control" />
                                             </div>
                                         </div>
-
-                                        <div class="row mb-3 align-items-center">
-                                            <label class="col-md-3 col-form-label text-md-end text-muted">Địa
-                                                chỉ</label>
-                                            <div class="col-md-7">
-                                                <form:input path="address" class="form-control"
-                                                    placeholder="Thêm địa chỉ nhận hàng" />
+                                        <div class="row mb-4">
+                                            <label class="col-md-3 text-md-end mt-2 form-label-custom">Địa chỉ</label>
+                                            <div class="col-md-8">
+                                                <form:textarea path="address" class="form-control" rows="3" />
                                             </div>
                                         </div>
-
-                                        <div class="row mt-4">
-                                            <div class="col-md-7 offset-md-3">
+                                        <div class="row mt-5">
+                                            <div class="col-md-8 offset-md-3">
                                                 <button type="submit"
-                                                    class="btn btn-primary px-4 rounded-pill fw-bold">Lưu thay
+                                                    class="btn btn-primary px-5 rounded-pill fw-bold">Lưu thay
                                                     đổi</button>
                                             </div>
                                         </div>
@@ -123,7 +104,6 @@
                 </div>
 
                 <jsp:include page="../layout/footer.jsp" />
-
             </body>
 
             </html>

@@ -5,8 +5,8 @@ import com.example.shop.service.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import com.example.shop.domain.Order; // <-- Thêm dòng này
-import java.util.List; // <-- Thêm dòng này nếu List cũng bị đỏ
+import com.example.shop.domain.Order;
+import java.util.List;
 
 @Controller
 public class UserController {
@@ -17,25 +17,23 @@ public class UserController {
         this.userService = userService;
     }
 
-    // 1. TÌM KIẾM & HIỂN THỊ DANH SÁCH
+    // Tìm kiếm và hiển thị danh sách người dùng
     @GetMapping("/admin/user")
     public String getUserPage(Model model, @RequestParam(value = "keyword", required = false) String keyword) {
-        // Giả sử Jake đã có hàm getAllUsers(keyword) trong service (giống bên Product)
-        // Nếu chưa thì dùng getAllUsers() tạm
         List<User> users = userService.getAllUsers();
         model.addAttribute("users", users);
         model.addAttribute("keyword", keyword);
         return "admin/user/show";
     }
 
-    // 2. KHÓA / MỞ KHÓA TÀI KHOẢN
+    // Xử lý khóa hoặc mở khóa tài khoản người dùng
     @PostMapping("/admin/user/lock/{id}")
     public String lockUser(@PathVariable long id) {
         userService.toggleLockUser(id);
         return "redirect:/admin/user";
     }
 
-    // 3. XÓA TÀI KHOẢN
+    // Xử lý xóa tài khoản người dùng sau khi kiểm tra trạng thái đơn hàng
     @GetMapping("/admin/user/delete/{id}")
     public String deleteUser(@PathVariable long id) {
         User user = userService.getUserById(id);
@@ -45,7 +43,6 @@ public class UserController {
 
             if (orders != null) {
                 for (Order order : orders) {
-                    // Chặn nếu có đơn chưa xong
                     if ("PENDING".equals(order.getStatus()) || "SHIPPING".equals(order.getStatus())) {
                         hasActiveOrder = true;
                         break;
@@ -54,10 +51,8 @@ public class UserController {
             }
 
             if (hasActiveOrder) {
-                // Thông báo hoặc redirect nếu có đơn dở
                 return "redirect:/admin/user?error=active_order";
             } else {
-                // Chỉ xóa khi mọi thứ đã an toàn
                 userService.deleteUserById(id);
             }
         }

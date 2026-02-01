@@ -12,24 +12,21 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    // Tổng tiền thanh toán
     private double totalPrice;
 
-    // Thông tin người nhận (có thể khác với User đăng ký)
     private String receiverName;
     private String receiverAddress;
     private String receiverPhone;
 
-    // Trạng thái đơn hàng: PENDING (Chờ xác nhận), SHIPPING, COMPLETED, CANCELLED
     private String status;
 
-    // Phương thức thanh toán: COD, VN_PAY...
     private String paymentMethod;
 
-    // Trạng thái thanh toán: UNPAID, PAID
     private String paymentStatus;
 
     private Date createdAt;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date completedAt;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -37,9 +34,6 @@ public class Order {
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderDetail> orderDetails;
-
-    // --- Constructor, Getter, Setter ---
-    // Bạn tự generate nhé (Alt + Insert trong IntelliJ)
 
     @PrePersist
     protected void onCreate() {
@@ -135,4 +129,11 @@ public class Order {
         this.orderDetails = orderDetails;
     }
 
+    public Date getCompletedAt() {
+        return completedAt;
+    }
+
+    public void setCompletedAt(Date completedAt) {
+        this.completedAt = completedAt;
+    }
 }

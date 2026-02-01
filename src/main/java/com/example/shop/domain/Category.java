@@ -17,13 +17,11 @@ public class Category {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    // --- MỚI THÊM: Lưu tên file ảnh (VD: camera.png) ---
     private String image;
 
     @OneToMany(mappedBy = "category")
     private List<Product> products;
 
-    // --- Getters and Setters ---
     public long getId() {
         return id;
     }

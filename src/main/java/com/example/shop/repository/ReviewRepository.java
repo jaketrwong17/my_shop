@@ -9,7 +9,7 @@ import com.example.shop.domain.User;
 
 @Repository
 public interface ReviewRepository extends JpaRepository<Review, Long> {
-    // Tìm kiếm theo nội dung đánh giá hoặc tên khách hoặc tên sản phẩm
+
     List<Review> findByContentContainingOrUserFullNameContainingOrProductNameContaining(String content, String userName,
             String productName);
 

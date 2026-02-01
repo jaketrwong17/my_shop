@@ -7,11 +7,9 @@ public class RegisterDTO {
     private String password;
     private String confirmPassword;
 
-    // Constructor mặc định (Bắt buộc để Spring form binding hoạt động)
     public RegisterDTO() {
     }
 
-    // Getter và Setter
     public String getFirstName() {
         return firstName;
     }

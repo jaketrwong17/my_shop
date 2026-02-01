@@ -10,13 +10,12 @@ public class Role {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    private String name; // Ví dụ: "ADMIN", "CUSTOMER"
+    private String name;
     private String description;
 
     @OneToMany(mappedBy = "role")
     private List<User> users;
 
-    // Getter & Setter
     public long getId() {
         return id;
     }

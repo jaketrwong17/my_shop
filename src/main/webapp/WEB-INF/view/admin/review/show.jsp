@@ -44,10 +44,13 @@
                                 <div class="card-header bg-white py-3">
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <form action="/admin/review" method="GET" class="d-flex gap-2">
-                                                <input type="text" name="keyword" class="form-control"
-                                                    placeholder="Tìm kiếm đánh giá..." value="${keyword}">
-                                                <button class="btn btn-primary"><i class="fas fa-search"></i></button>
+
+                                            <form action="/admin/review" method="GET"
+                                                class="d-flex gap-2 align-items-center">
+                                                <input type="text" name="keyword" class="form-control" placeholder=""
+                                                    value="${keyword}" style="max-width: 400px;">
+                                                <button class="btn btn-outline-primary ms-2"><i
+                                                        class="fas fa-search"></i></button>
                                             </form>
                                         </div>
                                     </div>

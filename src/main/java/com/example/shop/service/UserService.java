@@ -23,46 +23,45 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    // 1. Xử lý lưu user (Dùng chung cho tạo mới và cập nhật)
+    // Lưu thông tin người dùng vào cơ sở dữ liệu
     public User handleSaveUser(User user) {
         return userRepository.save(user);
     }
 
-    // 2. Đăng ký user mới (Chỉ mã hóa mật khẩu và gán role khi tạo mới)
+    // Đăng ký người dùng mới, gán quyền mặc định và mã hóa mật khẩu
     public User registerUser(User user) {
-        Role role = roleRepository.findByName("USER"); // Đổi thành USER cho đúng kịch bản khách hàng
+        Role role = roleRepository.findByName("USER");
         user.setRole(role);
-
-        // Chỉ mã hóa mật khẩu ở bước đăng ký
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return this.handleSaveUser(user);
     }
 
+    // Tìm kiếm người dùng theo địa chỉ email
     public User getUserByEmail(String email) {
         return userRepository.findByEmail(email);
     }
 
+    // Lấy danh sách tất cả người dùng trong hệ thống
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
+    // Tìm kiếm người dùng theo ID
     public User getUserById(long id) {
         return this.userRepository.findById(id).orElse(null);
     }
 
-    // [FIX LỖI MẤT ROLE KHI KHÓA]
+    // Đảo trạng thái khóa/mở khóa tài khoản người dùng
     public void toggleLockUser(long id) {
         User user = this.getUserById(id);
         if (user != null) {
             user.setIsLocked(!user.getIsLocked());
-            // Dùng trực tiếp repository.save để tránh đi qua logic mã hóa lại pass
             this.userRepository.save(user);
         }
     }
 
+    // Xóa người dùng và gỡ bỏ liên kết với giỏ hàng
     public void deleteUserById(long id) {
-        // [CẬP NHẬT] Gỡ liên kết Cart trước khi xóa để tránh lỗi
-        // TransientObjectException
         User user = this.getUserById(id);
         if (user != null) {
             if (user.getCart() != null) {
@@ -72,12 +71,12 @@ public class UserService {
         }
     }
 
-    // [BỔ SUNG] Lấy Role theo tên cho các logic phân quyền
+    // Lấy thông tin quyền hạn theo tên role
     public Role getRoleByName(String name) {
         return this.roleRepository.findByName(name);
     }
 
-    // 4. Hàm chuyển đổi từ RegisterDTO sang User Entity
+    // Chuyển đổi dữ liệu từ RegisterDTO sang thực thể User
     public User registerDTOtoUser(RegisterDTO registerDTO) {
         User user = new User();
         user.setFullName(registerDTO.getFirstName() + " " + registerDTO.getLastName());
@@ -86,25 +85,24 @@ public class UserService {
         return user;
     }
 
-    // THÊM HÀM NÀY
+    // Kiểm tra xem email đã tồn tại trong hệ thống chưa
     public boolean checkEmailExists(String email) {
         return this.userRepository.existsByEmail(email);
     }
-    // Trong class UserService
 
+    // Cập nhật thông tin cá nhân của người dùng
     public void updateUserProfile(long userId, User updatedUser) {
         User currentUser = this.getUserById(userId);
-
         if (currentUser != null) {
-            // Chỉ cập nhật các thông tin cho phép
             currentUser.setFullName(updatedUser.getFullName());
             currentUser.setPhone(updatedUser.getPhone());
             currentUser.setAddress(updatedUser.getAddress());
-
-            // currentUser.setEmail(...) -> KHÔNG cập nhật email
-            // currentUser.setPassword(...) -> KHÔNG cập nhật password tại đây
-
             this.userRepository.save(currentUser);
         }
+    }
+
+    // Đếm tổng số lượng người dùng trong hệ thống
+    public long countAllUsers() {
+        return userRepository.count();
     }
 }

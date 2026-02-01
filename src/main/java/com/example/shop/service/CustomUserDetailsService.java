@@ -19,15 +19,13 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        // Trong hệ thống của bạn, username chính là Email
+
         com.example.shop.domain.User user = this.userService.getUserByEmail(username);
 
         if (user == null) {
             throw new UsernameNotFoundException("User not found");
         }
 
-        // Tạo User của Spring Security (Mapping từ User của bạn sang)
-        // Giả sử Role của bạn là String (ví dụ "ADMIN" hoặc "USER")
         return new User(
                 user.getEmail(),
                 user.getPassword(),

@@ -21,8 +21,6 @@ public class Product implements Serializable {
 
     private double price;
 
-    // SỬA TẠI ĐÂY: Thêm FetchType.EAGER để load ảnh ngay lập tức, tránh lỗi "no
-    // Session"
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<ProductImage> images = new ArrayList<>();
 
@@ -39,18 +37,15 @@ public class Product implements Serializable {
     @JoinColumn(name = "category_id")
     private Category category;
 
-    // Các thông số kỹ thuật cũng nên để EAGER để hiển thị mượt mà
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<ProductSpec> specs = new ArrayList<>();
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductColor> colors = new ArrayList<>();
 
-    // --- Constructor ---
     public Product() {
     }
 
-    // --- Getters and Setters ---
     public long getId() {
         return id;
     }
@@ -159,18 +154,13 @@ public class Product implements Serializable {
     public String toString() {
         return "Product [id=" + id + ", name=" + name + ", price=" + price + "]";
     }
-    // ... (Các code cũ giữ nguyên) ...
 
-    // ==================================================================
-    // THÊM HÀM NÀY ĐỂ SỬA LỖI: "Property [image] not found"
-    // Giúp file JSP gọi được ${product.image}
-    // ==================================================================
     public String getImage() {
         if (this.images != null && !this.images.isEmpty()) {
-            // VÌ ProductImage DÙNG getImageUrl() NÊN Ở ĐÂY PHẢI GỌI getImageUrl()
+
             return this.images.get(0).getImageUrl();
         }
-        return ""; // Trả về chuỗi rỗng nếu không có ảnh
+        return "";
     }
 
     @Formula("(SELECT COALESCE(AVG(r.rating), 0) FROM reviews r WHERE r.product_id = id)")

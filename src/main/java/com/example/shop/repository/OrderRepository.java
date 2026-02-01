@@ -11,11 +11,8 @@ import java.util.List;
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
-    // Lấy danh sách đơn hàng của một User cụ thể (Lịch sử mua hàng)
     List<Order> findByUser(User user);
 
-    // (Admin) Tìm đơn hàng theo mã giao dịch VNPay (để đối soát)
-    // Order findByPaymentRef(String paymentRef);
     @Query("SELECT o FROM Order o WHERE " +
             "o.receiverName LIKE %?1% OR " +
             "o.receiverPhone LIKE %?1% OR " +
@@ -23,4 +20,12 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> searchOrders(String keyword);
 
     List<Order> findByUserAndStatusIn(User user, List<String> statuses);
+
+    @Query("SELECT SUM(o.totalPrice) FROM Order o WHERE o.status = 'COMPLETED'")
+    Double calculateTotalRevenue();
+
+    long countByStatus(String status);
+
+    long count();
+
 }

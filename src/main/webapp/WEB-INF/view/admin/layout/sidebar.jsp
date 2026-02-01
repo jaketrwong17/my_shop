@@ -6,13 +6,16 @@
         </div>
 
         <div class="list-group list-group-flush mt-3">
-            <a href="/admin"
+            <a href="/" class="list-group-item list-group-item-action text-primary fw-bold">
+                <i class="fas fa-external-link-alt me-2"></i> Xem Website
+            </a>
+
+            <hr class="mx-3 my-2 text-muted">
+
+            <a href="/admin/dashboard"
                 class="list-group-item list-group-item-action ${param.active == 'dashboard' ? 'active' : ''}">
                 <i class="fas fa-tachometer-alt me-2"></i> Thống kê
             </a>
-
-            <div class="text-uppercase small text-muted px-4 pt-4 pb-2">Quản lý</div>
-
             <a href="/admin/product"
                 class="list-group-item list-group-item-action ${param.active == 'product' ? 'active' : ''}">
                 <i class="fas fa-box me-2"></i> Sản phẩm

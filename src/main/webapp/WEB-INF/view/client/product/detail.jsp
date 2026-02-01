@@ -11,7 +11,6 @@
                 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
                 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
                 <style>
-                    /* Slider & Thumbnails */
                     .carousel-inner img {
                         height: 400px;
                         object-fit: contain;
@@ -140,43 +139,41 @@
                         font-size: 0.95rem;
                     }
 
-                    /* Review Item */
+
                     .review-item:last-child {
                         border-bottom: none !important;
                         margin-bottom: 0 !important;
                         padding-bottom: 0 !important;
                     }
 
-                    /* =========================================
-           CSS CHO SAO ĐÁNH GIÁ (INTERACTIVE STARS) 
-           ========================================= */
+
                     .star-rating-input {
                         display: flex;
                         flex-direction: row-reverse;
-                        /* Đảo ngược để dùng selector ~ */
+
                         justify-content: flex-start;
                         gap: 5px;
                     }
 
                     .star-rating-input input {
                         display: none;
-                        /* Ẩn radio button */
+
                     }
 
                     .star-rating-input label {
                         cursor: pointer;
                         font-size: 1.8rem;
                         color: #e4e5e9;
-                        /* Màu xám mặc định */
+
                         transition: color 0.2s;
                     }
 
-                    /* Khi hover hoặc checked: đổi màu vàng */
+
                     .star-rating-input label:hover,
                     .star-rating-input label:hover~label,
                     .star-rating-input input:checked~label {
                         color: #ffc107;
-                        /* Màu vàng */
+
                     }
                 </style>
             </head>

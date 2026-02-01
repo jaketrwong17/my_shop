@@ -7,7 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface RoleRepository extends JpaRepository<Role, Long> {
 
-    // Tìm Role theo tên (VD: "ADMIN", "CUSTOMER")
-    // Dùng để gán quyền mặc định khi đăng ký
     Role findByName(String name);
 }

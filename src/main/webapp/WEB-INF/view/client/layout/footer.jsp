@@ -2,22 +2,21 @@
     <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
         <style>
-            /* Class tạo khối gradient Instagram */
             .insta-box {
                 display: inline-flex;
                 align-items: center;
                 justify-content: center;
                 width: 30px;
-                /* Mình chỉnh nhỏ lại xíu cho cân đối với các icon bên cạnh */
+
                 height: 30px;
                 border-radius: 10px;
-                /* Bo góc */
-                color: white;
-                /* Icon màu trắng */
-                font-size: 22px;
-                /* Kích thước icon */
 
-                /* Dải màu gradient Instagram */
+                color: white;
+
+                font-size: 22px;
+
+
+
                 background: linear-gradient(45deg,
                         #f09433 0%,
                         #e6683c 25%,
@@ -25,7 +24,7 @@
                         #cc2366 75%,
                         #bc1888 100%);
 
-                /* Bóng đổ */
+
                 box-shadow: 0 4px 10px rgba(220, 39, 67, 0.3);
                 transition: transform 0.3s ease;
             }
@@ -40,36 +39,34 @@
 
             }
 
-            /* Style chung cho các ô thanh toán */
+
             .payment-badge {
                 background: white;
                 border: 1px solid #e0e0e0;
                 border-radius: 6px;
                 padding: 5px 12px;
                 font-weight: 800;
-                /* Chữ đậm mới giống logo */
+
                 font-size: 14px;
                 display: inline-flex;
                 align-items: center;
                 box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
             }
 
-            /* VNPAY: Nửa Xanh - Nửa Đỏ */
+
             .vnpay-blue {
                 color: #005baa;
             }
 
-            /* Mã màu chuẩn VNPAY */
+
             .vnpay-red {
                 color: #ed1c24;
             }
 
-            /* MOMO: Màu hồng tím đặc trưng */
             .momo-color {
                 color: #a50064;
             }
 
-            /* COD: Màu xanh lá hoặc xám đậm */
             .cod-color {
                 color: #212529;
             }
@@ -165,7 +162,7 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
         <script>
-            // Tự động tắt thông báo lỗi sau 5 giây
+
             setTimeout(function () {
                 let alerts = document.querySelectorAll('.alert');
                 alerts.forEach(function (alert) {

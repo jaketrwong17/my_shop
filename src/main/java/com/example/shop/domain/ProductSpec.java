@@ -13,14 +13,13 @@ public class ProductSpec implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    private String specName; // Tên thông số: Lực hút, Dung tích...
-    private String specValue; // Giá trị: 8000 Pa, 500ml...
+    private String specName;
+    private String specValue;
 
     @ManyToOne
     @JoinColumn(name = "product_id")
-    private Product product; // Thuộc về sản phẩm nào
+    private Product product;
 
-    // Constructor, Getter, Setter
     public ProductSpec() {
     }
 

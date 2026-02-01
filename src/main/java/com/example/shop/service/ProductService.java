@@ -5,11 +5,13 @@ import com.example.shop.domain.CartItem;
 import com.example.shop.domain.Product;
 import com.example.shop.domain.ProductColor;
 import com.example.shop.domain.User;
+import com.example.shop.domain.dto.TopProductDTO;
 import com.example.shop.repository.CartItemRepository;
 import com.example.shop.repository.CartRepository;
 import com.example.shop.repository.ProductColorRepository;
 import com.example.shop.repository.ProductRepository;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import jakarta.servlet.http.HttpSession;
@@ -18,7 +20,6 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -44,26 +45,20 @@ public class ProductService {
         this.userService = userService;
     }
 
-    // ==================== QUẢN LÝ SẢN PHẨM (LOGIC CHUẨN) ====================
-
-    // 1. Hàm hỗ trợ: Tính tổng số lượng từ các biến thể màu sắc
+    // Tính toán tổng số lượng sản phẩm dựa trên các biến thể màu sắc
     private void enrichProductQuantity(Product product) {
-        // Kiểm tra xem sản phẩm có danh sách màu không
         if (product.getColors() != null && !product.getColors().isEmpty()) {
             long total = product.getColors().stream()
                     .mapToLong(ProductColor::getQuantity)
                     .sum();
-            // Nếu có màu, gán tổng số lượng các màu vào sản phẩm
             product.setQuantity(total);
         }
-        // Nếu không có màu, giữ nguyên quantity mặc định từ bảng products
     }
 
-    // 2. Lấy danh sách sản phẩm (Tích hợp tìm kiếm + lọc + tính tổng)
+    // Lấy danh sách sản phẩm theo từ khóa và danh mục
     public List<Product> getAllProducts(String keyword, Long categoryId) {
         List<Product> products;
 
-        // Logic tìm kiếm và lọc
         if (keyword != null && !keyword.isEmpty() && categoryId != null) {
             products = productRepository.findByNameContainingIgnoreCaseAndCategoryId(keyword, categoryId);
         } else if (keyword != null && !keyword.isEmpty()) {
@@ -74,7 +69,6 @@ public class ProductService {
             products = productRepository.findAll();
         }
 
-        // [QUAN TRỌNG] Duyệt qua từng sản phẩm để tính lại tổng số lượng
         for (Product p : products) {
             this.enrichProductQuantity(p);
         }
@@ -82,11 +76,12 @@ public class ProductService {
         return products;
     }
 
+    // Lưu thông tin sản phẩm
     public Product handleSaveProduct(Product product) {
         return productRepository.save(product);
     }
 
-    // 3. Lấy chi tiết sản phẩm (Cũng phải tính tổng)
+    // Tìm kiếm sản phẩm theo ID và cập nhật số lượng tổng
     public Optional<Product> fetchProductById(long id) {
         Optional<Product> productOptional = productRepository.findById(id);
         if (productOptional.isPresent()) {
@@ -95,24 +90,26 @@ public class ProductService {
         return productOptional;
     }
 
+    // Xóa sản phẩm theo ID
     public void deleteProduct(long id) {
         productRepository.deleteById(id);
     }
 
+    // Tìm kiếm sản phẩm theo tên
     public List<Product> fetchProductsByName(String name) {
         List<Product> products = productRepository.findByNameContainingIgnoreCase(name);
-        products.forEach(this::enrichProductQuantity); // Nhớ tính tổng ở đây nữa
+        products.forEach(this::enrichProductQuantity);
         return products;
     }
 
+    // Tìm kiếm sản phẩm theo danh mục
     public List<Product> fetchProductsByCategory(Long categoryId) {
         List<Product> products = productRepository.findByCategoryId(categoryId);
-        products.forEach(this::enrichProductQuantity); // Nhớ tính tổng ở đây nữa
+        products.forEach(this::enrichProductQuantity);
         return products;
     }
 
-    // ==================== QUẢN LÝ GIỎ HÀNG (GIỮ NGUYÊN) ====================
-
+    // Lấy thông tin giỏ hàng thông qua email người dùng
     public Cart fetchCartByUserEmail(String email) {
         User user = this.userService.getUserByEmail(email);
         if (user != null) {
@@ -121,9 +118,10 @@ public class ProductService {
         return null;
     }
 
+    // Xử lý thêm sản phẩm vào giỏ hàng cho cả khách vãng lai và người dùng đã đăng
+    // nhập
     public void handleAddProductToCart(String email, long productId, long colorId, HttpSession session, long quantity) {
         if (email == null) {
-            // --- GUEST ---
             List<CartItem> guestCart = (List<CartItem>) session.getAttribute("guestCart");
             if (guestCart == null) {
                 guestCart = new ArrayList<>();
@@ -156,7 +154,6 @@ public class ProductService {
                 session.setAttribute("sum", guestCart.size());
             }
         } else {
-            // --- USER ---
             User user = this.userService.getUserByEmail(email);
             if (user != null) {
                 Cart cart = this.cartRepository.findByUser(user);
@@ -193,6 +190,7 @@ public class ProductService {
         }
     }
 
+    // Cập nhật số lượng sản phẩm trong giỏ hàng
     public void handleUpdateCartQuantity(long cartItemId, String action, HttpSession session) {
         String email = (String) session.getAttribute("email");
         if (email == null) {
@@ -222,6 +220,7 @@ public class ProductService {
         }
     }
 
+    // Xóa sản phẩm khỏi giỏ hàng
     public void handleDeleteCartItem(long id, HttpSession session) {
         String email = (String) session.getAttribute("email");
         if (email == null) {
@@ -247,7 +246,20 @@ public class ProductService {
         }
     }
 
+    // Lấy danh sách sản phẩm có phân trang và sắp xếp theo tồn kho
     public Page<Product> getAllProductsWithPaging(Pageable pageable) {
         return productRepository.findAllSortedByStock(pageable);
     }
+
+    // Lấy danh sách sản phẩm bán chạy nhất
+    public List<TopProductDTO> getBestSellingProducts(int limit) {
+        Pageable pageable = PageRequest.of(0, limit);
+        return productRepository.findBestSellingProducts(pageable);
+    }
+
+    // Đếm tổng số lượng sản phẩm trong hệ thống
+    public long countAllProducts() {
+        return productRepository.count();
+    }
+
 }

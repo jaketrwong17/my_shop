@@ -10,14 +10,12 @@ public class ProductImage implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    private String imageUrl; // Tên file ảnh (ví dụ: abc-xyz.jpg)
+    private String imageUrl;
 
-    // Quan hệ Nhiều - Một: Nhiều ảnh thuộc về một sản phẩm
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id") // Tên cột khóa ngoại trong bảng product_images
+    @JoinColumn(name = "product_id")
     private Product product;
 
-    // --- Constructors, Getters, Setters ---
     public ProductImage() {
     }
 

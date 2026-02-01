@@ -22,14 +22,6 @@
                         flex: 1;
                     }
 
-                    .page-header-box {
-                        background: #fff;
-                        padding: 1rem;
-                        border-radius: 8px;
-                        box-shadow: 0 .125rem .25rem rgba(0, 0, 0, .075);
-                        margin-bottom: 1.5rem;
-                    }
-
                     .content-box {
                         background: #fff;
                         border-radius: 8px;
@@ -58,23 +50,22 @@
 
                 <div class="main-wrapper">
                     <div class="container mt-4 mb-5">
-                        <div class="page-header-box">
-                            <nav aria-label="breadcrumb">
-                                <ol class="breadcrumb mb-0">
-                                    <li class="breadcrumb-item"><a href="/"
-                                            class="text-decoration-none text-muted">Trang chủ</a></li>
-                                    <li class="breadcrumb-item"><a href="/order-history"
-                                            class="text-decoration-none text-muted">Lịch sử đơn hàng</a></li>
-                                    <li class="breadcrumb-item active text-primary" aria-current="page">Chi tiết
-                                        #${order.id}</li>
-                                </ol>
-                            </nav>
-                        </div>
+
+                        <nav aria-label="breadcrumb" class="mb-4">
+                            <ol class="breadcrumb mb-0">
+                                <li class="breadcrumb-item"><a href="/" class="text-decoration-none text-muted">Trang
+                                        chủ</a></li>
+                                <li class="breadcrumb-item"><a href="/order-history"
+                                        class="text-decoration-none text-muted">Lịch sử đơn hàng</a></li>
+                                <li class="breadcrumb-item active text-primary" aria-current="page">Chi tiết
+                                    #${order.id}</li>
+                            </ol>
+                        </nav>
 
                         <div class="row g-4">
                             <div class="col-lg-3">
                                 <jsp:include page="sidebar.jsp">
-                                    <jsp:param name="activePage" value="" />
+                                    <jsp:param name="activePage" value="history" />
                                 </jsp:include>
                             </div>
 
@@ -98,8 +89,8 @@
                                                     hàng</h6>
                                                 <hr class="my-2">
                                                 <p class="mb-1 fw-bold">${order.receiverName}</p>
-                                                <p class="mb-1 text-muted small"><i class="fas fa-phone me-1"></i>
-                                                    ${order.receiverPhone}</p>
+                                                <p class="mb-1 text-muted small"><i
+                                                        class="fas fa-phone me-1"></i>${order.receiverPhone}</p>
                                                 <p class="mb-0 text-muted small">${order.receiverAddress}</p>
                                             </div>
                                         </div>
@@ -108,26 +99,39 @@
                                                 class="p-3 bg-light rounded h-100 d-flex flex-column justify-content-center align-items-end">
                                                 <span class="text-muted mb-2">Trạng thái đơn hàng</span>
                                                 <c:choose>
-                                                    <c:when test="${order.status == 'PENDING'}"><span
-                                                            class="badge bg-warning text-dark fs-6 px-3 py-2">Chờ xử
-                                                            lý</span></c:when>
-                                                    <c:when test="${order.status == 'CONFIRMED'}"><span
-                                                            class="badge bg-primary fs-6 px-3 py-2">Đã xác nhận</span>
+                                                    <c:when test="${order.status == 'PENDING'}">
+                                                        <span class="badge bg-warning text-dark fs-6 px-3 py-2">Chờ xử
+                                                            lý</span>
                                                     </c:when>
-                                                    <c:when test="${order.status == 'SHIPPING'}"><span
-                                                            class="badge bg-info text-dark fs-6 px-3 py-2">Đang giao
-                                                            hàng</span></c:when>
-                                                    <c:when test="${order.status == 'COMPLETED'}"><span
-                                                            class="badge bg-success fs-6 px-3 py-2">Giao hàng thành
-                                                            công</span></c:when>
-                                                    <c:when test="${order.status == 'CANCELLED'}"><span
-                                                            class="badge bg-secondary fs-6 px-3 py-2">Đã hủy</span>
+                                                    <c:when test="${order.status == 'CONFIRMED'}">
+                                                        <span class="badge bg-primary fs-6 px-3 py-2">Đã xác nhận</span>
+                                                    </c:when>
+                                                    <c:when test="${order.status == 'SHIPPING'}">
+                                                        <span class="badge bg-info text-dark fs-6 px-3 py-2">Đang giao
+                                                            hàng</span>
+                                                    </c:when>
+                                                    <c:when test="${order.status == 'COMPLETED'}">
+                                                        <span class="badge bg-success fs-6 px-3 py-2">Giao hàng thành
+                                                            công</span>
+                                                    </c:when>
+                                                    <c:when test="${order.status == 'CANCELLED'}">
+                                                        <span class="badge bg-secondary fs-6 px-3 py-2">Đã hủy</span>
                                                     </c:when>
                                                 </c:choose>
-                                                <small class="text-muted mt-2">Ngày đặt:
+
+                                                <small class="text-muted mt-2">
+                                                    Ngày đặt:
                                                     <fmt:formatDate value="${order.createdAt}"
                                                         pattern="dd/MM/yyyy HH:mm" />
                                                 </small>
+
+                                                <c:if test="${not empty order.completedAt}">
+                                                    <small class="text-success fw-bold mt-1">
+                                                        Hoàn thành:
+                                                        <fmt:formatDate value="${order.completedAt}"
+                                                            pattern="dd/MM/yyyy HH:mm" />
+                                                    </small>
+                                                </c:if>
                                             </div>
                                         </div>
                                     </div>
@@ -147,7 +151,6 @@
                                                     <tr>
                                                         <td>
                                                             <div class="d-flex align-items-center">
-
                                                                 <c:choose>
                                                                     <c:when
                                                                         test="${not empty detail.product.images and not empty detail.product.images[0].imageUrl}">
@@ -159,8 +162,7 @@
                                                                     <c:otherwise>
                                                                         <div style="width: 70px; height: 70px;"
                                                                             class="me-3 border rounded bg-light d-flex align-items-center justify-content-center text-muted small">
-                                                                            No Img
-                                                                        </div>
+                                                                            No Img</div>
                                                                     </c:otherwise>
                                                                 </c:choose>
 
@@ -170,15 +172,13 @@
 
                                                                     <c:if test="${not empty detail.selectedColor}">
                                                                         <div class="mb-1">
-                                                                            <small class="text-muted">
-                                                                                Phân loại: <strong
-                                                                                    class="text-dark">${detail.selectedColor}</strong>
-                                                                            </small>
+                                                                            <small class="text-muted">Phân loại: <strong
+                                                                                    class="text-dark">${detail.selectedColor}</strong></small>
                                                                         </div>
                                                                     </c:if>
 
                                                                     <c:if test="${order.status == 'COMPLETED'}">
-                                                                        <a href="/review/product/${detail.product.id}"
+                                                                        <a href="/product/${detail.product.id}#review-section"
                                                                             class="text-warning text-decoration-none small review-link">
                                                                             <i class="fas fa-star me-1"></i> Đánh giá
                                                                             sản phẩm

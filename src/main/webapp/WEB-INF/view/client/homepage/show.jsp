@@ -378,7 +378,7 @@
                 <script>
                     document.addEventListener("DOMContentLoaded", function () {
 
-                        /* ================= 1. LOGIC CHO SLIDER DANH MỤC ================= */
+
                         const container = document.getElementById('categoryList');
                         const btnLeft = document.getElementById('slideLeft');
                         const btnRight = document.getElementById('slideRight');
@@ -393,7 +393,7 @@
                             });
                         }
 
-                        /* ================= 2. LOGIC LOAD MORE / COLLAPSE ================= */
+
                         const productItems = document.querySelectorAll('.product-item');
                         const loadMoreBtn = document.getElementById('loadMoreBtn');
                         const collapseBtn = document.getElementById('collapseBtn');
@@ -403,7 +403,7 @@
                         const loadStep = 20;
                         let visibleCount = initialItems;
 
-                        // Ẩn bớt nếu > 20 sản phẩm
+
                         if (productItems.length > initialItems) {
                             loadMoreBtn.style.display = 'inline-block';
                             for (let i = initialItems; i < productItems.length; i++) {
@@ -412,7 +412,7 @@
                             updateBtnText();
                         }
 
-                        // Sự kiện Xem thêm
+
                         loadMoreBtn.addEventListener('click', function () {
                             const nextCount = visibleCount + loadStep;
                             for (let i = visibleCount; i < nextCount; i++) {
@@ -427,7 +427,7 @@
                             }
                         });
 
-                        // Sự kiện Thu gọn
+
                         collapseBtn.addEventListener('click', function () {
                             for (let i = initialItems; i < productItems.length; i++) {
                                 productItems[i].classList.add('d-none-custom');

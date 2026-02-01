@@ -50,17 +50,14 @@ public class HomePageController {
         if (search != null || categoryId != null) {
             products = productService.getAllProducts(search, categoryId);
         } else {
-            // LẤY 100 SẢN PHẨM để Frontend thoải mái ẩn/hiện
-            // Nhớ là Service phải gọi hàm findAllSortedByStock đã viết ở bước trước
+
             Pageable pageable = PageRequest.of(0, 100);
             Page<Product> pageProducts = productService.getAllProductsWithPaging(pageable);
             products = pageProducts.getContent();
         }
 
-        // 3. Lấy Voucher
         List<Voucher> vouchers = voucherService.getAllVouchers();
 
-        // 4. Đẩy dữ liệu ra View
         model.addAttribute("products", products);
         model.addAttribute("categories", categoryService.getAllCategories(null));
         model.addAttribute("vouchers", vouchers);

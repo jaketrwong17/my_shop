@@ -46,7 +46,7 @@
             </div>
             <script>
                 document.addEventListener("DOMContentLoaded", function () {
-                    // Thay 'username' và 'password' bằng name hoặc id của input bên bạn
+
 
                     document.querySelector('input[name="password"]').value = "123456";
                 });

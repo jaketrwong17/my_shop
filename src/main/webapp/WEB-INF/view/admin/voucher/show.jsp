@@ -74,13 +74,12 @@
                                                 </select>
                                             </div>
 
-                                            <input type="text" name="keyword" class="form-control shadow-none"
-                                                placeholder="Tìm tên mã hoặc code..." value="${keyword}"
-                                                style="max-width: 300px;">
 
-                                            <button class="btn btn-primary px-3 shadow-none">
-                                                <i class="fas fa-search me-1"></i> Lọc
-                                            </button>
+                                            <input type="text" name="keyword" class="form-control" placeholder=""
+                                                value="${keyword}" style="max-width: 400px;">
+                                            <button class="btn btn-outline-primary ms-2"><i
+                                                    class="fas fa-search"></i></button>
+
                                         </form>
                                     </div>
                                     <div class="col-md-3 text-end">
