@@ -11,6 +11,7 @@
                 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
                 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 
+
                 <style>
                     /* ==================== 1. STYLE CHO PRODUCT CARD ==================== */
                     .product-card {
@@ -113,7 +114,7 @@
 
                     .scroll-btn:hover {
                         opacity: 1;
-                        background-color: #0d6efd;
+                        background-color: ##2A83E9;
                         color: white;
                     }
 
@@ -123,12 +124,12 @@
 
                     .category-card:hover .card {
                         transform: translateY(-5px);
-                        border-color: #0d6efd !important;
+                        border-color: ##2A83E9 !important;
                         background-color: white !important;
                     }
 
                     .hover-primary:hover {
-                        color: #0d6efd !important;
+                        color: ##2A83E9 !important;
                         text-decoration: underline !important;
                     }
 
@@ -138,6 +139,13 @@
                         border-radius: 8px;
                         border: 1px solid #dee2e6;
                     }
+
+                    /* STYLE CHO BANNER SLIDER */
+                    .carousel-item img {
+                        object-fit: cover;
+                        /* Đảm bảo ảnh không bị méo */
+                        object-position: center;
+                    }
                 </style>
             </head>
 
@@ -145,6 +153,42 @@
 
                 <jsp:include page="../layout/header.jsp" />
 
+                <div class="container-fluid p-0 mb-5">
+                    <div id="homeBannerCarousel" class="carousel slide" data-bs-ride="carousel">
+
+                        <div class="carousel-indicators">
+                            <button type="button" data-bs-target="#homeBannerCarousel" data-bs-slide-to="0"
+                                class="active" aria-current="true" aria-label="Slide 1"></button>
+                            <button type="button" data-bs-target="#homeBannerCarousel" data-bs-slide-to="1"
+                                aria-label="Slide 2"></button>
+                        </div>
+
+                        <div class="carousel-inner">
+                            <div class="carousel-item active" data-bs-interval="4000">
+                                <img src="https://bizweb.dktcdn.net/100/592/467/themes/1036709/assets/slider_2.jpg?1760604794821"
+                                    class="d-block w-100" alt="Banner 1"
+                                    style="height: 600px; object-fit: cover; object-position: center;">
+                            </div>
+
+                            <div class="carousel-item" data-bs-interval="4000">
+                                <img src="https://bizweb.dktcdn.net/100/592/467/themes/1036709/assets/slider_1.jpg?1760604794821"
+                                    class="d-block w-100" alt="Banner 2"
+                                    style="height: 600px; object-fit: cover; object-position: center;">
+                            </div>
+                        </div>
+
+                        <button class="carousel-control-prev" type="button" data-bs-target="#homeBannerCarousel"
+                            data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#homeBannerCarousel"
+                            data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    </div>
+                </div>
                 <section class="container py-4">
                     <div class="bg-white p-4 rounded-3 shadow-sm position-relative">
 
@@ -272,6 +316,31 @@
                                                 style="height: 2.5em; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
                                                 ${p.name}
                                             </h6>
+
+                                            <div class="mb-2 small">
+                                                <c:if test="${p.reviewCount > 0}">
+                                                    <span class="text-warning">
+                                                        <c:forEach begin="1" end="${p.averageRating.intValue()}">
+                                                            <i class="fas fa-star"></i>
+                                                        </c:forEach>
+                                                        <c:if test="${p.averageRating % 1 >= 0.5}">
+                                                            <i class="fas fa-star-half-alt"></i>
+                                                        </c:if>
+                                                        <c:forEach begin="1"
+                                                            end="${5 - p.averageRating + (p.averageRating % 1 >= 0.5 ? -1 : 0)}">
+                                                            <i class="far fa-star text-muted opacity-25"></i>
+                                                        </c:forEach>
+                                                    </span>
+                                                    <span class="text-muted ms-1"
+                                                        style="font-size: 0.8rem;">(${p.reviewCount})</span>
+                                                </c:if>
+
+                                                <c:if test="${p.reviewCount == 0}">
+                                                    <span class="text-muted small" style="font-size: 0.8rem;">Chưa có
+                                                        đánh giá</span>
+                                                </c:if>
+                                            </div>
+
                                             <p class="product-price mb-0">
                                                 <fmt:formatNumber value="${p.price}" type="currency"
                                                     currencySymbol="đ" />
@@ -292,7 +361,7 @@
 
                     <div class="text-center mt-5 mb-4 d-flex gap-2 justify-content-center">
                         <button id="loadMoreBtn" class="btn btn-primary px-4 py-2 rounded-pill fw-bold shadow-sm"
-                            style="background-color: #e3f2fd; color: #0d6efd; border: none; display: none;">
+                            style="background-color: #e3f2fd; color: #2A83E9; border: none; display: none;">
                             Xem thêm 20 sản phẩm <i class="fas fa-chevron-down ms-2"></i>
                         </button>
 

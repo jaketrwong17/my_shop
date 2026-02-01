@@ -16,8 +16,19 @@
                 <jsp:include page="../layout/header.jsp" />
 
                 <div class="container my-5">
+                    <nav aria-label="breadcrumb" class="mb-4">
+                        <ol class="breadcrumb mb-0">
+                            <li class="breadcrumb-item">
+                                <a href="/" class="text-decoration-none text-muted">Trang chủ</a>
+                            </li>
+                            <li class="breadcrumb-item active text-primary" aria-current="page">
+                                Thông tin tài khoản
+                            </li>
+                        </ol>
+                    </nav>
                     <div class="row">
                         <div class="col-md-3 mb-4">
+
                             <div class="card border-0 shadow-sm rounded-3">
                                 <div class="card-body text-center py-4">
                                     <div class="bg-warning rounded-circle d-flex justify-content-center align-items-center mx-auto mb-3 fw-bold fs-2"

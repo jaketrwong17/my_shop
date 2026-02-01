@@ -15,7 +15,16 @@
                 <jsp:include page="../layout/header.jsp" />
 
                 <div class="container my-5">
-
+                    <nav aria-label="breadcrumb" class="mb-4">
+                        <ol class="breadcrumb mb-0">
+                            <li class="breadcrumb-item">
+                                <a href="/" class="text-decoration-none text-muted">Trang chủ / Giỏ hàng</a>
+                            </li>
+                            <li class="breadcrumb-item active text-primary" aria-current="page">
+                                Thanh toán
+                            </li>
+                        </ol>
+                    </nav>
                     <c:if test="${not empty param.error}">
                         <div class="alert alert-danger shadow-sm border-start border-4 border-danger">
                             <i class="fas fa-exclamation-triangle me-2"></i> ${param.error}

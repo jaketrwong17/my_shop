@@ -8,4 +8,5 @@ import org.springframework.stereotype.Repository;
 public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> {
     // Hiện tại chỉ cần các hàm CRUD cơ bản có sẵn của JpaRepository
     // như save(), saveAll(), delete() là đủ.
+    boolean existsByOrderUserEmailAndProductIdAndOrderStatus(String email, long productId, String status);
 }

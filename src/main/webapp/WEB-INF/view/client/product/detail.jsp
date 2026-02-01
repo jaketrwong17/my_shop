@@ -57,7 +57,6 @@
                         position: relative;
                     }
 
-                    /* Hiệu ứng màu hết hàng */
                     .color-radio:disabled+.color-label-small {
                         background-color: #f5f5f5;
                         color: #ccc;
@@ -140,6 +139,45 @@
                         color: #444;
                         font-size: 0.95rem;
                     }
+
+                    /* Review Item */
+                    .review-item:last-child {
+                        border-bottom: none !important;
+                        margin-bottom: 0 !important;
+                        padding-bottom: 0 !important;
+                    }
+
+                    /* =========================================
+           CSS CHO SAO ĐÁNH GIÁ (INTERACTIVE STARS) 
+           ========================================= */
+                    .star-rating-input {
+                        display: flex;
+                        flex-direction: row-reverse;
+                        /* Đảo ngược để dùng selector ~ */
+                        justify-content: flex-start;
+                        gap: 5px;
+                    }
+
+                    .star-rating-input input {
+                        display: none;
+                        /* Ẩn radio button */
+                    }
+
+                    .star-rating-input label {
+                        cursor: pointer;
+                        font-size: 1.8rem;
+                        color: #e4e5e9;
+                        /* Màu xám mặc định */
+                        transition: color 0.2s;
+                    }
+
+                    /* Khi hover hoặc checked: đổi màu vàng */
+                    .star-rating-input label:hover,
+                    .star-rating-input label:hover~label,
+                    .star-rating-input input:checked~label {
+                        color: #ffc107;
+                        /* Màu vàng */
+                    }
                 </style>
             </head>
 
@@ -147,26 +185,20 @@
                 <jsp:include page="../layout/header.jsp" />
 
                 <div class="container mt-4">
-                    <div class="product-header mb-4 bg-white p-3 rounded shadow-sm border">
-                        <nav aria-label="breadcrumb">
-                            <ol class="breadcrumb mb-1 small">
-                                <li class="breadcrumb-item"><a href="/" class="text-decoration-none text-muted">Trang
-                                        chủ</a></li>
-                                <li class="breadcrumb-item active text-primary">${product.category.name}</li>
-                            </ol>
-                        </nav>
-                        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
-                            <h2 class="fw-bold mb-0" style="font-size: 1.4rem;">${product.name}</h2>
-                            <div class="rating text-warning small">
-                                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
-                                    class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
-                                <span class="text-muted ms-2">(12 đánh giá)</span>
-                            </div>
-                        </div>
-                    </div>
+
+                    <nav aria-label="breadcrumb" class="mb-3">
+                        <ol class="breadcrumb mb-0 small">
+                            <li class="breadcrumb-item">
+                                <a href="/" class="text-decoration-none text-muted">Trang chủ</a>
+                            </li>
+                            <li class="breadcrumb-item active text-primary" aria-current="page">
+                                ${product.category.name}
+                            </li>
+                        </ol>
+                    </nav>
 
                     <div class="row g-4">
-                        <div class="col-lg-5">
+                        <div class="col-lg-7">
                             <div class="bg-white p-3 rounded shadow-sm border h-100 text-center">
                                 <div id="productCarousel" class="carousel slide" data-bs-ride="false">
                                     <div class="carousel-inner">
@@ -198,10 +230,39 @@
                             </div>
                         </div>
 
-                        <div class="col-lg-7">
+                        <div class="col-lg-5">
                             <div class="bg-white p-4 rounded shadow-sm border h-100">
-                                <div class="price-section mb-3">
-                                    <span class="text-muted text-decoration-line-through me-2 small">1.590.000đ</span>
+
+                                <h2 class="fw-bold mb-2" style="font-size: 1.5rem;">${product.name}</h2>
+
+                                <div class="rating mb-3 small">
+                                    <c:choose>
+                                        <c:when test="${product.reviewCount > 0}">
+                                            <span class="text-warning">
+                                                <c:forEach begin="1" end="${product.averageRating.intValue()}">
+                                                    <i class="fas fa-star"></i>
+                                                </c:forEach>
+                                                <c:if test="${product.averageRating % 1 >= 0.5}">
+                                                    <i class="fas fa-star-half-alt"></i>
+                                                </c:if>
+                                                <c:forEach begin="1"
+                                                    end="${5 - product.averageRating.intValue() - (product.averageRating % 1 >= 0.5 ? 1 : 0)}">
+                                                    <i class="far fa-star text-secondary opacity-50"></i>
+                                                </c:forEach>
+                                                <span class="text-muted ms-2">(${product.reviewCount} đánh giá)</span>
+                                            </span>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <c:forEach begin="1" end="5">
+                                                <i class="far fa-star text-secondary opacity-50"></i>
+                                            </c:forEach>
+                                            <span class="text-muted small ms-2">Chưa có đánh giá</span>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </div>
+
+                                <div class="price-section mb-3 border-top pt-3">
+
                                     <h2 class="text-danger fw-bold d-inline-block mb-0">
                                         <fmt:formatNumber value="${product.price}" type="currency" currencySymbol="đ" />
                                     </h2>
@@ -259,11 +320,124 @@
                     <div class="row mt-4 g-4">
                         <div class="col-lg-8">
                             <div class="bg-white p-4 rounded shadow-sm border mb-4">
-                                <h5 class="fw-bold border-bottom pb-3 mb-3 text-uppercase"><i
-                                        class="fas fa-info-circle text-primary me-2"></i>Thông tin sản phẩm</h5>
+                                <h5 class="fw-bold border-bottom pb-3 mb-3 text-uppercase">
+                                    <i class="fas fa-info-circle text-primary me-2"></i>Thông tin sản phẩm
+                                </h5>
                                 <div class="detail-content">${product.detailDesc}</div>
                             </div>
+
+                            <div class="bg-white p-4 rounded shadow-sm border" id="review-section">
+                                <h5 class="fw-bold border-bottom pb-3 mb-4 text-uppercase">
+                                    <i class="fas fa-star text-warning me-2"></i>Đánh giá sản phẩm <span
+                                        class="text-muted small">(${reviews.size()})</span>
+                                </h5>
+
+                                <c:if test="${canReview}">
+                                    <div class="card bg-light border-0 mb-4">
+                                        <div class="card-body">
+                                            <h6 class="fw-bold mb-3 text-primary"><i class="fas fa-pen me-2"></i>Viết
+                                                đánh giá của bạn</h6>
+                                            <form action="/product/add-review" method="POST">
+                                                <input type="hidden" name="${_csrf.parameterName}"
+                                                    value="${_csrf.token}" />
+                                                <input type="hidden" name="productId" value="${product.id}" />
+
+                                                <div class="mb-3">
+                                                    <label class="form-label small text-muted fw-bold">Mức độ hài
+                                                        lòng:</label>
+                                                    <div class="star-rating-input">
+                                                        <input type="radio" id="star5" name="rating" value="5"
+                                                            required />
+                                                        <label for="star5" title="Tuyệt vời"><i
+                                                                class="fas fa-star"></i></label>
+
+                                                        <input type="radio" id="star4" name="rating" value="4" />
+                                                        <label for="star4" title="Tốt"><i
+                                                                class="fas fa-star"></i></label>
+
+                                                        <input type="radio" id="star3" name="rating" value="3" />
+                                                        <label for="star3" title="Bình thường"><i
+                                                                class="fas fa-star"></i></label>
+
+                                                        <input type="radio" id="star2" name="rating" value="2" />
+                                                        <label for="star2" title="Tệ"><i
+                                                                class="fas fa-star"></i></label>
+
+                                                        <input type="radio" id="star1" name="rating" value="1" />
+                                                        <label for="star1" title="Rất tệ"><i
+                                                                class="fas fa-star"></i></label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="mb-3">
+                                                    <textarea name="content" class="form-control" rows="3"
+                                                        placeholder="Chia sẻ cảm nhận của bạn về sản phẩm..."
+                                                        required></textarea>
+                                                </div>
+                                                <button type="submit" class="btn btn-primary px-4">Gửi đánh giá</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </c:if>
+
+                                <c:if test="${not canReview}">
+                                    <div class="alert alert-secondary small mb-4 d-flex align-items-center">
+                                        <i class="fas fa-info-circle me-2 fs-5"></i>
+                                        <div>
+                                            <c:choose>
+                                                <c:when test="${hasReviewed}">
+                                                    <strong>Bạn đã đánh giá sản phẩm này.</strong> Cảm ơn bạn đã chia
+                                                    sẻ!
+                                                </c:when>
+                                                <c:otherwise>
+                                                    Bạn cần <strong>mua sản phẩm</strong> này và đơn hàng phải hoàn
+                                                    thành để viết đánh giá.
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </div>
+                                    </div>
+                                </c:if>
+
+                                <div class="review-list">
+                                    <c:if test="${empty reviews}">
+                                        <div class="text-center py-4 text-muted">
+                                            <i class="far fa-comment-dots fa-2x mb-2"></i>
+                                            <p>Chưa có đánh giá nào cho sản phẩm này.</p>
+                                        </div>
+                                    </c:if>
+                                    <c:forEach var="rv" items="${reviews}">
+                                        <div class="review-item border-bottom pb-3 mb-3">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="bg-light rounded-circle d-flex align-items-center justify-content-center me-3 fw-bold text-primary border"
+                                                        style="width: 40px; height: 40px;">
+                                                        ${rv.user.fullName.charAt(0)}
+                                                    </div>
+                                                    <div>
+                                                        <div class="fw-bold text-dark">${rv.user.fullName}</div>
+                                                        <div class="text-warning small">
+                                                            <c:forEach begin="1" end="${rv.rating}"><i
+                                                                    class="fas fa-star"></i>
+                                                            </c:forEach>
+                                                            <c:forEach begin="1" end="${5 - rv.rating}"><i
+                                                                    class="far fa-star text-secondary opacity-25"></i>
+                                                            </c:forEach>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <small class="text-muted">
+                                                    <fmt:formatDate value="${rv.createdAt}" pattern="dd/MM/yyyy" />
+                                                </small>
+                                            </div>
+                                            <div class="mt-2 ms-5 ps-2 text-secondary" style="font-size: 0.95rem;">
+                                                ${rv.content}
+                                            </div>
+                                        </div>
+                                    </c:forEach>
+                                </div>
+                            </div>
                         </div>
+
                         <div class="col-lg-4">
                             <div class="specs-box p-3 shadow-sm border bg-white">
                                 <h6 class="fw-bold mb-3 text-primary text-uppercase small"><i

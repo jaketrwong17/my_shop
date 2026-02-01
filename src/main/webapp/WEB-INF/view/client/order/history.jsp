@@ -60,16 +60,17 @@
 
                 <div class="main-wrapper">
                     <div class="container mt-4 mb-5">
-                        <div class="page-header-box">
-                            <nav aria-label="breadcrumb">
-                                <ol class="breadcrumb mb-0">
-                                    <li class="breadcrumb-item"><a href="/"
-                                            class="text-decoration-none text-muted">Trang chủ</a></li>
-                                    <li class="breadcrumb-item active text-primary" aria-current="page">Lịch sử mua hàng
-                                    </li>
-                                </ol>
-                            </nav>
-                        </div>
+
+                        <nav aria-label="breadcrumb" class="mb-4">
+                            <ol class="breadcrumb mb-0">
+                                <li class="breadcrumb-item">
+                                    <a href="/" class="text-decoration-none text-muted">Trang chủ</a>
+                                </li>
+                                <li class="breadcrumb-item active text-primary" aria-current="page">
+                                    Lịch sử mua hàng
+                                </li>
+                            </ol>
+                        </nav>
 
                         <div class="row g-4">
                             <div class="col-lg-3">

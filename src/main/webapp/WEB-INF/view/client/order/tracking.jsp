@@ -49,7 +49,7 @@
 
                     .order-card-item:hover {
                         box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-                        border-color: #0d6efd;
+                        border-color: ##2A83E9;
                         transform: translateY(-2px);
                     }
                 </style>
@@ -60,16 +60,16 @@
 
                 <div class="main-wrapper">
                     <div class="container mt-4 mb-5">
-                        <div class="page-header-box">
-                            <nav aria-label="breadcrumb">
-                                <ol class="breadcrumb mb-0">
-                                    <li class="breadcrumb-item"><a href="/"
-                                            class="text-decoration-none text-muted">Trang chủ</a></li>
-                                    <li class="breadcrumb-item active text-primary" aria-current="page">Theo dõi đơn
-                                        hàng</li>
-                                </ol>
-                            </nav>
-                        </div>
+                        <nav aria-label="breadcrumb" class="mb-4">
+                            <ol class="breadcrumb mb-0">
+                                <li class="breadcrumb-item">
+                                    <a href="/" class="text-decoration-none text-muted">Trang chủ</a>
+                                </li>
+                                <li class="breadcrumb-item active text-primary" aria-current="page">
+                                    Theo dõi đơn hàng
+                                </li>
+                            </ol>
+                        </nav>
 
                         <div class="row g-4">
                             <div class="col-lg-3">

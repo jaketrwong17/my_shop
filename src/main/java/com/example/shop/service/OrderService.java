@@ -234,4 +234,8 @@ public class OrderService {
         }
         return new ArrayList<>();
     }
+
+    public boolean hasUserBoughtProduct(String email, long productId) {
+        return orderDetailRepository.existsByOrderUserEmailAndProductIdAndOrderStatus(email, productId, "COMPLETED");
+    }
 }

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import java.io.Serializable;
 import java.util.List;
 import java.util.ArrayList;
+import org.hibernate.annotations.Formula;
 
 @Entity
 @Table(name = "products")
@@ -172,4 +173,16 @@ public class Product implements Serializable {
         return ""; // Trả về chuỗi rỗng nếu không có ảnh
     }
 
+    @Formula("(SELECT COALESCE(AVG(r.rating), 0) FROM reviews r WHERE r.product_id = id)")
+    private double averageRating;
+    @Formula("(SELECT COUNT(r.id) FROM reviews r WHERE r.product_id = id)")
+    private int reviewCount;
+
+    public double getAverageRating() {
+        return averageRating;
+    }
+
+    public int getReviewCount() {
+        return reviewCount;
+    }
 }

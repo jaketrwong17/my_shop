@@ -27,7 +27,7 @@
                 }
 
                 .btn-home {
-                    background-color: #0d6efd;
+                    background-color: ##2A83E9;
 
                     border: none;
                 }

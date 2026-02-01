@@ -35,7 +35,7 @@
         <style>
             .active-menu {
                 background-color: #f0f8ff !important;
-                border-left: 4px solid #0d6efd !important;
+                border-left: 4px solid ##2A83E9 !important;
             }
 
             .list-group-item-action:hover {

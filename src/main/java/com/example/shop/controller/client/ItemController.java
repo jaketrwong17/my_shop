@@ -3,11 +3,17 @@ package com.example.shop.controller.client;
 import com.example.shop.domain.Cart;
 import com.example.shop.domain.CartItem;
 import com.example.shop.domain.Product;
-import com.example.shop.service.CategoryService; // <--- Mới thêm
+import com.example.shop.domain.Review;
+
+import com.example.shop.service.CategoryService;
+import com.example.shop.service.OrderService;
 import com.example.shop.service.ProductService;
+import com.example.shop.service.ReviewService;
+import com.example.shop.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import java.util.ArrayList;
+
 import java.util.List;
 
 import org.springframework.stereotype.Controller;
@@ -21,21 +27,54 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class ItemController {
 
     private final ProductService productService;
-    private final CategoryService categoryService; // <--- Khai báo Service danh mục
+    private final CategoryService categoryService;
+    private final OrderService orderService;
+    private final ReviewService reviewService;
+    private final UserService userService;
 
-    // Inject cả ProductService và CategoryService vào Constructor
-    public ItemController(ProductService productService, CategoryService categoryService) {
+    public ItemController(ProductService productService, CategoryService categoryService,
+            OrderService orderService, ReviewService reviewService, UserService userService) {
         this.productService = productService;
         this.categoryService = categoryService;
+        this.orderService = orderService;
+        this.reviewService = reviewService;
+        this.userService = userService;
     }
 
     @GetMapping("/product/{id}")
-    public String getProductDetail(Model model, @PathVariable long id) {
-        Product product = productService.fetchProductById(id).get();
-        model.addAttribute("product", product);
+    public String getProductDetail(Model model, @PathVariable long id, HttpServletRequest request) {
+        Product product = productService.fetchProductById(id).orElse(null);
+        if (product == null)
+            return "redirect:/";
 
-        // <--- LẤY DANH MỤC ĐỂ HIỆN TRÊN HEADER --->
+        model.addAttribute("product", product);
         model.addAttribute("categories", categoryService.getAllCategories(null));
+
+        // 1. Lấy danh sách đánh giá của sản phẩm này
+        List<Review> reviews = reviewService.getReviewsByProduct(product);
+        model.addAttribute("reviews", reviews);
+
+        // 2. Kiểm tra quyền đánh giá
+        boolean canReview = false;
+        boolean hasReviewed = false;
+
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            String email = (String) session.getAttribute("email");
+            if (email != null) {
+                // Check xem user đã mua sản phẩm này và đơn hàng đã hoàn thành chưa
+                boolean bought = orderService.hasUserBoughtProduct(email, id);
+                // Check xem user đã đánh giá chưa
+                hasReviewed = reviewService.hasUserReviewedProduct(email, id);
+
+                // Chỉ cho đánh giá nếu ĐÃ MUA và CHƯA TỪNG ĐÁNH GIÁ
+                if (bought && !hasReviewed) {
+                    canReview = true;
+                }
+            }
+        }
+        model.addAttribute("canReview", canReview);
+        model.addAttribute("hasReviewed", hasReviewed);
 
         return "client/product/detail";
     }
@@ -76,8 +115,6 @@ public class ItemController {
 
         model.addAttribute("cartItems", cartItems);
         model.addAttribute("totalPrice", totalPrice);
-
-        // <--- LẤY DANH MỤC ĐỂ HIỆN TRÊN HEADER (TRANG GIỎ HÀNG) --->
         model.addAttribute("categories", categoryService.getAllCategories(null));
 
         return "client/cart/show";
@@ -108,5 +145,25 @@ public class ItemController {
             }
         }
         return "redirect:/cart";
+    }
+
+    // --- HÀM XỬ LÝ POST ĐÁNH GIÁ (CẬP NHẬT LOGIC) ---
+    @PostMapping("/product/add-review")
+    public String addReview(@RequestParam("productId") long productId,
+            @RequestParam("content") String content,
+            @RequestParam("rating") int rating,
+            HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            String email = (String) session.getAttribute("email");
+            if (email != null) {
+                // Kiểm tra lại lần nữa trước khi lưu để bảo mật
+                boolean hasReviewed = reviewService.hasUserReviewedProduct(email, productId);
+                if (!hasReviewed) {
+                    reviewService.saveReview(email, productId, content, rating);
+                }
+            }
+        }
+        return "redirect:/product/" + productId;
     }
 }

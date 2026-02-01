@@ -34,7 +34,7 @@
                     }
 
                     .btn-checkout {
-                        background-color: #0d6efd;
+                        background-color: #2A83E9;
                         color: white;
                         border-radius: 50px;
                         font-weight: 600;
@@ -70,6 +70,16 @@
                 <jsp:include page="../layout/header.jsp" />
 
                 <div class="container mt-5 pb-5">
+                    <nav aria-label="breadcrumb" class="mb-4">
+                        <ol class="breadcrumb mb-0">
+                            <li class="breadcrumb-item">
+                                <a href="/" class="text-decoration-none text-muted">Trang chủ</a>
+                            </li>
+                            <li class="breadcrumb-item active text-primary" aria-current="page">
+                                Giỏ hàng
+                            </li>
+                        </ol>
+                    </nav>
                     <h3 class="fw-bold mb-5 border-start border-primary border-4 ps-3">GIỎ HÀNG CỦA BẠN</h3>
 
                     <div class="row g-4">

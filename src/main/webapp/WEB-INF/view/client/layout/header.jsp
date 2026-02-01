@@ -5,9 +5,9 @@
             <style>
                 /* 1. CSS CHO THANH CHỮ CHẠY */
                 .coupon-ticker-wrap {
-                    background-color: #0D6EFD;
+                    background-color: #237fe7;
                     /* Màu xanh */
-                    border-bottom: 1px solid #ffecb5;
+
                     width: 100%;
                     position: relative;
                     z-index: 1;
@@ -18,7 +18,7 @@
                 .ticker-viewport {
                     overflow: hidden;
                     white-space: nowrap;
-                    height: 40px;
+                    height: 35px;
                     display: flex;
                     align-items: center;
                     position: relative;
@@ -78,9 +78,36 @@
                     z-index: 1030 !important;
                     /* Cao hơn mọi thứ */
                 }
+
+                /* Class tùy chỉnh để đổi màu chữ khi di chuột */
+                .btn-register-custom {
+                    color: #0d6efd !important;
+                    /* Màu xanh mặc định (giống text-primary) */
+                    background-color: #fff;
+                    transition: all 0.3s ease;
+                }
+
+                /* Ép nút Đăng nhập chuyển chữ đen khi di chuột */
+                .btn-login-hover:hover {
+                    color: #2A83E9 !important;
+                    /* Chữ màu đen */
+                    background-color: #fff !important;
+                    /* Nền màu trắng */
+                    border-color: #fff !important;
+                    /* Viền màu trắng */
+                }
+
+                .btn-auth {
+                    min-width: 120px;
+                    /* Độ rộng đủ để chứa chữ 'Đăng nhập' */
+                    display: inline-flex;
+                    /* Giúp căn giữa nội dung tốt hơn */
+                    justify-content: center;
+                    align-items: center;
+                }
             </style>
 
-            <header class="navbar navbar-expand-lg navbar-dark bg-primary py-3 sticky-top">
+            <header class="navbar navbar-expand-lg navbar-dark py-3 sticky-top" style="background-color: #2A83E9;">
                 <div class="container">
                     <a class="navbar-brand fw-bold fs-3" href="/">16Home<span class="text-warning">.</span></a>
 
@@ -157,10 +184,15 @@
 
                             <c:choose>
                                 <c:when test="${empty sessionScope.email}">
-                                    <a href="/login" class="btn btn-outline-light rounded-pill fw-bold btn-sm px-3">Đăng
-                                        nhập</a>
+                                    <a href="/login"
+                                        class="btn btn-outline-light rounded-pill fw-bold btn-sm btn-auth btn-login-hover">
+                                        Đăng nhập
+                                    </a>
+
                                     <a href="/register"
-                                        class="btn btn-light text-primary rounded-pill fw-bold btn-sm px-3">Đăng ký</a>
+                                        class="btn btn-light text-primary rounded-pill fw-bold btn-sm btn-auth">
+                                        Đăng ký
+                                    </a>
                                 </c:when>
                                 <c:otherwise>
                                     <div class="dropdown">

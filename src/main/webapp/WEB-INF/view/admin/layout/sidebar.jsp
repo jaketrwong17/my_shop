@@ -33,7 +33,8 @@
                 <i class="fas fa-users me-2"></i> Người dùng
             </a>
 
-            <a href="#" class="list-group-item list-group-item-action ${param.active == 'review' ? 'active' : ''}">
+            <a href="/admin/review"
+                class="list-group-item list-group-item-action ${param.active == 'review' ? 'active' : ''}">
                 <i class="fas fa-star me-2"></i> Đánh giá
             </a>
             <a href="/admin/voucher"

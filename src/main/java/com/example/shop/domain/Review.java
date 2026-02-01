@@ -2,7 +2,7 @@ package com.example.shop.domain;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
+import java.util.Date; // Bắt buộc dùng java.util.Date để tương thích với JSP
 
 @Entity
 @Table(name = "reviews")
@@ -20,11 +20,8 @@ public class Review implements Serializable {
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    // Ngày đánh giá
+    // Ngày tạo (Kiểu Date để fix lỗi 500 bên Admin)
     private Date createdAt;
-
-    // Trạng thái kiểm duyệt (VD: "PENDING", "APPROVED", "HIDDEN")
-    private String status;
 
     // Người đánh giá
     @ManyToOne
@@ -36,16 +33,13 @@ public class Review implements Serializable {
     @JoinColumn(name = "product_id")
     private Product product;
 
-    // --- Constructor ---
     public Review() {
     }
 
+    // Tự động gán ngày giờ hiện tại khi lưu vào DB
     @PrePersist
     public void onCreate() {
         this.createdAt = new Date();
-        if (this.status == null) {
-            this.status = "PENDING"; // Mặc định chờ duyệt nếu cần
-        }
     }
 
     // --- Getters and Setters ---
@@ -79,14 +73,6 @@ public class Review implements Serializable {
 
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
     }
 
     public User getUser() {
