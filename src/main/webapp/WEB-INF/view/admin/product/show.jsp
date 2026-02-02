@@ -7,7 +7,6 @@
             <jsp:include page="../layout/header.jsp" />
 
             <style>
-                /* 1. Giao diện chính của Modal kiểu Shopee */
                 .shopee-modal-content {
                     display: flex;
                     background-color: #fff;
@@ -16,7 +15,7 @@
                     min-height: 500px;
                 }
 
-                /* Vùng ảnh to bên trái */
+
                 .shopee-main-view {
                     flex: 2;
                     background-color: #f5f5f5;
@@ -32,7 +31,7 @@
                     object-fit: contain;
                 }
 
-                /* Vùng danh sách ảnh nhỏ bên phải */
+
                 .shopee-side-view {
                     flex: 1;
                     padding: 20px;
@@ -67,7 +66,7 @@
                     object-fit: cover;
                 }
 
-                /* Chỉnh nút chuyển ảnh cho nổi bật trên nền xám */
+
                 .carousel-control-prev-icon,
                 .carousel-control-next-icon {
                     filter: invert(1);

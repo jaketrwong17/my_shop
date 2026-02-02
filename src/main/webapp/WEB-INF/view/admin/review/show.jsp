@@ -16,7 +16,7 @@
                         gap: 8px;
                     }
 
-                    /* CSS cho ngôi sao vàng */
+
                     .star-rating i {
                         margin-right: 1px;
                     }

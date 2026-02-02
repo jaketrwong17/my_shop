@@ -26,7 +26,7 @@ public class Product implements Serializable {
 
     @Column(columnDefinition = "TEXT")
     private String detailDesc;
-
+    @Column(columnDefinition = "TEXT")
     private String shortDesc;
     private long quantity;
     private long sold;

@@ -133,12 +133,39 @@
                         width: 40%;
                     }
 
+                    /* --- PHẦN MỚI SỬA --- */
+
+                    /* 1. Sửa phần mô tả chi tiết */
                     .detail-content {
-                        line-height: 1.7;
+                        line-height: 1.6;
+                        /* Dãn dòng vừa phải cho phần chi tiết */
                         color: #444;
                         font-size: 0.95rem;
                     }
 
+                    .detail-content p,
+                    .short-desc-content p {
+                        margin-bottom: 10px;
+                        /* Khoảng cách giữa các đoạn */
+                    }
+
+                    /* 2. CSS RIÊNG CHO ĐẶC ĐIỂM NỔI BẬT (ĐÃ SỬA DÃN DÒNG) */
+                    .short-desc-content {
+                        font-size: 14px;
+                        line-height: 1.25;
+                        /* <-- ĐÃ TĂNG LÊN 1.8 CHO THOÁNG */
+                        color: #555;
+                        text-align: justify;
+                    }
+
+                    .short-desc-content img {
+                        max-width: 100%;
+                        height: auto;
+                        border-radius: 5px;
+                        margin: 10px 0;
+                    }
+
+                    /* -------------------- */
 
                     .review-item:last-child {
                         border-bottom: none !important;
@@ -267,14 +294,17 @@
 
                                 <div class="mb-4 p-3 bg-light rounded border-start border-primary border-4">
                                     <h6 class="fw-bold small text-uppercase mb-2">Đặc điểm nổi bật:</h6>
-                                    <div class="small text-secondary">${product.shortDesc}</div>
+
+                                    <div class="detail-content text-secondary short-desc-content">
+                                        <c:out value="${product.shortDesc}" escapeXml="false" />
+                                    </div>
                                 </div>
 
                                 <form action="/add-product-to-cart/${product.id}" method="POST" id="addToCartForm">
                                     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
 
                                     <div class="mb-4">
-                                        <label class="fw-bold small mb-2 d-block text-uppercase">Màu sắc:
+                                        <label class="fw-bold small mb-2 d-block text-uppercase">Phân loại:
                                             <span id="stock-display" class="text-secondary fw-normal"></span>
                                         </label>
                                         <div class="d-flex gap-2 flex-wrap">

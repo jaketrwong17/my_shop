@@ -74,6 +74,11 @@
                     .dynamic-row:hover {
                         background-color: #f8f9fa;
                     }
+
+
+                    .cke_notification_warning {
+                        display: none !important;
+                    }
                 </style>
             </head>
 
@@ -141,11 +146,13 @@
                                                 </div>
                                                 <div class="mb-3"><label class="form-label fw-bold small">Mô tả
                                                         ngắn</label>
-                                                    <form:textarea path="shortDesc" class="form-control" rows="2" />
+                                                    <form:textarea path="shortDesc" id="shortDesc" class="form-control"
+                                                        rows="2" />
                                                 </div>
                                                 <div class="mb-0"><label class="form-label fw-bold small">Chi
                                                         tiết</label>
-                                                    <form:textarea path="detailDesc" class="form-control" rows="5" />
+                                                    <form:textarea path="detailDesc" id="detailDesc"
+                                                        class="form-control" rows="5" />
                                                 </div>
                                             </div>
                                         </div>
@@ -225,7 +232,14 @@
                     </div>
                 </div>
                 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+                <script src="https://cdn.ckeditor.com/4.22.1/full/ckeditor.js"></script>
+
                 <script>
+                    // ĐÃ SỬA: Kích hoạt CKEditor
+                    CKEDITOR.replace('shortDesc');
+                    CKEDITOR.replace('detailDesc');
+
                     function removeOldImage(id) { if (confirm('Xóa ảnh?')) { document.getElementById('old-img-' + id).remove(); const input = document.createElement('input'); input.type = 'hidden'; input.name = 'deleteImageIds'; input.value = id; document.getElementById('deleteContainer').appendChild(input); } }
                     const dt = new DataTransfer();
                     function handleFileSelect(input) {

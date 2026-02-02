@@ -28,7 +28,7 @@
                         gap: 8px;
                     }
 
-                    /* Chỉnh font size bảng cho gọn */
+
                     .table {
                         font-size: 0.95rem;
                     }
@@ -233,8 +233,7 @@
                             body: formData
                         }).then(response => {
                             if (response.ok) {
-                                // Nếu thành công -> Reload lại trang để cập nhật ngày tháng từ server
-                                // (Vì nếu chỉ dùng JS update UI thì sẽ không có ngày hoàn thành mới)
+
                                 window.location.reload();
                             } else {
                                 alert("Lỗi cập nhật trạng thái!");

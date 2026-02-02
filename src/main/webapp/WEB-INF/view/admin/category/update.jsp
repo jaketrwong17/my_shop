@@ -162,37 +162,35 @@
 
                 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
                 <script>
-                    // Xóa ảnh cũ đang có trên server
+
                     function deleteCurrentImage() {
                         const currentImgContainer = document.getElementById('currentImageContainer');
                         if (currentImgContainer) {
-                            // Không remove() khỏi DOM mà chỉ ẩn đi, phòng khi user muốn Undo (nếu code phức tạp hơn)
-                            // Nhưng ở đây ta ẩn đi và set cờ xóa
+
                             currentImgContainer.style.display = 'none';
                         }
 
-                        // Hiện nút upload để chọn ảnh thay thế
+
                         document.getElementById('uploadBtnLabel').style.display = 'flex';
 
-                        // Set value input hidden = true để Controller biết cần set image = null
                         document.getElementById('isDeleteImage').value = "true";
                     }
 
-                    // Xem trước ảnh khi chọn input file
+
                     function previewImage(input) {
                         if (input.files && input.files[0]) {
                             const reader = new FileReader();
                             reader.onload = function (e) {
-                                // Gán src cho thẻ img preview
+
                                 document.getElementById('imgPreview').src = e.target.result;
 
-                                // Hiện container preview
+
                                 document.getElementById('previewContainer').style.display = 'block';
 
-                                // Ẩn nút upload
+
                                 document.getElementById('uploadBtnLabel').style.display = 'none';
 
-                                // Ẩn ảnh cũ đi (nếu đang hiện) vì đang định thay thế bằng ảnh mới
+
                                 const currentImg = document.getElementById('currentImageContainer');
                                 if (currentImg) currentImg.style.display = 'none';
                             }
@@ -200,26 +198,22 @@
                         }
                     }
 
-                    // Bỏ chọn ảnh vừa upload (Preview)
                     function removePreview() {
-                        // Reset input file
+
                         document.getElementById('imgFile').value = "";
 
-                        // Ẩn khung preview
                         document.getElementById('previewContainer').style.display = 'none';
 
-                        // Logic hiển thị lại:
-                        // Nếu trước đó ĐÃ bấm xóa ảnh cũ (isDeleteImage = true) -> Hiện nút upload
-                        // Nếu trước đó CHƯA bấm xóa ảnh cũ -> Hiện lại ảnh cũ
+
                         const isDeleted = document.getElementById('isDeleteImage').value === "true";
                         const currentImg = document.getElementById('currentImageContainer');
 
                         if (currentImg && !isDeleted) {
-                            // Trường hợp thay thế ảnh: Bỏ thay thế -> Hiện lại ảnh cũ
-                            currentImg.style.display = 'flex'; // Dùng flex để căn giữa lại
+
+                            currentImg.style.display = 'flex';
                             document.getElementById('uploadBtnLabel').style.display = 'none';
                         } else {
-                            // Trường hợp thêm mới hoặc đã xóa ảnh cũ -> Hiện nút upload
+
                             document.getElementById('uploadBtnLabel').style.display = 'flex';
                         }
                     }

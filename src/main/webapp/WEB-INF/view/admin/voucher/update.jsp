@@ -8,7 +8,6 @@
             <head>
                 <jsp:include page="../layout/header.jsp" />
                 <style>
-                    /* CSS đồng nhất với trang Show/Create */
                     .category-scroll {
                         max-height: 250px;
                         overflow-y: auto;
@@ -141,7 +140,7 @@
                         }
 
                         isAllSwitch.addEventListener('change', toggleCategoryUI);
-                        toggleCategoryUI(); // Chạy ngay khi load trang để kiểm tra trạng thái cũ
+                        toggleCategoryUI();
                     });
                 </script>
             </body>

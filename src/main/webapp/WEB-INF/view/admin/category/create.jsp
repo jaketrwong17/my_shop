@@ -6,7 +6,6 @@
         <jsp:include page="../layout/header.jsp" />
 
         <style>
-            /* CSS CHO Ô UPLOAD ẢNH */
             .img-card {
                 position: relative;
                 width: 100px;
