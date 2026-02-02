@@ -165,13 +165,13 @@
 
                         <div class="carousel-inner">
                             <div class="carousel-item active" data-bs-interval="4000">
-                                <img src="https://bizweb.dktcdn.net/100/592/467/themes/1036709/assets/slider_2.jpg?1760604794821"
+                                <img src="https://theme.hstatic.net/200000946105/1001363519/14/collection_banner.jpg?v=1368"
                                     class="d-block w-100" alt="Banner 1"
                                     style="height: 600px; object-fit: cover; object-position: center;">
                             </div>
 
                             <div class="carousel-item" data-bs-interval="4000">
-                                <img src="https://bizweb.dktcdn.net/100/592/467/themes/1036709/assets/slider_1.jpg?1760604794821"
+                                <img src="https://duytan.com/Data/Sites/1/Banner/banner-spm-t12.jpg"
                                     class="d-block w-100" alt="Banner 2"
                                     style="height: 600px; object-fit: cover; object-position: center;">
                             </div>
