@@ -2,6 +2,7 @@ package com.example.shop.controller.client;
 
 import com.example.shop.domain.Product;
 import com.example.shop.domain.Voucher;
+import com.example.shop.domain.dto.TopProductDTO;
 import com.example.shop.service.CategoryService;
 import com.example.shop.service.ProductService;
 import com.example.shop.service.VoucherService;
@@ -36,28 +37,28 @@ public class HomePageController {
     public String getHomePage(Model model,
             HttpServletRequest request,
             @RequestParam(required = false) String search,
-            @RequestParam(required = false) Long categoryId) {
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) String sort) {
 
-        // 1. Session giỏ hàng
         HttpSession session = request.getSession(true);
         if (session.getAttribute("sum") == null) {
             session.setAttribute("sum", 0);
         }
 
-        // 2. Lấy danh sách Sản phẩm
         List<Product> products;
 
         if (search != null || categoryId != null) {
-            products = productService.getAllProducts(search, categoryId);
+            products = productService.getAllProducts(search, categoryId, sort);
         } else {
-
             Pageable pageable = PageRequest.of(0, 100);
-            Page<Product> pageProducts = productService.getAllProductsWithPaging(pageable);
+            Page<Product> pageProducts = productService.getAllProductsWithPaging(pageable, sort);
             products = pageProducts.getContent();
         }
 
         List<Voucher> vouchers = voucherService.getAllVouchers();
+        List<TopProductDTO> bestSellingProducts = productService.getBestSellingProducts(10);
 
+        model.addAttribute("bestSellingProducts", bestSellingProducts);
         model.addAttribute("products", products);
         model.addAttribute("categories", categoryService.getAllCategories(null));
         model.addAttribute("vouchers", vouchers);

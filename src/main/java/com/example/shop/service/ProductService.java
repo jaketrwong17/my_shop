@@ -13,6 +13,7 @@ import com.example.shop.repository.ProductRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort; // Bổ sung import Sort
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
@@ -55,7 +56,7 @@ public class ProductService {
         }
     }
 
-    // Lấy danh sách sản phẩm theo từ khóa và danh mục
+    // Lấy danh sách sản phẩm theo từ khóa và danh mục (Hàm cũ giữ nguyên)
     public List<Product> getAllProducts(String keyword, Long categoryId) {
         List<Product> products;
 
@@ -69,6 +70,41 @@ public class ProductService {
             products = productRepository.findAll();
         }
 
+        for (Product p : products) {
+            this.enrichProductQuantity(p);
+        }
+
+        return products;
+    }
+
+    // Hàm lấy sản phẩm có sắp xếp (Dùng cho Controller mới)
+    // Trong ProductService.java
+
+    public List<Product> getAllProducts(String keyword, Long categoryId, String status) {
+        List<Product> products;
+
+        // 1. Lấy danh sách theo Keyword và Category như cũ
+        if (keyword != null && !keyword.isEmpty() && categoryId != null) {
+            products = productRepository.findByNameContainingIgnoreCaseAndCategoryId(keyword, categoryId);
+        } else if (keyword != null && !keyword.isEmpty()) {
+            products = productRepository.findByNameContainingIgnoreCase(keyword);
+        } else if (categoryId != null) {
+            products = productRepository.findByCategoryId(categoryId);
+        } else {
+            products = productRepository.findAll();
+        }
+
+        // 2. Lọc tiếp theo Status (Xử lý bằng Java Code)
+        if ("active".equals(status)) {
+            // Chỉ lấy sản phẩm đang hoạt động (active = true)
+            products = products.stream().filter(Product::isActive).toList();
+        } else if ("inactive".equals(status)) {
+            // Chỉ lấy sản phẩm ngừng kinh doanh (active = false)
+            products = products.stream().filter(p -> !p.isActive()).toList();
+        }
+        // Nếu status là "all" hoặc null thì không lọc gì cả
+
+        // 3. Tính toán số lượng tồn kho (Logic cũ của bạn)
         for (Product p : products) {
             this.enrichProductQuantity(p);
         }
@@ -118,8 +154,7 @@ public class ProductService {
         return null;
     }
 
-    // Xử lý thêm sản phẩm vào giỏ hàng cho cả khách vãng lai và người dùng đã đăng
-    // nhập
+    // Xử lý thêm sản phẩm vào giỏ hàng
     public void handleAddProductToCart(String email, long productId, long colorId, HttpSession session, long quantity) {
         if (email == null) {
             List<CartItem> guestCart = (List<CartItem>) session.getAttribute("guestCart");
@@ -161,14 +196,18 @@ public class ProductService {
                     cart = new Cart();
                     cart.setUser(user);
                     cart.setSum(0);
-                    this.cartRepository.save(cart);
+                    cart = this.cartRepository.save(cart);
                 }
+
                 Optional<Product> pOptional = this.productRepository.findById(productId);
                 Optional<ProductColor> cOptional = this.productColorRepository.findById(colorId);
+
                 if (pOptional.isPresent() && cOptional.isPresent()) {
                     Product p = pOptional.get();
                     ProductColor pc = cOptional.get();
+
                     CartItem oldDetail = this.cartItemRepository.findByCartAndProductAndProductColor(cart, p, pc);
+
                     if (oldDetail == null) {
                         CartItem newItem = new CartItem();
                         newItem.setCart(cart);
@@ -176,7 +215,9 @@ public class ProductService {
                         newItem.setProductColor(pc);
                         newItem.setPrice(p.getPrice());
                         newItem.setQuantity(quantity);
+
                         this.cartItemRepository.save(newItem);
+
                         int newSum = cart.getSum() + 1;
                         cart.setSum(newSum);
                         this.cartRepository.save(cart);
@@ -246,9 +287,18 @@ public class ProductService {
         }
     }
 
-    // Lấy danh sách sản phẩm có phân trang và sắp xếp theo tồn kho
-    public Page<Product> getAllProductsWithPaging(Pageable pageable) {
-        return productRepository.findAllSortedByStock(pageable);
+    // Lấy danh sách sản phẩm có phân trang và sắp xếp (Dùng cho Controller mới)
+    public Page<Product> getAllProductsWithPaging(Pageable pageable, String sort) {
+        if (sort != null && !sort.equals("default")) {
+            Sort s = Sort.by("id").descending();
+            if ("price-asc".equals(sort))
+                s = Sort.by("price").ascending();
+            else if ("price-desc".equals(sort))
+                s = Sort.by("price").descending();
+
+            pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), s);
+        }
+        return productRepository.findAll(pageable);
     }
 
     // Lấy danh sách sản phẩm bán chạy nhất
@@ -262,4 +312,14 @@ public class ProductService {
         return productRepository.count();
     }
 
+    // Hàm đảo ngược trạng thái kinh doanh (Active <-> Inactive)
+    public void toggleProductStatus(long id) {
+        Optional<Product> productOptional = productRepository.findById(id);
+        if (productOptional.isPresent()) {
+            Product product = productOptional.get();
+            // Đảo ngược trạng thái hiện tại (Đang bật -> Tắt, Đang tắt -> Bật)
+            product.setActive(!product.isActive());
+            productRepository.save(product);
+        }
+    }
 }

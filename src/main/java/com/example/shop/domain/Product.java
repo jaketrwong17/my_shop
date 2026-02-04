@@ -21,6 +21,10 @@ public class Product implements Serializable {
 
     private double price;
 
+    // Thêm trường active cho Soft Delete (Mặc định là true - Đang kinh doanh)
+    @Column(columnDefinition = "boolean default true")
+    private boolean active = true;
+
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<ProductImage> images = new ArrayList<>();
 
@@ -43,8 +47,24 @@ public class Product implements Serializable {
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductColor> colors = new ArrayList<>();
 
+    // Các trường tính toán (Formula)
+    @Formula("(SELECT COALESCE(AVG(r.rating), 0) FROM reviews r WHERE r.product_id = id)")
+    private double averageRating;
+    @Formula("(SELECT COUNT(r.id) FROM reviews r WHERE r.product_id = id)")
+    private int reviewCount;
+
     public Product() {
     }
+
+    // --- Getter và Setter mới cho active ---
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+    // ---------------------------------------
 
     public long getId() {
         return id;
@@ -150,6 +170,14 @@ public class Product implements Serializable {
         this.colors = colors;
     }
 
+    public double getAverageRating() {
+        return averageRating;
+    }
+
+    public int getReviewCount() {
+        return reviewCount;
+    }
+
     @Override
     public String toString() {
         return "Product [id=" + id + ", name=" + name + ", price=" + price + "]";
@@ -157,22 +185,8 @@ public class Product implements Serializable {
 
     public String getImage() {
         if (this.images != null && !this.images.isEmpty()) {
-
             return this.images.get(0).getImageUrl();
         }
         return "";
-    }
-
-    @Formula("(SELECT COALESCE(AVG(r.rating), 0) FROM reviews r WHERE r.product_id = id)")
-    private double averageRating;
-    @Formula("(SELECT COUNT(r.id) FROM reviews r WHERE r.product_id = id)")
-    private int reviewCount;
-
-    public double getAverageRating() {
-        return averageRating;
-    }
-
-    public int getReviewCount() {
-        return reviewCount;
     }
 }

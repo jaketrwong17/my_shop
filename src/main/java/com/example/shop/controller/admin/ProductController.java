@@ -32,12 +32,24 @@ public class ProductController {
     }
 
     // Hiển thị danh sách sản phẩm có lọc theo từ khóa và danh mục
+    // Trong ProductController.java
+
     @GetMapping
     public String getProductPage(Model model,
             @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) Long categoryId) {
-        model.addAttribute("products", productService.getAllProducts(keyword, categoryId));
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false, defaultValue = "all") String status) { // 1. Thêm tham số status
+
+        // 2. Gọi hàm Service mới (sẽ sửa ở bước dưới)
+        model.addAttribute("products", productService.getAllProducts(keyword, categoryId, status));
+
         model.addAttribute("categories", categoryService.getAllCategories(null));
+
+        // 3. Truyền lại các giá trị để giữ trên form sau khi reload
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("categoryId", categoryId);
+        model.addAttribute("status", status);
+
         return "admin/product/show";
     }
 
@@ -115,8 +127,9 @@ public class ProductController {
             productService.deleteProduct(id);
             redirectAttributes.addFlashAttribute("successMessage", "Xóa sản phẩm thành công!");
         } catch (Exception e) {
+            // Sửa lại thông báo lỗi cho rõ ràng hơn
             redirectAttributes.addFlashAttribute("errorMessage",
-                    "Sản phẩm này dính dáng đến đơn hàng (kể cả đơn đã hủy), không thể xóa!");
+                    "Sản phẩm đã có lịch sử đơn hàng, không thể xóa! Vui lòng chọn 'Ngừng kinh doanh'.");
         }
         return "redirect:/admin/product";
     }
@@ -164,5 +177,13 @@ public class ProductController {
                 product.getImages().add(img);
             }
         }
+    }
+
+    // --- (Thêm đoạn này vào) Xử lý Ngừng kinh doanh / Mở bán lại ---
+    @GetMapping("/toggle-status/{id}")
+    public String toggleProductStatus(@PathVariable long id, RedirectAttributes redirectAttributes) {
+        productService.toggleProductStatus(id);
+        redirectAttributes.addFlashAttribute("successMessage", "Đã cập nhật trạng thái kinh doanh của sản phẩm!");
+        return "redirect:/admin/product";
     }
 }

@@ -5,6 +5,7 @@ import com.example.shop.domain.dto.TopProductDTO;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -14,12 +15,18 @@ import java.util.List;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
-    // Giữ lại các hàm cũ của bạn
     List<Product> findByNameContainingIgnoreCaseAndCategoryId(String name, Long categoryId);
 
     List<Product> findByNameContainingIgnoreCase(String name);
 
     List<Product> findByCategoryId(Long categoryId);
+
+    // Các hàm phục vụ sắp xếp (Sort)
+    List<Product> findByNameContainingIgnoreCaseAndCategoryId(String name, Long categoryId, Sort sort);
+
+    List<Product> findByNameContainingIgnoreCase(String name, Sort sort);
+
+    List<Product> findByCategoryId(Long categoryId, Sort sort);
 
     @Query("SELECT p FROM Product p ORDER BY CASE WHEN p.quantity > 0 THEN 0 ELSE 1 END ASC, p.id DESC")
     Page<Product> findAllSortedByStock(Pageable pageable);
@@ -27,6 +34,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     long count();
 
     @Query("SELECT new com.example.shop.domain.dto.TopProductDTO(" +
+            "p.id, " +
             "p.name, " +
             "MIN(i.imageUrl), " +
             "SUM(od.quantity), " +
@@ -36,7 +44,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             "LEFT JOIN p.images i " +
             "JOIN od.order o " +
             "WHERE o.status = 'COMPLETED' " +
-            "GROUP BY p.name " +
+            "GROUP BY p.id, p.name " +
             "ORDER BY SUM(od.quantity) DESC")
     List<TopProductDTO> findBestSellingProducts(Pageable pageable);
 }

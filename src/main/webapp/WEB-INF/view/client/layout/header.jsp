@@ -179,8 +179,8 @@
                             </div>
 
                             <form class="flex-grow-1 d-flex position-relative" action="/" method="GET">
-                                <input class="form-control rounded-pill pe-5" type="search" name="keyword"
-                                    placeholder="" value="${param.keyword}">
+                                <input class="form-control rounded-pill pe-5" type="search" name="search" placeholder=""
+                                    value="${param.keyword}">
                                 <button
                                     class="btn btn-link position-absolute end-0 top-50 translate-middle-y me-2 text-primary"
                                     type="submit">

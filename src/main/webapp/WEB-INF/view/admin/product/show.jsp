@@ -7,6 +7,7 @@
             <jsp:include page="../layout/header.jsp" />
 
             <style>
+                /* Style cho Modal xem ảnh */
                 .shopee-modal-content {
                     display: flex;
                     background-color: #fff;
@@ -14,7 +15,6 @@
                     overflow: hidden;
                     min-height: 500px;
                 }
-
 
                 .shopee-main-view {
                     flex: 2;
@@ -30,7 +30,6 @@
                     max-height: 550px;
                     object-fit: contain;
                 }
-
 
                 .shopee-side-view {
                     flex: 1;
@@ -66,7 +65,6 @@
                     object-fit: cover;
                 }
 
-
                 .carousel-control-prev-icon,
                 .carousel-control-next-icon {
                     filter: invert(1);
@@ -83,9 +81,16 @@
                         <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom px-4 py-3">
                             <h4 class="mb-0 text-dark fw-bold">Quản lý Sản phẩm</h4>
                         </nav>
+
                         <c:if test="${not empty errorMessage}">
                             <div class="alert alert-danger alert-dismissible fade show m-3">
                                 ${errorMessage}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        </c:if>
+                        <c:if test="${not empty successMessage}">
+                            <div class="alert alert-success alert-dismissible fade show m-3">
+                                ${successMessage}
                                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                             </div>
                         </c:if>
@@ -94,12 +99,15 @@
                             <div class="card shadow-sm border-0 rounded-3">
                                 <div class="card-header bg-white py-3">
                                     <div class="row align-items-center">
-                                        <div class="col-md-9">
+                                        <div class="col-md-10">
                                             <form action="/admin/product" method="GET"
-                                                class="d-flex gap-2 align-items-center">
-                                                <div class="input-group" style="max-width: 300px;">
+                                                class="d-flex gap-2 align-items-center flex-wrap">
+
+                                                <div class="input-group" style="max-width: 250px;">
+                                                    <span class="input-group-text bg-white"><i
+                                                            class="fas fa-list"></i></span>
                                                     <select name="categoryId" class="form-select">
-                                                        <option value="">-- Tất cả danh mục --</option>
+                                                        <option value="">-- Danh mục --</option>
                                                         <c:forEach var="cate" items="${categories}">
                                                             <option value="${cate.id}" ${categoryId==cate.id
                                                                 ? 'selected' : '' }>
@@ -107,19 +115,33 @@
                                                             </option>
                                                         </c:forEach>
                                                     </select>
-
                                                 </div>
 
-                                                <input type="text" name="keyword" class="form-control" placeholder=""
-                                                    value="${keyword}" style="max-width: 400px;">
-                                                <button class="btn btn-outline-primary ms-2"><i
-                                                        class="fas fa-search"></i>
-                                                </button>
+                                                <div class="input-group" style="max-width: 200px;">
+                                                    <span class="input-group-text bg-white"><i
+                                                            class="fas fa-toggle-on"></i></span>
+                                                    <select name="status" class="form-select">
+                                                        <option value="all">-- Trạng thái --</option>
+                                                        <option value="active" ${status=='active' ? 'selected' : '' }>
+                                                            Đang bán</option>
+                                                        <option value="inactive" ${status=='inactive' ? 'selected' : ''
+                                                            }>Ngừng bán</option>
+                                                    </select>
+                                                </div>
+
+                                                <div class="input-group" style="max-width: 300px;">
+                                                    <input type="text" name="keyword" class="form-control"
+                                                        placeholder="Tên sản phẩm..." value="${keyword}">
+                                                    <button class="btn btn-primary"><i class="fas fa-search"></i>
+                                                        Lọc</button>
+                                                </div>
+
                                             </form>
                                         </div>
-                                        <div class="col-md-3 text-end">
-                                            <a href="/admin/product/create" class="btn btn-success fw-bold">
-                                                <i class="fas fa-plus me-1"></i> THÊM SẢN PHẨM
+
+                                        <div class="col-md-2 text-end">
+                                            <a href="/admin/product/create" class="btn btn-success fw-bold text-nowrap">
+                                                <i class="fas fa-plus me-1"></i> THÊM MỚI
                                             </a>
                                         </div>
                                     </div>
@@ -134,6 +156,7 @@
                                                 <th>Tên sản phẩm</th>
                                                 <th>Giá bán</th>
                                                 <th>Danh mục</th>
+                                                <th>Trạng thái</th>
                                                 <th>Hành động</th>
                                             </tr>
                                         </thead>
@@ -166,6 +189,18 @@
                                                             currencySymbol="đ" />
                                                     </td>
                                                     <td><span class="badge bg-secondary">${p.category.name}</span></td>
+
+                                                    <td>
+                                                        <c:choose>
+                                                            <c:when test="${p.active}">
+                                                                <span class="badge bg-success">Đang bán</span>
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <span class="badge bg-secondary">Ngừng bán</span>
+                                                            </c:otherwise>
+                                                        </c:choose>
+                                                    </td>
+
                                                     <td>
                                                         <button type="button"
                                                             class="btn btn-sm btn-info text-white me-1"
@@ -174,13 +209,22 @@
                                                             data-images="<c:forEach var='img' items='${p.images}' varStatus='status'>/images/${img.imageUrl}${!status.last ? ',' : ''}</c:forEach>">
                                                             <i class="fas fa-eye"></i>
                                                         </button>
+
                                                         <a href="/admin/product/update/${p.id}"
                                                             class="btn btn-sm btn-warning text-white me-1"><i
                                                                 class="fas fa-edit"></i></a>
+
+                                                        <a href="/admin/product/toggle-status/${p.id}"
+                                                            class="btn btn-sm ${p.active ? 'btn-danger' : 'btn-success'} me-1"
+                                                            title="${p.active ? 'Ngừng kinh doanh' : 'Mở bán lại'}">
+                                                            <i class="fas ${p.active ? 'fa-pause' : 'fa-play'}"></i>
+                                                        </a>
+
                                                         <a href="/admin/product/delete/${p.id}"
-                                                            class="btn btn-sm btn-danger"
-                                                            onclick="return confirm('Xóa sản phẩm này?')"><i
-                                                                class="fas fa-trash"></i></a>
+                                                            class="btn btn-sm btn-outline-danger"
+                                                            onclick="return confirm('Bạn có chắc chắn muốn XÓA VĨNH VIỄN? \nLưu ý: Nếu sản phẩm đã có đơn hàng, vui lòng dùng nút Bật/Tắt trạng thái bên cạnh.')">
+                                                            <i class="fas fa-trash"></i>
+                                                        </a>
                                                     </td>
                                                 </tr>
                                             </c:forEach>
