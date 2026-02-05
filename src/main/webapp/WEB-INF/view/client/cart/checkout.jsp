@@ -56,8 +56,9 @@
                                         </div>
                                         <div class="mb-3">
                                             <label class="form-label text-muted small">Số điện thoại</label>
-                                            <input type="text" name="receiverPhone" class="form-control"
-                                                value="${user.phone}" required>
+                                            <input type="tel" name="receiverPhone" class="form-control"
+                                                value="${user.phone}" pattern="0[0-9]{9}"
+                                                title="Số điện thoại phải bắt đầu bằng số 0 và đủ 10 chữ số" required>
                                         </div>
                                         <div class="mb-3">
                                             <label class="form-label text-muted small">Địa chỉ giao hàng</label>
@@ -175,7 +176,8 @@
                                         </div>
                                         <div class="form-check mb-4">
                                             <input class="form-check-input" type="radio" name="paymentMethod"
-                                                id="online" value="VNPAY"> <label class="form-check-label" for="online">
+                                                id="online" value="VNPAY">
+                                            <label class="form-check-label" for="online">
                                                 <i class="fas fa-credit-card me-2"></i>Thanh toán Online qua VNPAY
                                             </label>
                                         </div>

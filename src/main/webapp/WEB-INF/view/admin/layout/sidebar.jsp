@@ -46,7 +46,12 @@
             </a>
 
             <div class="mt-auto p-4">
-                <a href="/logout" class="btn btn-outline-danger w-100">
+                <form id="logoutForm" method="POST" action="/logout" style="display:none;">
+                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                </form>
+
+                <a href="#" onclick="document.getElementById('logoutForm').submit(); return false;"
+                    class="btn btn-outline-danger w-100">
                     <i class="fas fa-sign-out-alt me-2"></i> Đăng xuất
                 </a>
             </div>

@@ -134,11 +134,8 @@
                     }
 
                     /* --- PHẦN MỚI SỬA --- */
-
-                    /* 1. Sửa phần mô tả chi tiết */
                     .detail-content {
                         line-height: 1.6;
-                        /* Dãn dòng vừa phải cho phần chi tiết */
                         color: #444;
                         font-size: 0.95rem;
                     }
@@ -146,14 +143,11 @@
                     .detail-content p,
                     .short-desc-content p {
                         margin-bottom: 10px;
-                        /* Khoảng cách giữa các đoạn */
                     }
 
-                    /* 2. CSS RIÊNG CHO ĐẶC ĐIỂM NỔI BẬT (ĐÃ SỬA DÃN DÒNG) */
                     .short-desc-content {
                         font-size: 14px;
                         line-height: 1.25;
-                        /* <-- ĐÃ TĂNG LÊN 1.8 CHO THOÁNG */
                         color: #555;
                         text-align: justify;
                     }
@@ -165,42 +159,34 @@
                         margin: 10px 0;
                     }
 
-                    /* -------------------- */
-
                     .review-item:last-child {
                         border-bottom: none !important;
                         margin-bottom: 0 !important;
                         padding-bottom: 0 !important;
                     }
 
-
                     .star-rating-input {
                         display: flex;
                         flex-direction: row-reverse;
-
                         justify-content: flex-start;
                         gap: 5px;
                     }
 
                     .star-rating-input input {
                         display: none;
-
                     }
 
                     .star-rating-input label {
                         cursor: pointer;
                         font-size: 1.8rem;
                         color: #e4e5e9;
-
                         transition: color 0.2s;
                     }
-
 
                     .star-rating-input label:hover,
                     .star-rating-input label:hover~label,
                     .star-rating-input input:checked~label {
                         color: #ffc107;
-
                     }
                 </style>
             </head>
@@ -286,15 +272,23 @@
                                 </div>
 
                                 <div class="price-section mb-3 border-top pt-3">
-
-                                    <h2 class="text-danger fw-bold d-inline-block mb-0">
-                                        <fmt:formatNumber value="${product.price}" type="currency" currencySymbol="đ" />
-                                    </h2>
+                                    <c:choose>
+                                        <c:when test="${product.active}">
+                                            <h2 class="text-danger fw-bold d-inline-block mb-0">
+                                                <fmt:formatNumber value="${product.price}" type="currency"
+                                                    currencySymbol="đ" />
+                                            </h2>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <h3 class="text-danger fw-bold d-inline-block mb-0 text-uppercase">
+                                                Ngừng kinh doanh
+                                            </h3>
+                                        </c:otherwise>
+                                    </c:choose>
                                 </div>
 
                                 <div class="mb-4 p-3 bg-light rounded border-start border-primary border-4">
                                     <h6 class="fw-bold small text-uppercase mb-2">Đặc điểm nổi bật:</h6>
-
                                     <div class="detail-content text-secondary short-desc-content">
                                         <c:out value="${product.shortDesc}" escapeXml="false" />
                                     </div>
@@ -305,13 +299,16 @@
 
                                     <div class="mb-4">
                                         <label class="fw-bold small mb-2 d-block text-uppercase">Phân loại:
-                                            <span id="stock-display" class="text-secondary fw-normal"></span>
+                                            <span id="stock-display" class="text-secondary fw-normal">
+                                                <c:if test="${!product.active}">(Sản phẩm này đã ngừng bán)</c:if>
+                                            </span>
                                         </label>
                                         <div class="d-flex gap-2 flex-wrap">
                                             <c:forEach var="color" items="${product.colors}" varStatus="status">
                                                 <input type="radio" name="colorId" id="color-${color.id}"
                                                     class="color-radio" data-stock="${color.quantity}"
-                                                    value="${color.id}" ${color.quantity <=0 ? 'disabled' : '' }>
+                                                    value="${color.id}" ${(color.quantity <=0 || !product.active)
+                                                    ? 'disabled' : '' }>
                                                 <label for="color-${color.id}"
                                                     class="color-label-small">${color.colorName}</label>
                                             </c:forEach>
@@ -321,19 +318,35 @@
                                     <div class="d-flex gap-2 align-items-center">
                                         <div class="input-group input-group-small">
                                             <button class="btn btn-outline-secondary" type="button"
-                                                onclick="changeQty(-1)">-</button>
+                                                onclick="changeQty(-1)" ${!product.active ? 'disabled' : '' }>-</button>
+
                                             <input type="number" name="quantity" id="inputQuantity" value="1" min="1"
-                                                class="form-control text-center border-secondary">
+                                                class="form-control text-center border-secondary" ${!product.active
+                                                ? 'disabled' : '' }>
+
                                             <button class="btn btn-outline-secondary" type="button"
-                                                onclick="changeQty(1)">+</button>
+                                                onclick="changeQty(1)" ${!product.active ? 'disabled' : '' }>+</button>
                                         </div>
-                                        <button type="submit" id="btnSubmit"
-                                            class="btn btn-shopee-small rounded-pill text-uppercase">
-                                            <i class="fas fa-cart-plus me-2"></i>Thêm vào giỏ hàng
-                                        </button>
+
+                                        <c:choose>
+                                            <c:when test="${product.active}">
+                                                <button type="submit" id="btnSubmit"
+                                                    class="btn btn-shopee-small rounded-pill text-uppercase">
+                                                    <i class="fas fa-cart-plus me-2"></i>Thêm vào giỏ hàng
+                                                </button>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <button type="button" disabled
+                                                    class="btn btn-secondary rounded-pill text-uppercase"
+                                                    style="cursor: not-allowed; opacity: 0.7;">
+                                                    <i class="fas fa-ban me-2"></i>Ngừng kinh doanh
+                                                </button>
+                                            </c:otherwise>
+                                        </c:choose>
                                     </div>
                                     <div id="error-msg" class="text-danger small mt-2" style="display:none;">Số lượng
-                                        vượt quá kho hàng!</div>
+                                        vượt quá kho
+                                        hàng!</div>
                                 </form>
 
                                 <div class="mt-4 pt-3 border-top d-flex gap-4 small text-muted">
@@ -363,7 +376,8 @@
                                     <div class="card bg-light border-0 mb-4">
                                         <div class="card-body">
                                             <h6 class="fw-bold mb-3 text-primary"><i class="fas fa-pen me-2"></i>Viết
-                                                đánh giá của bạn</h6>
+                                                đánh giá của
+                                                bạn</h6>
                                             <form action="/product/add-review" method="POST">
                                                 <input type="hidden" name="${_csrf.parameterName}"
                                                     value="${_csrf.token}" />
@@ -418,7 +432,8 @@
                                                 </c:when>
                                                 <c:otherwise>
                                                     Bạn cần <strong>mua sản phẩm</strong> này và đơn hàng phải hoàn
-                                                    thành để viết đánh giá.
+                                                    thành để viết
+                                                    đánh giá.
                                                 </c:otherwise>
                                             </c:choose>
                                         </div>
@@ -520,15 +535,37 @@
                             errorMsg.style.display = 'block';
                             setTimeout(() => { errorMsg.style.display = 'none'; }, 2000);
                         }
-                        btnSubmit.disabled = (currentStock <= 0);
+                        // Chỉ enable nút submit nếu có hàng
+                        if (btnSubmit) {
+                            btnSubmit.disabled = (currentStock <= 0);
+                        }
                     }
 
-                    inputQty.addEventListener('change', validateQuantity);
+                    if (inputQty) {
+                        inputQty.addEventListener('change', validateQuantity);
+                    }
 
                     window.addEventListener('DOMContentLoaded', () => {
-                        const firstAvailable = document.querySelector('.color-radio:not(:disabled)');
-                        if (firstAvailable) { firstAvailable.click(); }
-                        else { stockDisplay.innerText = "(Hết hàng)"; btnSubmit.disabled = true; inputQty.disabled = true; }
+                        // Lấy trạng thái active từ server về JS
+                        const isProductActive = ${ product.active };
+
+                        if (isProductActive) {
+                            // Logic cũ: Tự động chọn màu đầu tiên nếu còn hàng
+                            const firstAvailable = document.querySelector('.color-radio:not(:disabled)');
+                            if (firstAvailable) {
+                                firstAvailable.click();
+                            } else {
+                                // Trường hợp active nhưng hết tất cả các màu
+                                if (stockDisplay) stockDisplay.innerText = "(Tạm hết hàng)";
+                                if (btnSubmit) btnSubmit.disabled = true;
+                                if (inputQty) inputQty.disabled = true;
+                            }
+                        } else {
+                            // Logic mới: Nếu ngừng kinh doanh, vô hiệu hóa form
+                            if (stockDisplay) stockDisplay.innerText = "(Sản phẩm này đã ngừng bán)";
+                            if (btnSubmit) btnSubmit.disabled = true;
+                            if (inputQty) inputQty.disabled = true;
+                        }
                     });
                 </script>
             </body>

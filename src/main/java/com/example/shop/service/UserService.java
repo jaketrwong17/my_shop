@@ -115,10 +115,13 @@ public class UserService {
     }
 
     // 3. Cập nhật mật khẩu mới và xóa token
+    // 3. Cập nhật mật khẩu mới và xóa token
     public void updatePassword(User user, String newPassword) {
-        String encodedPassword = passwordEncoder.encode(newPassword);
-        user.setPassword(encodedPassword);
-        user.setResetPasswordToken(null);
+        // QUAN TRỌNG: Ở Controller mình đã mã hóa rồi, nên ở đây KHÔNG mã hóa nữa
+        // Chỉ gán trực tiếp vào thôi.
+        user.setPassword(newPassword);
+
+        user.setResetPasswordToken(null); // Xóa token reset nếu có
         userRepository.save(user);
     }
 
@@ -205,7 +208,7 @@ public class UserService {
         User currentUser = this.getUserById(userId);
         if (currentUser != null) {
             currentUser.setFullName(updatedUser.getFullName());
-            currentUser.setPhone(updatedUser.getPhone());
+            currentUser.setPhone(updatedUser.getPhone()); // Dòng này cực kỳ quan trọng
             currentUser.setAddress(updatedUser.getAddress());
             this.userRepository.save(currentUser);
         }

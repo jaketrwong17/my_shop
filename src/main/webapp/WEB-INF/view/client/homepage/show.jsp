@@ -12,7 +12,18 @@
                 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 
                 <style>
-                    /* ==================== 1. STYLE CHUNG & PRODUCT CARD ==================== */
+                    /* === 1. CẤU HÌNH CUỘN TRANG MƯỢT MÀ === */
+                    html {
+                        scroll-behavior: smooth;
+                    }
+
+                    /* === 2. CĂN CHỈNH VỊ TRÍ DỪNG KHI CUỘN (OFFSET MENU) === */
+                    #danh-sach-san-pham {
+                        /* Giúp tiêu đề không bị thanh menu che mất khi trượt tới */
+                        scroll-margin-top: 110px;
+                    }
+
+                    /* ==================== STYLE CHUNG & PRODUCT CARD ==================== */
                     .product-card {
                         transition: 0.3s;
                         border-radius: 12px;
@@ -73,7 +84,7 @@
                         z-index: 10;
                     }
 
-                    /* ==================== 2. BEST SELLER & RANKING COLORS ==================== */
+                    /* ==================== BEST SELLER & RANKING COLORS ==================== */
                     .best-seller-card {
                         border: 1px solid rgba(0, 0, 0, 0.08);
                         border-radius: 15px;
@@ -133,9 +144,7 @@
                         background: linear-gradient(45deg, #2d97f5, #035fb1);
                     }
 
-                    /* XANH ĐẬM TOP 5-10 */
-
-                    /* ==================== 3. HIỆU ỨNG HOT TREND CAO CẤP ==================== */
+                    /* ==================== HOT TREND BADGE ==================== */
                     .hot-trend-badge-new {
                         background: #fff;
                         border: 2px solid #ff4b2b;
@@ -183,7 +192,7 @@
                         }
                     }
 
-                    /* ==================== 4. BỘ LỌC PILL & SLIDER ==================== */
+                    /* ==================== SORT OPTIONS & SLIDER ==================== */
                     .sort-options {
                         display: flex;
                         gap: 12px;
@@ -284,7 +293,8 @@
                                     <i class="fas fa-crown text-warning me-2"></i>SẢN PHẨM BÁN CHẠY
                                 </h4>
                                 <div class="bg-primary"
-                                    style="height: 3px; width: 45px; border-radius: 2px; margin-top: 5px;"></div>
+                                    style="height: 3px; width: 45px; border-radius: 2px; margin-top: 5px;">
+                                </div>
                             </div>
                             <div class="hot-trend-badge-new">Hot Trend <i class="fas fa-fire ms-2"></i></div>
                         </div>
@@ -294,35 +304,38 @@
                                     class="fas fa-chevron-left"></i></button>
                             <div class="d-flex gap-4 overflow-auto category-scroll-container" id="categoryList">
                                 <c:forEach var="item" items="${bestSellingProducts}" varStatus="status">
-                                    <a href="/product/${item.productId}" class="text-decoration-none text-dark">
-                                        <div class="card best-seller-card p-2" style="min-width: 220px;">
-                                            <div class="ranking-badge 
-                                ${status.index == 0 ? 'ranking-top-1' : 
-                                  (status.index == 1 ? 'ranking-top-2' : 
-                                  (status.index == 2 ? 'ranking-top-3' : 
-                                  (status.index == 3 ? 'ranking-top-4' : 'ranking-top-others')))}">
-                                                #${status.index + 1} Best Seller
-                                            </div>
-                                            <div class="bg-white rounded-3 mb-2 d-flex align-items-center justify-content-center"
-                                                style="height: 180px;">
-                                                <img src="/images/${not empty item.productImage ? item.productImage : 'default.png'}"
-                                                    style="max-width: 90%; max-height: 90%; object-fit: contain;">
-                                            </div>
-                                            <div class="card-body p-1 text-center">
-                                                <h6 class="text-dark fw-bold mb-2"
-                                                    style="font-size: 0.9rem; min-height: 2.6em;">${item.productName}
-                                                </h6>
-                                                <div class="price-container">
-                                                    <div class="text-danger fw-bold">
-                                                        <fmt:formatNumber
-                                                            value="${item.totalRevenue / item.quantitySold}"
-                                                            type="currency" currencySymbol="đ" />
+                                    <c:if test="${item.active}">
+                                        <a href="/product/${item.productId}" class="text-decoration-none text-dark">
+                                            <div class="card best-seller-card p-2" style="min-width: 220px;">
+                                                <div class="ranking-badge 
+                                    ${status.index == 0 ? 'ranking-top-1' : 
+                                      (status.index == 1 ? 'ranking-top-2' : 
+                                      (status.index == 2 ? 'ranking-top-3' : 
+                                      (status.index == 3 ? 'ranking-top-4' : 'ranking-top-others')))}">
+                                                    #${status.index + 1} Best Seller
+                                                </div>
+                                                <div class="bg-white rounded-3 mb-2 d-flex align-items-center justify-content-center"
+                                                    style="height: 180px;">
+                                                    <img src="/images/${not empty item.productImage ? item.productImage : 'default.png'}"
+                                                        style="max-width: 90%; max-height: 90%; object-fit: contain;">
+                                                </div>
+                                                <div class="card-body p-1 text-center">
+                                                    <h6 class="text-dark fw-bold mb-2"
+                                                        style="font-size: 0.9rem; min-height: 2.6em;">
+                                                        ${item.productName}
+                                                    </h6>
+                                                    <div class="price-container">
+                                                        <div class="text-danger fw-bold">
+                                                            <fmt:formatNumber
+                                                                value="${item.totalRevenue / item.quantitySold}"
+                                                                type="currency" currencySymbol="đ" />
+                                                        </div>
+                                                        <small class="text-muted">Đã bán: ${item.quantitySold}</small>
                                                     </div>
-                                                    <small class="text-muted">Đã bán: ${item.quantitySold}</small>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </a>
+                                        </a>
+                                    </c:if>
                                 </c:forEach>
                             </div>
                             <button class="btn scroll-btn end-0" id="slideRight"><i
@@ -331,106 +344,144 @@
                     </div>
                 </section>
 
-                <div class="container my-5">
+                <div class="container my-5" id="danh-sach-san-pham">
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h4 class="fw-bold mb-0" id="product-section-title">DANH SÁCH SẢN PHẨM</h4>
                         <div class="sort-options">
-
                             <c:set var="urlParams"
                                 value="${not empty param.categoryId ? '&categoryId='.concat(param.categoryId) : ''}${not empty param.search ? '&search='.concat(param.search) : ''}" />
-                            <a href="/?sort=price-asc${urlParams}"
+
+                            <a href="/?sort=price-asc${urlParams}#danh-sach-san-pham"
                                 class="btn-sort ${param.sort == 'price-asc' ? 'active' : ''}"><i
                                     class="fas fa-sort-amount-down-alt"></i> Giá Thấp - Cao</a>
-                            <a href="/?sort=price-desc${urlParams}"
+                            <a href="/?sort=price-desc${urlParams}#danh-sach-san-pham"
                                 class="btn-sort ${param.sort == 'price-desc' ? 'active' : ''}"><i
                                     class="fas fa-sort-amount-down"></i> Giá Cao - Thấp</a>
                         </div>
                     </div>
 
-                    <div id="product-list" class="row row-cols-1 row-cols-md-3 row-cols-lg-5 g-4">
-                        <c:forEach var="p" items="${products}">
-                            <c:if test="${p.active}">
-                                <div class="col product-item">
-                                    <div class="card product-card shadow-sm h-100">
-                                        <c:if test="${p.quantity <= 0}">
-                                            <div class="out-of-stock-label">Hết hàng</div>
-                                        </c:if>
-                                        <a href="/product/${p.id}"
-                                            class="text-decoration-none h-100 d-flex flex-column">
-                                            <div class="img-container"><img
-                                                    src="/images/${(not empty p.images and not empty p.images[0]) ? p.images[0].imageUrl : 'default.png'}"
-                                                    alt="${p.name}"></div>
-                                            <div class="info-section">
-                                                <h6 class="text-dark mb-2" style="min-height: 2.5em;">${p.name}</h6>
-
-                                                <div class="mb-2 small">
-                                                    <c:choose>
-                                                        <c:when test="${p.reviewCount > 0}">
-                                                            <span class="text-warning">
-                                                                <c:forEach begin="1"
-                                                                    end="${p.averageRating.intValue()}"><i
-                                                                        class="fas fa-star"></i></c:forEach>
-                                                                <span class="text-muted">(${p.reviewCount})</span>
-                                                            </span>
-                                                        </c:when>
-                                                        <c:otherwise><span class="text-muted">Chưa có đánh giá</span>
-                                                        </c:otherwise>
-                                                    </c:choose>
-                                                </div>
-
-                                                <p class="product-price mb-0">
-                                                    <fmt:formatNumber value="${p.price}" type="currency"
-                                                        currencySymbol="đ" />
-                                                </p>
+                    <c:choose>
+                        <%-- TRƯỜNG HỢP 1: KHÔNG CÓ SẢN PHẨM (Hiển thị to đẹp giữa màn hình) --%>
+                            <c:when test="${empty products}">
+                                <div class="row justify-content-center">
+                                    <div class="col-12 col-md-8 col-lg-6">
+                                        <div class="text-center py-5 bg-white rounded-4 shadow-sm border">
+                                            <div class="mb-3">
+                                                <i class="fas fa-box-open text-muted"
+                                                    style="font-size: 5rem; opacity: 0.3;"></i>
                                             </div>
-                                        </a>
-                                        <div class="card-footer bg-white border-0 pb-3 text-center">
-                                            <a href="/product/${p.id}"
-                                                class="btn btn-outline-primary w-100 rounded-pill btn-sm fw-bold">Xem
-                                                ngay</a>
+                                            <h5 class="text-muted fw-bold">Không tìm thấy sản phẩm nào!</h5>
+                                            <p class="text-secondary small mb-4">
+                                                Rất tiếc, chúng tôi không tìm thấy sản phẩm phù hợp với lựa chọn của
+                                                bạn.
+                                            </p>
+                                            <a href="/#danh-sach-san-pham"
+                                                class="btn btn-primary rounded-pill px-4 fw-bold">
+                                                <i class="fas fa-arrow-left me-2"></i>Xem tất cả sản phẩm
+                                            </a>
                                         </div>
                                     </div>
                                 </div>
-                            </c:if>
-                        </c:forEach>
-                    </div>
+                            </c:when>
 
-                    <div class="text-center mt-5 mb-4 d-flex gap-2 justify-content-center">
-                        <button id="loadMoreBtn" class="btn btn-primary px-5 py-2 rounded-pill fw-bold"
-                            style="display:none; background:#e3f2fd; color:#2A83E9; border:none;">XEM THÊM <i
-                                class="fas fa-chevron-down ms-2"></i></button>
-                        <button id="collapseBtn" class="btn btn-outline-secondary px-5 py-2 rounded-pill fw-bold"
-                            style="display:none;">THU GỌN <i class="fas fa-chevron-up ms-2"></i></button>
-                    </div>
+                            <%-- TRƯỜNG HỢP 2: CÓ SẢN PHẨM (Hiển thị lưới Grid 5 cột) --%>
+                                <c:otherwise>
+                                    <div id="product-list" class="row row-cols-1 row-cols-md-3 row-cols-lg-5 g-4">
+                                        <c:forEach var="p" items="${products}">
+                                            <c:if test="${p.active}">
+                                                <div class="col product-item">
+                                                    <div class="card product-card shadow-sm h-100">
+                                                        <c:if test="${p.quantity <= 0}">
+                                                            <div class="out-of-stock-label">Hết hàng</div>
+                                                        </c:if>
+                                                        <a href="/product/${p.id}"
+                                                            class="text-decoration-none h-100 d-flex flex-column">
+                                                            <div class="img-container"><img
+                                                                    src="/images/${(not empty p.images and not empty p.images[0]) ? p.images[0].imageUrl : 'default.png'}"
+                                                                    alt="${p.name}"></div>
+                                                            <div class="info-section">
+                                                                <h6 class="text-dark mb-2" style="min-height: 2.5em;">
+                                                                    ${p.name}</h6>
+                                                                <div class="mb-2 small">
+                                                                    <c:choose>
+                                                                        <c:when test="${p.reviewCount > 0}">
+                                                                            <span class="text-warning">
+                                                                                <c:forEach begin="1"
+                                                                                    end="${p.averageRating.intValue()}">
+                                                                                    <i class="fas fa-star"></i>
+                                                                                </c:forEach>
+                                                                                <span
+                                                                                    class="text-muted">(${p.reviewCount})</span>
+                                                                            </span>
+                                                                        </c:when>
+                                                                        <c:otherwise><span class="text-muted">Chưa có
+                                                                                đánh giá</span>
+                                                                        </c:otherwise>
+                                                                    </c:choose>
+                                                                </div>
+                                                                <p class="product-price mb-0">
+                                                                    <fmt:formatNumber value="${p.price}" type="currency"
+                                                                        currencySymbol="đ" />
+                                                                </p>
+                                                            </div>
+                                                        </a>
+                                                        <div class="card-footer bg-white border-0 pb-3 text-center">
+                                                            <a href="/product/${p.id}"
+                                                                class="btn btn-outline-primary w-100 rounded-pill btn-sm fw-bold">Xem
+                                                                ngay</a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </c:if>
+                                        </c:forEach>
+                                    </div>
+
+                                    <div class="text-center mt-5 mb-4 d-flex gap-2 justify-content-center">
+                                        <button id="loadMoreBtn" class="btn btn-primary px-5 py-2 rounded-pill fw-bold"
+                                            style="display:none; background:#e3f2fd; color:#2A83E9; border:none;">XEM
+                                            THÊM <i class="fas fa-chevron-down ms-2"></i></button>
+                                        <button id="collapseBtn"
+                                            class="btn btn-outline-secondary px-5 py-2 rounded-pill fw-bold"
+                                            style="display:none;">THU GỌN <i
+                                                class="fas fa-chevron-up ms-2"></i></button>
+                                    </div>
+                                </c:otherwise>
+                    </c:choose>
                 </div>
 
                 <jsp:include page="../layout/footer.jsp" />
 
-
                 <script>
                     document.addEventListener("DOMContentLoaded", function () {
+                        // Slider Best Seller
                         const container = document.getElementById('categoryList');
-                        document.getElementById('slideLeft').onclick = () => container.scrollBy({ left: -400, behavior: 'smooth' });
-                        document.getElementById('slideRight').onclick = () => container.scrollBy({ left: 400, behavior: 'smooth' });
+                        if (container) {
+                            document.getElementById('slideLeft').onclick = () => container.scrollBy({ left: -400, behavior: 'smooth' });
+                            document.getElementById('slideRight').onclick = () => container.scrollBy({ left: 400, behavior: 'smooth' });
+                        }
 
+                        // Logic Xem Thêm / Thu Gọn
                         const productItems = document.querySelectorAll('.product-item');
                         const loadMoreBtn = document.getElementById('loadMoreBtn');
                         const collapseBtn = document.getElementById('collapseBtn');
-                        if (productItems.length > 20) {
+
+                        if (loadMoreBtn && productItems.length > 20) {
                             loadMoreBtn.style.display = 'inline-block';
                             for (let i = 20; i < productItems.length; i++) productItems[i].classList.add('d-none-custom');
+
+                            loadMoreBtn.onclick = function () {
+                                productItems.forEach(item => item.classList.remove('d-none-custom'));
+                                this.style.display = 'none';
+                                collapseBtn.style.display = 'inline-block';
+                            };
+
+                            collapseBtn.onclick = function () {
+                                for (let i = 20; i < productItems.length; i++) productItems[i].classList.add('d-none-custom');
+                                this.style.display = 'none';
+                                loadMoreBtn.style.display = 'inline-block';
+                                document.getElementById('product-section-title').scrollIntoView({ behavior: 'smooth' });
+                            };
                         }
-                        loadMoreBtn.onclick = function () {
-                            productItems.forEach(item => item.classList.remove('d-none-custom'));
-                            this.style.display = 'none';
-                            collapseBtn.style.display = 'inline-block';
-                        };
-                        collapseBtn.onclick = function () {
-                            for (let i = 20; i < productItems.length; i++) productItems[i].classList.add('d-none-custom');
-                            this.style.display = 'none';
-                            loadMoreBtn.style.display = 'inline-block';
-                            document.getElementById('product-section-title').scrollIntoView({ behavior: 'smooth' });
-                        };
                     });
                 </script>
             </body>

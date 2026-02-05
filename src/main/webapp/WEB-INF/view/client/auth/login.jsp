@@ -38,6 +38,7 @@
 
                 .image-section {
                     background-image: url('https://img.freepik.com/free-vector/mobile-login-concept-illustration_114360-83.jpg?w=740');
+
                     background-size: cover;
                     background-position: center;
                     min-height: 500px;

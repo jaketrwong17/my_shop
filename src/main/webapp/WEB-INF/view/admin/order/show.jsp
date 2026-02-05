@@ -28,7 +28,6 @@
                         gap: 8px;
                     }
 
-
                     .table {
                         font-size: 0.95rem;
                     }
@@ -103,7 +102,7 @@
                                                                     pattern="dd/MM/yyyy HH:mm" />
                                                             </td>
 
-                                                            <td class="text-nowrap text-success  fw-bold">
+                                                            <td class="text-nowrap text-success fw-bold">
                                                                 <c:if test="${not empty order.completedAt}">
                                                                     <fmt:formatDate value="${order.completedAt}"
                                                                         pattern="dd/MM/yyyy HH:mm" />
@@ -199,8 +198,14 @@
                                                                         <i class="fas fa-times"></i>
                                                                     </button>
 
+                                                                    <a href="/admin/invoice/export/${order.id}"
+                                                                        class="btn btn-sm btn-warning text-dark border"
+                                                                        title="Xuất hóa đơn PDF">
+                                                                        <i class="fas fa-file-invoice"></i>
+                                                                    </a>
                                                                     <a href="/admin/order/view/${order.id}"
-                                                                        class="btn btn-sm btn-light border text-primary">
+                                                                        class="btn btn-sm btn-light border text-primary"
+                                                                        title="Xem chi tiết">
                                                                         <i class="fas fa-eye"></i>
                                                                     </a>
                                                                 </div>
@@ -221,48 +226,35 @@
 
                 <script>
                     function updateStatus(orderId, newStatus) {
-                        // 1. Lấy Token (Giá trị vé thông hành)
                         const csrfMeta = document.querySelector('meta[name="_csrf"]');
                         var csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : '';
-
-                        // 2. ÉP CỨNG tên Header là 'X-CSRF-TOKEN' để tránh lỗi "Invalid name"
-                        // (Không lấy từ thẻ meta _csrf_header nữa vì nó đang bị rỗng)
                         const csrfHeader = 'X-CSRF-TOKEN';
 
-                        // Kiểm tra xem có Token không
                         if (!csrfToken) {
-                            alert("Lỗi bảo mật: Không tìm thấy CSRF Token trong trang web. Hãy thử F5 lại trang.");
-                            console.error("CSRF Token is missing!");
+                            alert("Lỗi bảo mật: Không tìm thấy CSRF Token. Hãy thử F5 lại trang.");
                             return;
                         }
 
-                        // 3. Chuẩn bị dữ liệu
                         const params = new URLSearchParams();
                         params.append('id', orderId);
                         params.append('status', newStatus);
 
-                        // 4. Gửi Ajax
-                        // Dùng c:url để đảm bảo đường dẫn luôn đúng
                         fetch('<c:url value="/admin/order/update-status-ajax" />', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/x-www-form-urlencoded',
-                                [csrfHeader]: csrfToken // Key ở đây giờ chắc chắn là 'X-CSRF-TOKEN'
+                                [csrfHeader]: csrfToken
                             },
                             body: params
                         })
                             .then(response => {
                                 if (response.ok) {
-                                    // Thành công -> Reload trang
                                     window.location.reload();
                                 } else {
-                                    // Thất bại -> Báo lỗi
                                     alert("Lỗi từ Server: " + response.status);
-                                    console.error("Server Error:", response);
                                 }
                             })
                             .catch(error => {
-                                // Bắt lỗi kết nối hoặc lỗi JS
                                 console.error("Lỗi chi tiết:", error);
                                 alert("Lỗi thao tác: " + error.message);
                             });

@@ -33,18 +33,20 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     long count();
 
+    // === SỬA QUERY DƯỚI ĐÂY (Thêm p.active vào SELECT và GROUP BY) ===
     @Query("SELECT new com.example.shop.domain.dto.TopProductDTO(" +
             "p.id, " +
             "p.name, " +
             "MIN(i.imageUrl), " +
             "SUM(od.quantity), " +
-            "SUM(od.price * od.quantity)) " +
+            "SUM(od.price * od.quantity), " +
+            "p.active) " + // Thêm tham số active vào constructor
             "FROM OrderDetail od " +
             "JOIN od.product p " +
             "LEFT JOIN p.images i " +
             "JOIN od.order o " +
             "WHERE o.status = 'COMPLETED' " +
-            "GROUP BY p.id, p.name " +
+            "GROUP BY p.id, p.name, p.active " + // Thêm p.active vào Group By
             "ORDER BY SUM(od.quantity) DESC")
     List<TopProductDTO> findBestSellingProducts(Pageable pageable);
 }

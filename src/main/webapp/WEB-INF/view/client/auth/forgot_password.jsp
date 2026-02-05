@@ -66,6 +66,7 @@
                 </c:if>
 
                 <form action="/forgot-password" method="post">
+                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
                     <div class="mb-3">
                         <input type="email" name="email" class="form-control" required placeholder="Nhập email của bạn">
                     </div>

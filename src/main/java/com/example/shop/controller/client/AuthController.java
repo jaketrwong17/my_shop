@@ -126,6 +126,10 @@ public class AuthController {
         return "client/auth/reset_password"; // Trỏ đến file jsp đặt lại mật khẩu
     }
 
+    // Trong file AuthController.java
+
+    // Trong file AuthController.java
+
     @PostMapping("/reset-password")
     public String processResetPassword(HttpServletRequest request, Model model) {
         String token = request.getParameter("token");
@@ -143,7 +147,13 @@ public class AuthController {
             model.addAttribute("error", "Token không hợp lệ.");
             return "client/auth/reset_password";
         } else {
-            userService.updatePassword(user, password);
+            // === SỬA ĐOẠN NÀY ===
+            // 1. Mã hóa mật khẩu trước (Vì Service giờ chỉ lưu thôi, không mã hóa nữa)
+            String encodedPassword = passwordEncoder.encode(password);
+
+            // 2. Gọi hàm updatePassword với mật khẩu đã mã hóa
+            userService.updatePassword(user, encodedPassword);
+
             model.addAttribute("message", "Đổi mật khẩu thành công. Vui lòng đăng nhập.");
         }
 

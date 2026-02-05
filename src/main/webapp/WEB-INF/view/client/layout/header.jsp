@@ -148,7 +148,7 @@
                                             <c:forEach var="cat" items="${categories}">
                                                 <li>
                                                     <a class="dropdown-item py-2 d-flex align-items-center"
-                                                        href="/?categoryId=${cat.id}">
+                                                        href="/?categoryId=${cat.id}#danh-sach-san-pham">
                                                         <div class="me-3 d-flex align-items-center justify-content-center"
                                                             style="width: 30px; height: 30px;">
                                                             <c:choose>

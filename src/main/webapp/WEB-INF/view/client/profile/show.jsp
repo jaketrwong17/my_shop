@@ -63,6 +63,21 @@
                                         <i class="fas fa-user-circle me-2"></i>Hồ sơ của tôi
                                     </h5>
 
+                                    <c:if test="${not empty successMsg}">
+                                        <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+                                            <i class="fas fa-check-circle me-2"></i> ${successMsg}
+                                            <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                                aria-label="Close"></button>
+                                        </div>
+                                    </c:if>
+
+                                    <c:if test="${not empty errorMsg}">
+                                        <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+                                            <i class="fas fa-exclamation-circle me-2"></i> ${errorMsg}
+                                            <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                                aria-label="Close"></button>
+                                        </div>
+                                    </c:if>
                                     <form:form action="/profile" method="post" modelAttribute="user">
                                         <div class="row mb-4 align-items-center">
                                             <label class="col-md-3 text-md-end form-label-custom">Email</label>
@@ -80,7 +95,10 @@
                                         <div class="row mb-4 align-items-center">
                                             <label class="col-md-3 text-md-end form-label-custom">Số điện thoại</label>
                                             <div class="col-md-8">
-                                                <form:input path="phone" class="form-control" />
+                                                <form:input path="phone" class="form-control" type="tel"
+                                                    pattern="0[0-9]{9}"
+                                                    title="Số điện thoại phải bắt đầu bằng số 0 và đủ 10 chữ số"
+                                                    required="true" />
                                             </div>
                                         </div>
                                         <div class="row mb-4">
@@ -104,6 +122,8 @@
                 </div>
 
                 <jsp:include page="../layout/footer.jsp" />
+
+
             </body>
 
             </html>
