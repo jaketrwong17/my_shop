@@ -17,13 +17,35 @@
                     </nav>
 
                     <div class="container-fluid px-4 py-4">
+
+                        <c:if test="${not empty param.error}">
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                <c:choose>
+                                    <c:when test="${param.error == 'active_order'}">
+                                        <strong>Không thể xóa!</strong> Người dùng này đang có đơn hàng chưa hoàn tất.
+                                        Vui lòng xử lý đơn hàng trước.
+                                    </c:when>
+                                    <c:when test="${param.error == 'cannot_delete_has_orders'}">
+                                        <strong>Không thể xóa!</strong> Người dùng này đã có lịch sử mua hàng. Vui lòng
+                                        chọn <b>Khóa tài khoản</b> thay vì xóa để bảo toàn dữ liệu.
+                                    </c:when>
+                                    <c:otherwise>
+                                        Đã xảy ra lỗi trong quá trình xử lý yêu cầu.
+                                    </c:otherwise>
+                                </c:choose>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                    aria-label="Close"></button>
+                            </div>
+                        </c:if>
                         <div class="card shadow-sm border-0 rounded-3">
                             <div class="card-header bg-white py-3">
                                 <div class="row align-items-center">
                                     <div class="col-md-12">
                                         <form action="/admin/user" method="GET" class="d-flex">
-                                            <input type="text" name="keyword" class="form-control" placeholder=""
-                                                value="${keyword}" style="max-width: 400px;">
+                                            <input type="text" name="keyword" class="form-control"
+                                                placeholder="Tìm kiếm theo tên hoặc email..." value="${keyword}"
+                                                style="max-width: 400px;">
                                             <button class="btn btn-outline-primary ms-2"><i
                                                     class="fas fa-search"></i></button>
                                         </form>
@@ -75,10 +97,13 @@
                                                     <td>
                                                         <form action="/admin/user/lock/${user.id}" method="POST"
                                                             style="display:inline;">
+
+                                                            <input type="hidden" name="${_csrf.parameterName}"
+                                                                value="${_csrf.token}" />
                                                             <c:if test="${!user.isLocked}">
                                                                 <button class="btn btn-sm btn-outline-warning me-1"
                                                                     title="Khóa tài khoản"
-                                                                    onclick="return confirm('Bạn có muốn KHÓA tài khoản này không?');">
+                                                                    onclick="return confirm('Bạn có muốn KHÓA tài khoản này không? Người dùng sẽ không thể đăng nhập.');">
                                                                     <i class="fas fa-lock"></i>
                                                                 </button>
                                                             </c:if>

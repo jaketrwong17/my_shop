@@ -27,7 +27,7 @@
                             <div class="card-header bg-white py-3">
                                 <div class="row align-items-center">
                                     <div class="col-md-9">
-                                        <form action="/admin/product" method="GET"
+                                        <form action="/admin/category" method="GET"
                                             class="d-flex gap-2 align-items-center">
                                             <input type="text" name="keyword" class="form-control" placeholder=""
                                                 value="${keyword}" style="max-width: 400px;">

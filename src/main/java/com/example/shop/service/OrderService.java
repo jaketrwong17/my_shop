@@ -5,6 +5,7 @@ import com.example.shop.repository.*;
 import jakarta.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -197,21 +198,21 @@ public class OrderService {
         if (keyword != null && !keyword.trim().isEmpty()) {
             return orderRepository.searchOrders(keyword);
         }
-        return orderRepository.findAll();
+        return orderRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
     }
 
     // Lấy danh sách đơn hàng đã hoàn thành hoặc đã hủy của người dùng
     public List<Order> getCompletedOrders(String email) {
         User user = userRepository.findByEmail(email);
         List<String> statuses = List.of("COMPLETED", "CANCELLED");
-        return orderRepository.findByUserAndStatusIn(user, statuses);
+        return orderRepository.findByUserAndStatusInOrderByIdDesc(user, statuses);
     }
 
     // Lấy danh sách đơn hàng đang trong quá trình xử lý của người dùng
     public List<Order> getActiveOrders(String email) {
         User user = userRepository.findByEmail(email);
         List<String> statuses = List.of("PENDING", "CONFIRMED", "SHIPPING");
-        return orderRepository.findByUserAndStatusIn(user, statuses);
+        return orderRepository.findByUserAndStatusInOrderByIdDesc(user, statuses);
     }
 
     // Lấy danh sách chi tiết đơn hàng và xử lý tải dữ liệu Lazy Loading

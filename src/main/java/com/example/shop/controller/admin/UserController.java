@@ -33,28 +33,23 @@ public class UserController {
         return "redirect:/admin/user";
     }
 
-    // Xử lý xóa tài khoản người dùng sau khi kiểm tra trạng thái đơn hàng
+    // Xử lý xóa tài khoản (LOGIC MỚI: Chỉ xóa khi chưa có đơn hàng nào)
     @GetMapping("/admin/user/delete/{id}")
     public String deleteUser(@PathVariable long id) {
         User user = userService.getUserById(id);
         if (user != null) {
             List<Order> orders = user.getOrders();
-            boolean hasActiveOrder = false;
 
-            if (orders != null) {
-                for (Order order : orders) {
-                    if ("PENDING".equals(order.getStatus()) || "SHIPPING".equals(order.getStatus())) {
-                        hasActiveOrder = true;
-                        break;
-                    }
-                }
+            // KIỂM TRA: Nếu danh sách đơn hàng tồn tại và có ít nhất 1 đơn (bất kể trạng
+            // thái)
+            if (orders != null && !orders.isEmpty()) {
+                // Trả về trang User kèm mã lỗi để hiện thông báo bên JSP
+                // (Mã 'cannot_delete_has_orders' khớp với code JSP mình gửi ở trên)
+                return "redirect:/admin/user?error=cannot_delete_has_orders";
             }
 
-            if (hasActiveOrder) {
-                return "redirect:/admin/user?error=active_order";
-            } else {
-                userService.deleteUserById(id);
-            }
+            // Nếu sạch sẽ (chưa mua gì) -> Xóa vĩnh viễn
+            userService.deleteUserById(id);
         }
         return "redirect:/admin/user";
     }

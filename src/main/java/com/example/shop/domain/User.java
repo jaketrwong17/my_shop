@@ -30,6 +30,22 @@ public class User implements Serializable {
 
     private boolean isLocked = false;
 
+    // --- CÁC TRƯỜNG MỚI THÊM VÀO ---
+
+    // Dùng cho chức năng Quên mật khẩu
+    @Column(name = "reset_password_token")
+    private String resetPasswordToken;
+
+    // Dùng cho chức năng Xác thực Email
+    @Column(name = "verification_code", length = 64)
+    private String verificationCode;
+
+    // Trạng thái kích hoạt (false: chưa xác thực email, true: đã xác thực)
+    @Column(name = "enabled")
+    private boolean enabled;
+
+    // -------------------------------
+
     @ManyToOne
     @JoinColumn(name = "role_id")
     private Role role;
@@ -106,6 +122,33 @@ public class User implements Serializable {
     public void setIsLocked(boolean isLocked) {
         this.isLocked = isLocked;
     }
+
+    // --- GETTER & SETTER CHO CÁC TRƯỜNG MỚI ---
+
+    public String getResetPasswordToken() {
+        return resetPasswordToken;
+    }
+
+    public void setResetPasswordToken(String resetPasswordToken) {
+        this.resetPasswordToken = resetPasswordToken;
+    }
+
+    public String getVerificationCode() {
+        return verificationCode;
+    }
+
+    public void setVerificationCode(String verificationCode) {
+        this.verificationCode = verificationCode;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+    // ------------------------------------------
 
     public Role getRole() {
         return role;

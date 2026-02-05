@@ -6,7 +6,7 @@
             <html lang="vi">
 
             <head>
-                <title>Thanh toán - WolfHome</title>
+                <title>Thanh toán - 16Home</title>
                 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
                 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
             </head>
@@ -175,9 +175,8 @@
                                         </div>
                                         <div class="form-check mb-4">
                                             <input class="form-check-input" type="radio" name="paymentMethod"
-                                                id="online" value="VNPAY" disabled>
-                                            <label class="form-check-label text-muted" for="online">
-                                                <i class="fas fa-credit-card me-2"></i>Thanh toán Online - Đang bảo trì
+                                                id="online" value="VNPAY"> <label class="form-check-label" for="online">
+                                                <i class="fas fa-credit-card me-2"></i>Thanh toán Online qua VNPAY
                                             </label>
                                         </div>
 

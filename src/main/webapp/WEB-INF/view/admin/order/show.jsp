@@ -221,24 +221,51 @@
 
                 <script>
                     function updateStatus(orderId, newStatus) {
-                        const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
-                        const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
-                        const formData = new FormData();
-                        formData.append('id', orderId);
-                        formData.append('status', newStatus);
+                        // 1. Lấy Token (Giá trị vé thông hành)
+                        const csrfMeta = document.querySelector('meta[name="_csrf"]');
+                        var csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : '';
 
-                        fetch('/admin/order/update-status-ajax', {
+                        // 2. ÉP CỨNG tên Header là 'X-CSRF-TOKEN' để tránh lỗi "Invalid name"
+                        // (Không lấy từ thẻ meta _csrf_header nữa vì nó đang bị rỗng)
+                        const csrfHeader = 'X-CSRF-TOKEN';
+
+                        // Kiểm tra xem có Token không
+                        if (!csrfToken) {
+                            alert("Lỗi bảo mật: Không tìm thấy CSRF Token trong trang web. Hãy thử F5 lại trang.");
+                            console.error("CSRF Token is missing!");
+                            return;
+                        }
+
+                        // 3. Chuẩn bị dữ liệu
+                        const params = new URLSearchParams();
+                        params.append('id', orderId);
+                        params.append('status', newStatus);
+
+                        // 4. Gửi Ajax
+                        // Dùng c:url để đảm bảo đường dẫn luôn đúng
+                        fetch('<c:url value="/admin/order/update-status-ajax" />', {
                             method: 'POST',
-                            headers: { [csrfHeader]: csrfToken },
-                            body: formData
-                        }).then(response => {
-                            if (response.ok) {
-
-                                window.location.reload();
-                            } else {
-                                alert("Lỗi cập nhật trạng thái!");
-                            }
-                        }).catch(error => console.error('Error:', error));
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                                [csrfHeader]: csrfToken // Key ở đây giờ chắc chắn là 'X-CSRF-TOKEN'
+                            },
+                            body: params
+                        })
+                            .then(response => {
+                                if (response.ok) {
+                                    // Thành công -> Reload trang
+                                    window.location.reload();
+                                } else {
+                                    // Thất bại -> Báo lỗi
+                                    alert("Lỗi từ Server: " + response.status);
+                                    console.error("Server Error:", response);
+                                }
+                            })
+                            .catch(error => {
+                                // Bắt lỗi kết nối hoặc lỗi JS
+                                console.error("Lỗi chi tiết:", error);
+                                alert("Lỗi thao tác: " + error.message);
+                            });
                     }
                 </script>
             </body>

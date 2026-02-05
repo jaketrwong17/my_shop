@@ -9,12 +9,18 @@ import java.util.List;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    User findByEmail(String email);
-
-    boolean existsByEmail(String email);
-
     List<User> findByRole(Role role);
 
     List<User> findByFullNameContainingIgnoreCaseOrEmailContainingIgnoreCase(String name, String email);
+
+    User findByEmail(String email);
+
+    User findByVerificationCode(String code);
+
+    User findByResetPasswordToken(String token); // Dùng cho Quên mật khẩu
+    // Dùng cho Xác thực Email
+    // -----------------------
+
+    boolean existsByEmail(String email);
 
 }
