@@ -11,7 +11,7 @@ import java.util.List;
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
-    // SỬA DÒNG NÀY: Thêm OrderByIdDesc vào đuôi
+    // 1. Lấy danh sách đơn hàng của User (giữ nguyên)
     List<Order> findByUserOrderByIdDesc(User user);
 
     @Query("SELECT o FROM Order o WHERE " +
@@ -20,8 +20,14 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             "CAST(o.id as string) LIKE %?1%")
     List<Order> searchOrders(String keyword);
 
-    // Dòng này bạn đã có sẵn, rất tốt (Dùng cho lịch sử đơn hàng theo trạng thái)
+    // 2. Lấy lịch sử đơn hàng theo trạng thái (giữ nguyên)
     List<Order> findByUserAndStatusInOrderByIdDesc(User user, List<String> status);
+
+    // === THÊM DÒNG NÀY (Hỗ trợ logic chặn khóa tài khoản) ===
+    // Tìm các đơn hàng của User mà trạng thái KHÔNG nằm trong danh sách (Ví dụ:
+    // Không phải COMPLETE hay CANCEL)
+    List<Order> findByUserAndStatusNotIn(User user, List<String> status);
+    // ========================================================
 
     @Query("SELECT SUM(o.totalPrice) FROM Order o WHERE o.status = 'COMPLETED'")
     Double calculateTotalRevenue();

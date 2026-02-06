@@ -6,6 +6,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import com.example.shop.domain.Order;
+
+import java.security.Principal;
 import java.util.List;
 
 @Controller
@@ -17,7 +19,6 @@ public class UserController {
         this.userService = userService;
     }
 
-    // Tìm kiếm và hiển thị danh sách người dùng
     @GetMapping("/admin/user")
     public String getUserPage(Model model, @RequestParam(value = "keyword", required = false) String keyword) {
         List<User> users = userService.getAllUsers();
@@ -26,31 +27,49 @@ public class UserController {
         return "admin/user/show";
     }
 
-    // Xử lý khóa hoặc mở khóa tài khoản người dùng
     @PostMapping("/admin/user/lock/{id}")
-    public String lockUser(@PathVariable long id) {
-        userService.toggleLockUser(id);
-        return "redirect:/admin/user";
+    public String lockUser(@PathVariable long id, Principal principal) {
+        try {
+            User currentUser = userService.getUserByEmail(principal.getName());
+            long currentLoginId = currentUser.getId();
+
+            userService.toggleLockUser(id, currentLoginId);
+
+            // SỬA Ở ĐÂY: Dùng không dấu
+            return "redirect:/admin/user?message=Cap nhat trang thai thanh cong";
+        } catch (RuntimeException e) {
+            if (e.getMessage().contains("chính mình")) {
+                return "redirect:/admin/user?error=self_action";
+            }
+            if (e.getMessage().contains("đơn hàng")) {
+                return "redirect:/admin/user?error=active_order";
+            }
+            return "redirect:/admin/user?error=unknown";
+        }
     }
 
-    // Xử lý xóa tài khoản (LOGIC MỚI: Chỉ xóa khi chưa có đơn hàng nào)
     @GetMapping("/admin/user/delete/{id}")
-    public String deleteUser(@PathVariable long id) {
+    public String deleteUser(@PathVariable long id, Principal principal) {
         User user = userService.getUserById(id);
         if (user != null) {
             List<Order> orders = user.getOrders();
-
-            // KIỂM TRA: Nếu danh sách đơn hàng tồn tại và có ít nhất 1 đơn (bất kể trạng
-            // thái)
             if (orders != null && !orders.isEmpty()) {
-                // Trả về trang User kèm mã lỗi để hiện thông báo bên JSP
-                // (Mã 'cannot_delete_has_orders' khớp với code JSP mình gửi ở trên)
                 return "redirect:/admin/user?error=cannot_delete_has_orders";
             }
 
-            // Nếu sạch sẽ (chưa mua gì) -> Xóa vĩnh viễn
-            userService.deleteUserById(id);
+            try {
+                User currentUser = userService.getUserByEmail(principal.getName());
+                long currentLoginId = currentUser.getId();
+
+                userService.deleteUserById(id, currentLoginId);
+
+            } catch (RuntimeException e) {
+                if (e.getMessage().contains("chính mình")) {
+                    return "redirect:/admin/user?error=self_action";
+                }
+            }
         }
-        return "redirect:/admin/user";
+        // SỬA Ở ĐÂY: Dùng không dấu
+        return "redirect:/admin/user?message=Xoa thanh cong";
     }
 }

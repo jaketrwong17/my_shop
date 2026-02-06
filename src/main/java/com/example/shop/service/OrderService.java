@@ -4,7 +4,6 @@ import com.example.shop.domain.*;
 import com.example.shop.repository.*;
 import jakarta.servlet.http.HttpSession;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -103,8 +102,9 @@ public class OrderService {
 
     // Xử lý quy trình đặt hàng: kiểm tra kho, tính tiền, trừ tồn kho và lưu đơn
     // hàng
+    // === ĐÃ SỬA: Đổi kiểu trả về từ void -> Order ===
     @Transactional(rollbackFor = Exception.class)
-    public void handlePlaceOrder(
+    public Order handlePlaceOrder(
             User user, HttpSession session,
             String receiverName, String receiverAddress, String receiverPhone, String paymentMethod,
             List<Long> cartItemIds, String voucherCode) throws Exception {
@@ -161,11 +161,16 @@ public class OrderService {
         order.setReceiverAddress(receiverAddress);
         order.setReceiverPhone(receiverPhone);
         order.setPaymentMethod(paymentMethod);
+
+        // Mặc định là PENDING, khi VNPay callback về thành công thì mới update thành
+        // PAID
         order.setStatus("PENDING");
+
         order.setTotalPrice(finalTotalPrice);
         order.setPaymentStatus(paymentMethod.equals("COD") ? "UNPAID" : "PENDING");
         order.setCreatedAt(new Date());
 
+        // Lưu đơn hàng để có ID
         order = this.orderRepository.save(order);
 
         for (CartItem item : itemsToOrder) {
@@ -191,6 +196,9 @@ public class OrderService {
         cart.setSum(newSum);
         this.cartRepository.save(cart);
         session.setAttribute("sum", newSum);
+
+        // === QUAN TRỌNG: Trả về đối tượng order để Controller lấy ID ===
+        return order;
     }
 
     // Tìm kiếm đơn hàng theo từ khóa cho Admin

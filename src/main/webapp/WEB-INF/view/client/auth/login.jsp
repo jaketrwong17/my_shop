@@ -197,8 +197,7 @@
 
                                 <div class="d-flex justify-content-between align-items-center mb-4 px-2">
                                     <div class="form-check">
-                                        <input type="checkbox" class="form-check-input" id="remember">
-                                        <label class="form-check-label small text-muted" for="remember">Ghi nhớ</label>
+
                                     </div>
                                     <a href="/forgot-password" class="small text-decoration-none fw-bold"
                                         style="color: #2A83E9;">Quên mật khẩu?</a>

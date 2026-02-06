@@ -1,6 +1,6 @@
 package com.example.shop.controller.client;
 
-import com.example.shop.config.VnPayConfig; // Import file Config VNPAY
+import com.example.shop.config.VnPayConfig;
 import com.example.shop.domain.Cart;
 import com.example.shop.domain.CartItem;
 import com.example.shop.domain.Order;

@@ -17,9 +17,8 @@
                         scroll-behavior: smooth;
                     }
 
-                    /* === 2. CĂN CHỈNH VỊ TRÍ DỪNG KHI CUỘN (OFFSET MENU) === */
+                    /* === 2. CĂN CHỈNH VỊ TRÍ DỪNG KHI CUỘN === */
                     #danh-sach-san-pham {
-                        /* Giúp tiêu đề không bị thanh menu che mất khi trượt tới */
                         scroll-margin-top: 110px;
                     }
 
@@ -84,7 +83,7 @@
                         z-index: 10;
                     }
 
-                    /* ==================== BEST SELLER & RANKING COLORS ==================== */
+                    /* ==================== BEST SELLER COLORS ==================== */
                     .best-seller-card {
                         border: 1px solid rgba(0, 0, 0, 0.08);
                         border-radius: 15px;
@@ -293,8 +292,7 @@
                                     <i class="fas fa-crown text-warning me-2"></i>SẢN PHẨM BÁN CHẠY
                                 </h4>
                                 <div class="bg-primary"
-                                    style="height: 3px; width: 45px; border-radius: 2px; margin-top: 5px;">
-                                </div>
+                                    style="height: 3px; width: 45px; border-radius: 2px; margin-top: 5px;"></div>
                             </div>
                             <div class="hot-trend-badge-new">Hot Trend <i class="fas fa-fire ms-2"></i></div>
                         </div>
@@ -347,21 +345,41 @@
                 <div class="container my-5" id="danh-sach-san-pham">
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h4 class="fw-bold mb-0" id="product-section-title">DANH SÁCH SẢN PHẨM</h4>
-                        <div class="sort-options">
-                            <c:set var="urlParams"
-                                value="${not empty param.categoryId ? '&categoryId='.concat(param.categoryId) : ''}${not empty param.search ? '&search='.concat(param.search) : ''}" />
 
-                            <a href="/?sort=price-asc${urlParams}#danh-sach-san-pham"
-                                class="btn-sort ${param.sort == 'price-asc' ? 'active' : ''}"><i
-                                    class="fas fa-sort-amount-down-alt"></i> Giá Thấp - Cao</a>
-                            <a href="/?sort=price-desc${urlParams}#danh-sach-san-pham"
-                                class="btn-sort ${param.sort == 'price-desc' ? 'active' : ''}"><i
-                                    class="fas fa-sort-amount-down"></i> Giá Cao - Thấp</a>
-                        </div>
+                        <%--=====SỬA LỖI NÚT LỌC TẠI ĐÂY=====--%>
+                            <div class="sort-options">
+                                <%-- Bước 1: Lấy categoryId từ URL hoặc Attribute --%>
+                                    <c:set var="currentCatId" value="${param.categoryId}" />
+                                    <c:if test="${empty currentCatId}">
+                                        <c:set var="currentCatId" value="${categoryId}" />
+                                    </c:if>
+
+                                    <%-- Bước 2: Tạo chuỗi tham số phụ (giữ lại category và search) --%>
+                                        <c:set var="extraParams" value="" />
+                                        <c:if test="${not empty currentCatId}">
+                                            <c:set var="extraParams"
+                                                value="${extraParams}&categoryId=${currentCatId}" />
+                                        </c:if>
+                                        <c:if test="${not empty param.search}">
+                                            <c:set var="extraParams" value="${extraParams}&search=${param.search}" />
+                                        </c:if>
+
+                                        <%-- Bước 3: Nút lọc dùng đường dẫn tương đối (?) --%>
+                                            <a href="?sort=price-asc${extraParams}#danh-sach-san-pham"
+                                                class="btn-sort ${param.sort == 'price-asc' ? 'active' : ''}">
+                                                <i class="fas fa-sort-amount-down-alt"></i> Giá Thấp - Cao
+                                            </a>
+                                            <a href="?sort=price-desc${extraParams}#danh-sach-san-pham"
+                                                class="btn-sort ${param.sort == 'price-desc' ? 'active' : ''}">
+                                                <i class="fas fa-sort-amount-down"></i> Giá Cao - Thấp
+                                            </a>
+                            </div>
+                            <%--=====KẾT THÚC SỬA LỖI=====--%>
+
                     </div>
 
                     <c:choose>
-                        <%-- TRƯỜNG HỢP 1: KHÔNG CÓ SẢN PHẨM (Hiển thị to đẹp giữa màn hình) --%>
+                        <%-- TRƯỜNG HỢP 1: KHÔNG CÓ SẢN PHẨM --%>
                             <c:when test="${empty products}">
                                 <div class="row justify-content-center">
                                     <div class="col-12 col-md-8 col-lg-6">
@@ -371,10 +389,8 @@
                                                     style="font-size: 5rem; opacity: 0.3;"></i>
                                             </div>
                                             <h5 class="text-muted fw-bold">Không tìm thấy sản phẩm nào!</h5>
-                                            <p class="text-secondary small mb-4">
-                                                Rất tiếc, chúng tôi không tìm thấy sản phẩm phù hợp với lựa chọn của
-                                                bạn.
-                                            </p>
+                                            <p class="text-secondary small mb-4">Rất tiếc, chúng tôi không tìm thấy sản
+                                                phẩm phù hợp.</p>
                                             <a href="/#danh-sach-san-pham"
                                                 class="btn btn-primary rounded-pill px-4 fw-bold">
                                                 <i class="fas fa-arrow-left me-2"></i>Xem tất cả sản phẩm
@@ -384,66 +400,117 @@
                                 </div>
                             </c:when>
 
-                            <%-- TRƯỜNG HỢP 2: CÓ SẢN PHẨM (Hiển thị lưới Grid 5 cột) --%>
+                            <%-- TRƯỜNG HỢP 2: CÓ SẢN PHẨM --%>
                                 <c:otherwise>
                                     <div id="product-list" class="row row-cols-1 row-cols-md-3 row-cols-lg-5 g-4">
-                                        <c:forEach var="p" items="${products}">
-                                            <c:if test="${p.active}">
-                                                <div class="col product-item">
-                                                    <div class="card product-card shadow-sm h-100">
-                                                        <c:if test="${p.quantity <= 0}">
-                                                            <div class="out-of-stock-label">Hết hàng</div>
-                                                        </c:if>
-                                                        <a href="/product/${p.id}"
-                                                            class="text-decoration-none h-100 d-flex flex-column">
-                                                            <div class="img-container"><img
-                                                                    src="/images/${(not empty p.images and not empty p.images[0]) ? p.images[0].imageUrl : 'default.png'}"
-                                                                    alt="${p.name}"></div>
-                                                            <div class="info-section">
-                                                                <h6 class="text-dark mb-2" style="min-height: 2.5em;">
-                                                                    ${p.name}</h6>
-                                                                <div class="mb-2 small">
-                                                                    <c:choose>
-                                                                        <c:when test="${p.reviewCount > 0}">
-                                                                            <span class="text-warning">
-                                                                                <c:forEach begin="1"
-                                                                                    end="${p.averageRating.intValue()}">
-                                                                                    <i class="fas fa-star"></i>
-                                                                                </c:forEach>
-                                                                                <span
-                                                                                    class="text-muted">(${p.reviewCount})</span>
-                                                                            </span>
-                                                                        </c:when>
-                                                                        <c:otherwise><span class="text-muted">Chưa có
-                                                                                đánh giá</span>
-                                                                        </c:otherwise>
-                                                                    </c:choose>
-                                                                </div>
-                                                                <p class="product-price mb-0">
-                                                                    <fmt:formatNumber value="${p.price}" type="currency"
-                                                                        currencySymbol="đ" />
-                                                                </p>
-                                                            </div>
-                                                        </a>
-                                                        <div class="card-footer bg-white border-0 pb-3 text-center">
+
+                                        <%-- PHẦN 1: LOOP CÁC SẢN PHẨM CÒN HÀNG (quantity> 0) TRƯỚC --%>
+                                            <c:forEach var="p" items="${products}">
+                                                <c:if test="${p.active && p.quantity > 0}">
+                                                    <div class="col product-item">
+                                                        <div class="card product-card shadow-sm h-100">
                                                             <a href="/product/${p.id}"
-                                                                class="btn btn-outline-primary w-100 rounded-pill btn-sm fw-bold">Xem
-                                                                ngay</a>
+                                                                class="text-decoration-none h-100 d-flex flex-column">
+                                                                <div class="img-container">
+                                                                    <img src="/images/${(not empty p.images and not empty p.images[0]) ? p.images[0].imageUrl : 'default.png'}"
+                                                                        alt="${p.name}">
+                                                                </div>
+                                                                <div class="info-section">
+                                                                    <h6 class="text-dark mb-2"
+                                                                        style="min-height: 2.5em;">${p.name}</h6>
+                                                                    <div class="mb-2 small">
+                                                                        <c:choose>
+                                                                            <c:when test="${p.reviewCount > 0}">
+                                                                                <span class="text-warning">
+                                                                                    <c:forEach begin="1"
+                                                                                        end="${p.averageRating.intValue()}">
+                                                                                        <i class="fas fa-star"></i>
+                                                                                    </c:forEach>
+                                                                                    <span
+                                                                                        class="text-muted">(${p.reviewCount})</span>
+                                                                                </span>
+                                                                            </c:when>
+                                                                            <c:otherwise><span class="text-muted">Chưa
+                                                                                    có đánh giá</span></c:otherwise>
+                                                                        </c:choose>
+                                                                    </div>
+                                                                    <p class="product-price mb-0">
+                                                                        <fmt:formatNumber value="${p.price}"
+                                                                            type="currency" currencySymbol="đ" />
+                                                                    </p>
+                                                                </div>
+                                                            </a>
+                                                            <div class="card-footer bg-white border-0 pb-3 text-center">
+                                                                <a href="/product/${p.id}"
+                                                                    class="btn btn-outline-primary w-100 rounded-pill btn-sm fw-bold">Xem
+                                                                    ngay</a>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            </c:if>
-                                        </c:forEach>
+                                                </c:if>
+                                            </c:forEach>
+
+                                            <%-- PHẦN 2: LOOP CÁC SẢN PHẨM HẾT HÀNG (quantity <=0) SAU --%>
+                                                <c:forEach var="p" items="${products}">
+                                                    <c:if test="${p.active && p.quantity <= 0}">
+                                                        <div class="col product-item">
+                                                            <div class="card product-card shadow-sm h-100">
+                                                                <div class="out-of-stock-label">Hết hàng</div>
+                                                                <a href="/product/${p.id}"
+                                                                    class="text-decoration-none h-100 d-flex flex-column">
+                                                                    <div class="img-container">
+                                                                        <img src="/images/${(not empty p.images and not empty p.images[0]) ? p.images[0].imageUrl : 'default.png'}"
+                                                                            alt="${p.name}">
+                                                                    </div>
+                                                                    <div class="info-section">
+                                                                        <h6 class="text-dark mb-2"
+                                                                            style="min-height: 2.5em;">${p.name}</h6>
+                                                                        <div class="mb-2 small">
+                                                                            <c:choose>
+                                                                                <c:when test="${p.reviewCount > 0}">
+                                                                                    <span class="text-warning">
+                                                                                        <c:forEach begin="1"
+                                                                                            end="${p.averageRating.intValue()}">
+                                                                                            <i class="fas fa-star"></i>
+                                                                                        </c:forEach>
+                                                                                        <span
+                                                                                            class="text-muted">(${p.reviewCount})</span>
+                                                                                    </span>
+                                                                                </c:when>
+                                                                                <c:otherwise><span
+                                                                                        class="text-muted">Chưa có đánh
+                                                                                        giá</span></c:otherwise>
+                                                                            </c:choose>
+                                                                        </div>
+                                                                        <p class="product-price mb-0">
+                                                                            <fmt:formatNumber value="${p.price}"
+                                                                                type="currency" currencySymbol="đ" />
+                                                                        </p>
+                                                                    </div>
+                                                                </a>
+                                                                <div
+                                                                    class="card-footer bg-white border-0 pb-3 text-center">
+                                                                    <a href="/product/${p.id}"
+                                                                        class="btn btn-outline-primary w-100 rounded-pill btn-sm fw-bold">Xem
+                                                                        ngay</a>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </c:if>
+                                                </c:forEach>
+
                                     </div>
 
                                     <div class="text-center mt-5 mb-4 d-flex gap-2 justify-content-center">
                                         <button id="loadMoreBtn" class="btn btn-primary px-5 py-2 rounded-pill fw-bold"
-                                            style="display:none; background:#e3f2fd; color:#2A83E9; border:none;">XEM
-                                            THÊM <i class="fas fa-chevron-down ms-2"></i></button>
+                                            style="display:none; background:#e3f2fd; color:#2A83E9; border:none;">
+                                            XEM THÊM <i class="fas fa-chevron-down ms-2"></i>
+                                        </button>
                                         <button id="collapseBtn"
                                             class="btn btn-outline-secondary px-5 py-2 rounded-pill fw-bold"
-                                            style="display:none;">THU GỌN <i
-                                                class="fas fa-chevron-up ms-2"></i></button>
+                                            style="display:none;">
+                                            THU GỌN <i class="fas fa-chevron-up ms-2"></i>
+                                        </button>
                                     </div>
                                 </c:otherwise>
                     </c:choose>
@@ -453,33 +520,54 @@
 
                 <script>
                     document.addEventListener("DOMContentLoaded", function () {
-                        // Slider Best Seller
+                        // --- 1. CẤU HÌNH SỐ LƯỢNG SẢN PHẨM HIỂN THỊ MẶC ĐỊNH LÀ 15 ---
+                        const ITEMS_PER_PAGE = 15;
+
+                        // Slider Best Seller (Giữ nguyên)
                         const container = document.getElementById('categoryList');
                         if (container) {
                             document.getElementById('slideLeft').onclick = () => container.scrollBy({ left: -400, behavior: 'smooth' });
                             document.getElementById('slideRight').onclick = () => container.scrollBy({ left: 400, behavior: 'smooth' });
                         }
 
-                        // Logic Xem Thêm / Thu Gọn
+                        // --- 2. Logic Xem Thêm / Thu Gọn ---
                         const productItems = document.querySelectorAll('.product-item');
                         const loadMoreBtn = document.getElementById('loadMoreBtn');
                         const collapseBtn = document.getElementById('collapseBtn');
 
-                        if (loadMoreBtn && productItems.length > 20) {
-                            loadMoreBtn.style.display = 'inline-block';
-                            for (let i = 20; i < productItems.length; i++) productItems[i].classList.add('d-none-custom');
+                        // Log ra console để kiểm tra
+                        console.log("Tổng số sản phẩm tìm thấy:", productItems.length);
 
+                        // Chỉ hiện nút nếu số sản phẩm thực tế lớn hơn 15
+                        if (loadMoreBtn && productItems.length > ITEMS_PER_PAGE) {
+
+                            // 1. Hiện nút Xem thêm
+                            loadMoreBtn.style.display = 'inline-block';
+
+                            // 2. Ẩn các sản phẩm từ vị trí thứ 15 trở đi (index bắt đầu từ 0 nên là từ index 15)
+                            for (let i = ITEMS_PER_PAGE; i < productItems.length; i++) {
+                                productItems[i].classList.add('d-none-custom');
+                            }
+
+                            // 3. Sự kiện nút Xem Thêm
                             loadMoreBtn.onclick = function () {
-                                productItems.forEach(item => item.classList.remove('d-none-custom'));
-                                this.style.display = 'none';
-                                collapseBtn.style.display = 'inline-block';
+                                productItems.forEach(item => item.classList.remove('d-none-custom')); // Hiện tất cả
+                                this.style.display = 'none'; // Ẩn nút xem thêm
+                                collapseBtn.style.display = 'inline-block'; // Hiện nút thu gọn
                             };
 
+                            // 4. Sự kiện nút Thu Gọn
                             collapseBtn.onclick = function () {
-                                for (let i = 20; i < productItems.length; i++) productItems[i].classList.add('d-none-custom');
-                                this.style.display = 'none';
-                                loadMoreBtn.style.display = 'inline-block';
-                                document.getElementById('product-section-title').scrollIntoView({ behavior: 'smooth' });
+                                // Ẩn lại các sản phẩm từ vị trí 15 trở đi
+                                for (let i = ITEMS_PER_PAGE; i < productItems.length; i++) {
+                                    productItems[i].classList.add('d-none-custom');
+                                }
+                                this.style.display = 'none'; // Ẩn nút thu gọn
+                                loadMoreBtn.style.display = 'inline-block'; // Hiện nút xem thêm
+
+                                // Cuộn trang lên lại tiêu đề
+                                const title = document.getElementById('product-section-title');
+                                if (title) title.scrollIntoView({ behavior: 'smooth' });
                             };
                         }
                     });

@@ -19,11 +19,15 @@
                     <div class="container-fluid px-4 py-4">
 
                         <c:if test="${not empty param.error}">
-                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
                                 <i class="fas fa-exclamation-triangle me-2"></i>
                                 <c:choose>
+                                    <c:when test="${param.error == 'self_action'}">
+                                        <strong>Không thể thực hiện!</strong> Bạn không thể tự khóa hoặc xóa tài khoản
+                                        của chính mình.
+                                    </c:when>
                                     <c:when test="${param.error == 'active_order'}">
-                                        <strong>Không thể xóa!</strong> Người dùng này đang có đơn hàng chưa hoàn tất.
+                                        <strong>Không thể khóa!</strong> Người dùng này đang có đơn hàng chưa hoàn tất.
                                         Vui lòng xử lý đơn hàng trước.
                                     </c:when>
                                     <c:when test="${param.error == 'cannot_delete_has_orders'}">
@@ -31,9 +35,17 @@
                                         chọn <b>Khóa tài khoản</b> thay vì xóa để bảo toàn dữ liệu.
                                     </c:when>
                                     <c:otherwise>
-                                        Đã xảy ra lỗi trong quá trình xử lý yêu cầu.
+                                        Đã xảy ra lỗi trong quá trình xử lý yêu cầu: ${param.error}
                                     </c:otherwise>
                                 </c:choose>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                    aria-label="Close"></button>
+                            </div>
+                        </c:if>
+
+                        <c:if test="${not empty param.message}">
+                            <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+                                <i class="fas fa-check-circle me-2"></i> ${param.message}
                                 <button type="button" class="btn-close" data-bs-dismiss="alert"
                                     aria-label="Close"></button>
                             </div>

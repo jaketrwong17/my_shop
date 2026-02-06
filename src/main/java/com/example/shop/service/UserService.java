@@ -1,8 +1,10 @@
 package com.example.shop.service;
 
+import com.example.shop.domain.Order;
 import com.example.shop.domain.Role;
 import com.example.shop.domain.User;
 import com.example.shop.domain.dto.RegisterDTO;
+import com.example.shop.repository.OrderRepository;
 import com.example.shop.repository.RoleRepository;
 import com.example.shop.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,14 +24,16 @@ public class UserService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final JavaMailSender mailSender; // 1. Thêm JavaMailSender
+    private final OrderRepository orderRepository;
 
     // Cập nhật Constructor để Inject JavaMailSender
     public UserService(UserRepository userRepository, RoleRepository roleRepository,
-            PasswordEncoder passwordEncoder, JavaMailSender mailSender) {
+            PasswordEncoder passwordEncoder, JavaMailSender mailSender, OrderRepository orderRepository) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
         this.mailSender = mailSender;
+        this.orderRepository = orderRepository;
     }
 
     // Lưu thông tin người dùng vào cơ sở dữ liệu
@@ -165,16 +169,41 @@ public class UserService {
     }
 
     // Đảo trạng thái khóa/mở khóa tài khoản người dùng
-    public void toggleLockUser(long id) {
+    // Trong UserService.java
+    // --- Trong file UserService.java ---
+
+    // 1. Sửa lại hàm toggleLockUser (Nhận thêm currentLoginId)
+    public void toggleLockUser(long id, long currentLoginId) {
+        // Check chặn tự khóa
+        if (id == currentLoginId) {
+            throw new RuntimeException("Bạn không thể tự khóa tài khoản của chính mình!");
+        }
+
         User user = this.getUserById(id);
         if (user != null) {
+            // Check chặn nếu còn đơn hàng (Nhớ là bạn đã thêm OrderRepository vào
+            // UserService rồi nhé)
+            // Nếu chưa thêm OrderRepository thì tạm thời bỏ qua đoạn check đơn hàng này
+            /*
+             * List<Order> runningOrders = orderRepository.findByUserAndStatusNotIn(user,
+             * List.of("COMPLETE", "CANCEL"));
+             * if (!runningOrders.isEmpty()) {
+             * throw new RuntimeException("Tài khoản này còn đơn hàng chưa hoàn thành!");
+             * }
+             */
+
             user.setIsLocked(!user.getIsLocked());
             this.userRepository.save(user);
         }
     }
 
-    // Xóa người dùng và gỡ bỏ liên kết với giỏ hàng
-    public void deleteUserById(long id) {
+    // 2. Sửa lại hàm deleteUserById (Nhận thêm currentLoginId)
+    public void deleteUserById(long id, long currentLoginId) {
+        // Check chặn tự xóa
+        if (id == currentLoginId) {
+            throw new RuntimeException("Bạn không thể tự xóa tài khoản của chính mình!");
+        }
+
         User user = this.getUserById(id);
         if (user != null) {
             if (user.getCart() != null) {
