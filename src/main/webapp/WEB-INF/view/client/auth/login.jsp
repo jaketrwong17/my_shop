@@ -153,7 +153,7 @@
                                 <p class="text-muted small">Chào mừng bạn quay trở lại!</p>
                             </div>
 
-                            <c:if test="${not empty param.error}">
+                            <c:if test="${param.error != null}">
                                 <div class="alert alert-danger alert-custom text-center mb-3">
                                     <i class="fas fa-exclamation-triangle me-1"></i>
 
@@ -177,7 +177,7 @@
                                     </c:choose>
                                 </div>
                             </c:if>
-                            <c:if test="${not empty param.logout}">
+                            <c:if test="${param.logout != null}">
                                 <div class="alert alert-success alert-custom text-center mb-3">
                                     <i class="fas fa-check-circle me-1"></i> Đã đăng xuất thành công.
                                 </div>
